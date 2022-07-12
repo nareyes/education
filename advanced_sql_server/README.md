@@ -2,12 +2,12 @@
 https://www.udemy.com/course/advanced-sql-server-masterclass-for-data-analysis/
 
 ## Contents
-01. Adventure Works Database
-02. Window Functions
-03. Subqueries
-04. Common Table Expressions (CTEs)
-05. Temp Tables
-06. Optimization
-07. SQL Programming
+1. Adventure Works Database
+2. Window Functions
+3. Subqueries
+4. Common Table Expressions (CTEs)
+5. Temp Tables
+6. Optimization
+7. SQL Programming
 
 *All notes taken in Obsidian*
