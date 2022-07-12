@@ -1,5 +1,6 @@
 # Advanced SQL Server Course Notes
 [Udemy](https://www.udemy.com/course/advanced-sql-server-masterclass-for-data-analysis/)
+
 [Database](https://docs.microsoft.com/en-us/sql/samples/adventureworks-install-configure?view=sql-server-ver16&tabs=ssms)
 
 ## Contents
