@@ -1,7 +1,7 @@
 # T-SQL Fundamentals by Itzik Ben-Gan
 
 ## Contents
-1. Background to T-sQL Querying and Programming
+1. Background to T-SQL Querying and Programming
 2. Single-Table Queries
 3. Joins
 4. Subqueries
