@@ -10,5 +10,3 @@
 4. Temp Tables
 5. Optimization
 6. SQL Programming
-
-*All notes taken in Obsidian*
