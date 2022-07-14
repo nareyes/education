@@ -15,4 +15,4 @@
 12. Missing Values
 12. Duplicate Values
 13. Charts & Plots
-14. Exploring Data
+14. Exporting Data
