@@ -12,3 +12,7 @@
 9. Joining & Merging DataFrames
 10. Aggregating w/ Groupby
 11. Pivoting DataFrames
+12. Missing Values
+12. Duplicate Values
+13. Charts & Plots
+14. Exploring Data
