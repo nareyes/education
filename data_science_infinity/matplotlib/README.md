@@ -8,3 +8,6 @@
 4. Subplots
 5. Histogram Plots
 6. Scatter Plots
+7. Highlighting Data
+8. Adding Text
+9. Saving Plots
