@@ -1,4 +1,4 @@
-# Data Science Infinity - Fundametal Pandas
+# Data Science Infinity - Pandas
 
 ## Contents
 1. Creating DataFrames
