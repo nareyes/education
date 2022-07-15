@@ -7,8 +7,8 @@
 4. Pandas
 5. Matplotlib
 
+<br>
 
-### SQL Reference:
-fundamental_sql_server [repo](https://github.com/nareyes/education/tree/main/fundamental_sql_server)
-
-advanced_sql_server [repo](https://github.com/nareyes/education/tree/main/advanced_sql_server)
+## SQL Reference:
+- fundamental_sql_server [repo](https://github.com/nareyes/education/tree/main/fundamental_sql_server)
+- advanced_sql_server [repo](https://github.com/nareyes/education/tree/main/advanced_sql_server)
