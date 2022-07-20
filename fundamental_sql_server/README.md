@@ -2,7 +2,7 @@
 
 ## Contents
 1. Background to T-SQL Querying and Programming
-2. Single-Table Queries
+2. [Single-Table Queries](https://github.com/nareyes/education/blob/main/fundamental_sql_server/single_table_queries.ipynb)
 3. Joins
 4. Subqueries
 5. Table Expressions
