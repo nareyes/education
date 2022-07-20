@@ -10,5 +10,5 @@
 
 <br>
 
-Additional SQL Reference: [advanced_sql_server](https://github.com/nareyes/education/tree/main/advanced_sql_server)
-Additional Statistics Reference: (Link to Think Bayes Notes)
+- Additional SQL Reference: [advanced_sql_server](https://github.com/nareyes/education/tree/main/advanced_sql_server)
+- Additional Statistics Reference: (Link to Think Bayes Notes)
