@@ -6,6 +6,7 @@
 3. Numpy
 4. [Pandas](https://github.com/nareyes/education/tree/main/data_science_infinity/pandas)
 5. [Matplotlib](https://github.com/nareyes/education/tree/main/data_science_infinity/matplotlib)
+6. Statistics (Link to Think Bayes Notes)
 
 <br>
 
