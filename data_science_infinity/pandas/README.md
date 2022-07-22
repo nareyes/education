@@ -9,7 +9,7 @@
 5. [Map, Replace, Apply](https://github.com/nareyes/education/blob/main/data_science_infinity/pandas/map_replace_apply.ipynb)
 6. [Sorting & Ranking](https://github.com/nareyes/education/blob/main/data_science_infinity/pandas/sorting_ranking.ipynb)
 7. [Selecting Rows & Columns](https://github.com/nareyes/education/blob/main/data_science_infinity/pandas/selecting_rows_columns.ipynb)
-8. [Renaming COlumns](https://github.com/nareyes/education/blob/main/data_science_infinity/pandas/renaming_columns.ipynb)
+8. [Renaming Columns](https://github.com/nareyes/education/blob/main/data_science_infinity/pandas/renaming_columns.ipynb)
 9. [Joining & Merging DataFrames](https://github.com/nareyes/education/blob/main/data_science_infinity/pandas/joining_merging_dataframes.ipynb)
 10. [Aggregating w/ Groupby](https://github.com/nareyes/education/blob/main/data_science_infinity/pandas/aggregating_groupby.ipynb)
 11. [Pivoting DataFrames](https://github.com/nareyes/education/blob/main/data_science_infinity/pandas/pivoting_dataframe.ipynb)
