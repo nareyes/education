@@ -7,6 +7,7 @@
 4. [Pandas](https://github.com/nareyes/education/tree/main/data_science_infinity/pandas)
 5. [Matplotlib](https://github.com/nareyes/education/tree/main/data_science_infinity/matplotlib)
 6. Statistics (Link to Statistics Unplugged Notes)
+7. [A/B Testing](https://github.com/nareyes/education/tree/main/data_science_infinity/ab_testing)
 
 <br>
 
