@@ -9,4 +9,4 @@
 3. [Common Table Expressions (CTEs)](https://github.com/nareyes/education/blob/main/advanced_sql_server/common_table_expressions.ipynb)
 4. [Temp Tables](https://github.com/nareyes/education/blob/main/advanced_sql_server/temp_tables.ipynb)
 5. [Optimization](https://github.com/nareyes/education/blob/main/advanced_sql_server/optimization.ipynb)
-6. SQL Programming
+6. [SQL Programming](https://github.com/nareyes/education/blob/main/advanced_sql_server/programming.ipynb)
