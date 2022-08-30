@@ -15,5 +15,5 @@
 
 ## Additional References
 - Pandas: [Data Analysis with Pandas]()
-- Fundamental SQL: [Fundamental SQL Server]()
+- Fundamental SQL: [Fundamental SQL Server](https://github.com/nareyes/education/tree/main/fundamental_sql_server)
 - Advanced SQL: [Advanced SQL Server]()
