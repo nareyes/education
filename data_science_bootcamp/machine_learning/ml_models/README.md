@@ -7,3 +7,4 @@
 4. Basic Decision Tree
 5. Advanced Decision Tree
 6. Basic Random Forest
+7. Advanced Random Forest
