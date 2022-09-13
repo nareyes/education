@@ -8,7 +8,7 @@
 - DataFrames: Data Filtering
 - DataFrames: Data Extraction
 - Working with Text Data
-- Multi-Index
+- Multi-Index & Reorienting Data
 - Group By
 - DataFrames: Merging, Joining, and Concatenating
 - Dates and Times
