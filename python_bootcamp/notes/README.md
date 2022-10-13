@@ -1,4 +1,4 @@
-# 100 Days of Code Course Notes
+# Python Bootcamp Notes
 
 ## Contents
-1. Working w/ Variables
+- 

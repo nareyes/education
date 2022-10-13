@@ -1,5 +1,5 @@
-# 100 Days of Code
-[Udemy](https://www.udemy.com/course/100-days-of-code/)
+# Python Bootcamp
+[Udemy](https://www.udemy.com/course/complete-python-developer-zero-to-mastery/)
 
 ## Contents
 - Notes
