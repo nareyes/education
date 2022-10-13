@@ -1,4 +1,0 @@
-# Python Bootcamp Notes
-
-## Contents
-- 
