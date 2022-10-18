@@ -12,3 +12,8 @@
 - Loading From AWS
 - Loading From Azure
 - Showpipe
+- Time Travel
+- Table Types
+- Zero Copy Cloning
+- Data Sharing
+- Data Sampling
