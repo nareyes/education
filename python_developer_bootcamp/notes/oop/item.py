@@ -1,8 +1,10 @@
 import csv
 
+
 class Item:
     pay_rate = 0.8
     all = []
+
     def __init__(self, name: str, price: float, quantity=0):
         assert price >= 0, f"Price {price} is not greater than or equal to zero."
         assert quantity >= 0, f"Quantity {quantity} is not greater or equal to zero."
@@ -13,19 +15,24 @@ class Item:
 
         Item.all.append(self)
 
+
     @property
     def price(self):
         return self.__price
 
+
     def apply_discount(self):
         self.__price = self.__price * self.pay_rate
+
 
     def apply_increment(self, increment_value):
         self.__price = self.__price + self.__price * increment_value
 
+
     @property
     def name(self):
         return self.__name
+
 
     @name.setter
     def name(self, value):
@@ -34,8 +41,10 @@ class Item:
         else:
             self.__name = value
 
+
     def calculate_total_price(self):
         return self.__price * self.quantity
+
 
     @classmethod
     def instantiate_from_csv(cls):
@@ -50,6 +59,7 @@ class Item:
                 quantity=int(item.get('quantity')),
             )
 
+
     @staticmethod
     def is_integer(num):
         if isinstance(num, float):
@@ -59,17 +69,22 @@ class Item:
         else:
             return False
 
+
     def __repr__(self):
         return f"{self.__class__.__name__}('{self.name}', {self.__price}, {self.quantity})"
     
+
     def __connect(self, smtp_server):
         pass
+
 
     def __prepare_body(self):
         pass
     
+
     def __send(self):
         pass
+
 
     def send_email(self):
         self.__connect()

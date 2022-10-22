@@ -1,5 +1,6 @@
 from item import Item
 
+
 class Keyboard(Item):
     pay_rate = 0.7
     

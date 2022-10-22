@@ -1,5 +1,6 @@
 from item import Item
 
+
 class Phone(Item):
     pay_rate = 0.5
     
