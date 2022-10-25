@@ -17,3 +17,8 @@
 - Zero Copy Cloning
 - Data Sharing
 - Data Sampling
+- Scheduling Tasks
+- Streams
+- Materialized Views
+- Dynamic Data masking
+- Access Management
