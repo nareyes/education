@@ -39,7 +39,7 @@ class Flight:
             passenger: The passenger name.
         
         Raises:
-            ValueErrorL If the seat is unavailable.
+            ValueError: If the seat is unavailable.
         """
         row, letter = self._parse_seat(seat)
         
