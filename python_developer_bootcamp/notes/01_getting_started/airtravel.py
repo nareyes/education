@@ -11,7 +11,7 @@ class Flight:
         if not flight_number[:2].isalpha():
             raise ValueError(f"No Airline Code in '{flight_number}'")
         
-        if not flight_number[:2].issupper():
+        if not flight_number[:2].isupper():
             raise ValueError(f"Invalid Airline Code '{flight_number}'")
         
         if not (flight_number[2:].isdigit() and int(flight_number[2:]) <= 9999):
@@ -93,7 +93,7 @@ class Flight:
     
     def make_boarding_cards(self, card_printer):
         for passenger, seat in sorted(self._passenger_seats()):
-            card_printer(passenger, seat, self.number(), self.aircraft_model())
+            card_printer(passenger, seat, self.flight_number(), self.aircraft_model())
     
     def _passenger_seats(self):
         """An iterable series of passenger seating locations."""
