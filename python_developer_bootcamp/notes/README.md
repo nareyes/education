@@ -3,4 +3,4 @@
 - Instructor: Austin Bingham & Robert Smallshire
 
 ## Contents
-- Getting Started
+- Fundamentals
