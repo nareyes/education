@@ -22,4 +22,5 @@ With ehClient:
   ehClient.receive(
     on_event=on_event, 
     starting_position="-1",  # To start from the beginning of the partition. 
+    # partition_id = '0' # specifies a single partition to read from
  )
