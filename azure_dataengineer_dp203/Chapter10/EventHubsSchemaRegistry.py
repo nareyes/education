@@ -30,5 +30,23 @@ With schema_registry_client:
     "Avro"
   )
   
-  # Get the schema id
-  schema_id = schema_properties.id
+# Get the schema id
+schema_id = schema_properties.id
+
+
+# RETRIEVE A SCHEMA FROM SCHEMA REGISTRY
+from azure.schemaregistry import SchemaRegistryClient 
+from azure.identity import DefaultAzureCredential
+
+# Create schema registry client
+azureCredential = DefaultAzureCredential()
+schema_registry_client = SchemaRegistryClient( 
+  fully_qualified_namespace=<SCHEMA-NAMESPACE>.servicebus.windows.net, 
+  credential=azureCredential
+)
+
+# Retireve schema
+With schema_registry_client: 
+  schema = schema_registry_client.get_schema(schema_id) 
+  definition = schema.definition
+  properties = schema.properties
