@@ -1,8 +1,8 @@
 # todo list cli application
 user_prompt = "Enter a Todo: "
-todo_1 = input(user_prompt)
-todo_2 = input(user_prompt)
-todo_3 = input(user_prompt)
+todos = []
 
-todos = [todo_1, todo_2, todo_3]
-print(todos)
+while True:
+    todo = input(user_prompt).title()
+    todos.append(todo)
+    print(todos)
