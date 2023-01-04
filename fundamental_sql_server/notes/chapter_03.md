@@ -11,7 +11,7 @@
 - Assigning table aliases is a best practice
 	- Assigning an alias to the source table requires column names from that table to be prefixed with the same alias
 
-![SQL Joins](https://github.com/nareyes/education/tree/main/fundamental_sql_server/notes\images\SQL_Joins.png)
+![SQL Joins](https://github.com/nareyes/education/blob/main/fundamental_sql_server/notes/images/SQL_Joins.png)
 
 ##### CROSS JOIN
 - Implements one logical query processing phase - a Cartesian product
