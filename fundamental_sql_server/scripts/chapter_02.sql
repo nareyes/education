@@ -1,5 +1,5 @@
 -------------------------------------
--- Chapter 1: Single Table Queries --
+-- Chapter 2: Single Table Queries --
 -------------------------------------
 
 -- The FROM Clause

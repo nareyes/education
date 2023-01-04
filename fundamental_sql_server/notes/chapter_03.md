@@ -4,14 +4,14 @@
 - Within the FROM clause, table operators operate on input tables
 	- JOIN, APPLY, PIVOT, UNPIVOT (This chapter covers JOIN)
 - Each table operator acts on input tables, applies a set of logical processing phases, and returns a table result
-- JOIN operates on two input tables and has three fundamental types
+- JOIN operates on two or more input tables and has three fundamental types
 	- CROSS JOIN
 	- INNER JOIN
 	- LEFT/RIGHT OUTER JOIN
 - Assigning table aliases is a best practice
 	- Assigning an alias to the source table requires column names from that table to be prefixed with the same alias
 
-![[SQL Joins.png]]
+![SQL Joins](https://github.com/nareyes/education/tree/main/fundamental_sql_server/notes\images\SQL_Joins.png)
 
 ##### CROSS JOIN
 - Implements one logical query processing phase - a Cartesian product
@@ -27,9 +27,9 @@ FROM Sales.Customers AS C
 ```
 
 ##### INNER JOIN
-- Implements two logical query processing phases - a Cartesian product, a filter based on  a specified predicate (join condition)
+- Implements two logical query processing phases - a Cartesian product, a filter based on a specified predicate (join condition)
 	- The join condition is an ON statement and specifies which columns to match
-- The INNER keyword is options because inner joins are default, but it is a best practice to include it
+- The INNER keyword is optional because inner joins are default, but it is a best practice to be explicit
 - The result set is a table that matches each record from Table A with all related records from Table B (that have a matching join condition)
 	- Any record from Table A without a related record in Table B is discarded
 
@@ -52,7 +52,7 @@ FROM HR.Employees AS E
 
 ``` SQL
 SELECT
-    c.custid,
+    C.custid,
     C.companyname,
     O.orderid,
     OD.productid,
@@ -84,16 +84,25 @@ SELECT
     C.custid,
     C.companyname,
     O.orderid
-FROM Sales.Customers AS C
-    LEFT OUTER JOIN Sales.Orders AS O
-        ON C.custid = O.custid; -- Customers that have not placed an order will be in the result table with NULLs for orderid
+FROM Sales.Customers AS C 
+    LEFT OUTER JOIN Sales.Orders AS O -- Customers that have not placed an order will be in the result table with NULLs for orderid
+        ON C.custid = O.custid;
 
 SELECT
     C.custid,
     C.companyname,
     O.orderid
-FROM Sales.Customers AS C
-    LEFT OUTER JOIN Sales.Orders AS O
+FROM Sales.Customers AS C 
+    LEFT OUTER JOIN Sales.Orders AS O -- Returns inner rows only. Customers with a matching order id.
         ON C.custid = O.custid
-WHERE O.orderid IS NULL; -- Returns outer rows only. Customers without a matching order.
+WHERE O.orderid IS NOT NULL;
+
+SELECT
+    C.custid,
+    C.companyname,
+    O.orderid
+FROM Sales.Customers AS C 
+    LEFT OUTER JOIN Sales.Orders AS O -- Returns outer rows only. Customers without a matching order id.
+        ON C.custid = O.custid
+WHERE O.orderid IS NULL;
 ```
