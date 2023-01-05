@@ -1,4 +1,5 @@
 # todo list cli application
+# python version 3.11.1
 
 # variables
 user_input_action = "Type Add, Show, Edit, or Exit: "
