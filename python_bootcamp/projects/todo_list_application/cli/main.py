@@ -7,20 +7,33 @@ user_input_todo = "Enter a Todo: "
 user_input_position = "Enter a Valid Todo Number to Edit: "
 user_input_new = "Enter New Item: "
 user_input_complete = "Enter a Valid Todo Number to Complete: "
-todos = []
+# todos = []
 
 
 # functions
-def add_todo():
-    todo = input(user_input_todo).strip().title()
-    todos.append(todo)
+def add_todos():
+    todo = input(user_input_todo).strip().title() + '\n'
 
-def display_todos():
+    file = open('todos.txt', 'r')
+    todos = file.readlines()
+    file.close()
+
+    todos.append(todo) 
+
+    file = open('todos.txt', 'w')
+    file.writelines(todos)
+    file.close()
+
+def show_todos():
+    file = open('todos.txt', 'r')
+    todos = file.readlines()
+    file.close()
+    
     for index, item in enumerate(todos):
         output = f"{index + 1}: {item}"
         print(output)
 
-def replace_todo():
+def edit_todos():
     position = int(input(user_input_position).strip())
             
     if position >= 1 and position <= len(todos):
@@ -54,17 +67,17 @@ while True:
     match user_action:
 
         case 'add':
-            add_todo()
+            add_todos()
 
         case 'show':
-            display_todos()
+            show_todos()
 
         case 'edit':
-            display_todos()
-            replace_todo()
+            show_todos()
+            edit_todos()
 
         case 'complete':
-            display_todos()
+            show_todos()
             complete_todo()
 
         case 'exit':
