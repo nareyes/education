@@ -6,7 +6,6 @@ user_input_new = "Enter New Item: "
 user_input_complete = "Enter a Valid Todo Number to Complete: "
 todos = []
 
-
 class TodoList:
     def __init__(self):
         self.todos = []

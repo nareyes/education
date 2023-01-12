@@ -7,7 +7,7 @@ user_input_todo = "Enter a Todo: "
 user_input_position = "Enter a Valid Todo Number to Edit: "
 user_input_new = "Enter New Item: "
 user_input_complete = "Enter a Valid Todo Number to Complete: "
-# todos = []
+todos = []
 
 
 # functions
@@ -30,6 +30,7 @@ def show_todos():
     file.close()
     
     for index, item in enumerate(todos):
+        item = item.strip('\n')
         output = f"{index + 1}: {item}"
         print(output)
 
