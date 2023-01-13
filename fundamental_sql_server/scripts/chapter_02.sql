@@ -52,18 +52,14 @@ SELECT
                                                                                                 -- WHERE orderid IS NULL;
 FROM Sales.Orders
 WHERE custid = 71
-GROUP BY
-    empid
-    , YEAR (orderdate);
+GROUP BY empid, YEAR (orderdate);
 
 SELECT
     empid
     , YEAR (orderdate) AS orderyear
     , COUNT (DISTINCT custid) AS numcusts -- distinct customers handled by each employee
 FROM Sales.Orders
-GROUP BY
-    empid
-    , YEAR (orderdate);
+GROUP BY empid, YEAR (orderdate);
 
 
 -- The HAVING Clause
@@ -73,9 +69,7 @@ SELECT
     , COUNT (*) as numorders
 FROM Sales.Orders
 WHERE custid = 71
-GROUP BY
-    empid
-    , YEAR (orderdate)
+GROUP BY empid, YEAR (orderdate)
 HAVING COUNT (*) > 1; -- filters groups with more than one record (order)
 
 
@@ -100,13 +94,9 @@ SELECT
     , COUNT (*) AS numorders 
 FROM Sales.Orders 
 WHERE custid = 71 
-GROUP BY
-    empid
-    , YEAR (orderdate) 
+GROUP BY empid, YEAR (orderdate) 
 HAVING COUNT (*) > 1 
-ORDER BY
-    empid ASC -- ASC is the default, be explicit
-    , orderyear DESC;
+ORDER BY empid ASC, orderyear DESC; -- ASC is the default, be explicit
 -- ORDER BY can reference columns not in the SELECT clause, unless DISTINCT is used
 
 
