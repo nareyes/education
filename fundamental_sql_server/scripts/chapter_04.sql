@@ -1,6 +1,7 @@
--------------------------------------
-------  Chapter 4: Subqueries  ------
--------------------------------------
+-----------------------------
+--  Chapter 4: Subqueries  --
+-----------------------------
+USE tsql_fundamentals;
 
 -- Using a variable (less efficient)
 DECLARE @maxid AS INT = (SELECT MAX(orderid) FROM Sales.Orders);

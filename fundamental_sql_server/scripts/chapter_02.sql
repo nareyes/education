@@ -1,74 +1,113 @@
 -------------------------------------
 -- Chapter 2: Single Table Queries --
 -------------------------------------
+USE tsql_fundamentals;
+
+-- Syntax Order of a SQL Query
+SELECT empid, YEAR (orderdate) AS orderyear, COUNT (*) as numorder
+FROM Sales.Orders
+WHERE custid = 71
+GROUP BY empid, YEAR (orderdate)
+HAVING COUNT (*) > 1
+ORDER BY empid, orderyear
+
+-- Processing Order of a SQL Query
+    -- FROM Sales.Orders
+    -- WHERE custid = 71
+    -- GROUP BY empid, YEAR (orderdate)
+    -- HAVING COUNT (*) > 1
+    -- SELECT empid, YEAR (orderdate) AS orderyear, COUNT (*) as numorder
+    -- ORDER BY empid, orderyear
+
 
 -- The FROM Clause
 SELECT
-    orderid, 
-    custid, 
-    empid, 
-    orderdate, 
-    freight
+    orderid
+    , custid
+    , empid
+    , orderdate
+    , freight
 FROM Sales.Orders;
 
 
 -- The WHERE Clause
-SELECT 
-    orderid, 
-    custid, 
-    empid, 
-    orderdate, 
-    freight 
+SELECT
+    orderid
+    , custid
+    , empid
+    , orderdate
+    , freight
 FROM Sales.Orders
 WHERE custid = 71;
 
-
 -- The GROUP BY Clause
 SELECT
-  empid, 
-  YEAR(orderdate) AS orderyear, 
-  SUM(freight) AS totalfreight, 
-  COUNT(*) AS numorders 
-FROM Sales.Orders 
-WHERE custid = 71 
-GROUP BY empid, YEAR(orderdate);
+    empid
+    , YEAR (orderdate) AS orderyear
+    , SUM (freight) as totalfreight
+    , COUNT (*) as numorders -- counts nulls
+    , COUNT (orderid) as numorders -- counts known values (same in this case since there are no NULL orderids)
+                                                                                                -- SELECT orderid
+                                                                                                -- FROM Sales.Orders
+                                                                                                -- WHERE orderid IS NULL;
+FROM Sales.Orders
+WHERE custid = 71
+GROUP BY
+    empid
+    , YEAR (orderdate);
+
+SELECT
+    empid
+    , YEAR (orderdate) AS orderyear
+    , COUNT (DISTINCT custid) AS numcusts -- distinct customers handled by each employee
+FROM Sales.Orders
+GROUP BY
+    empid
+    , YEAR (orderdate);
 
 
 -- The HAVING Clause
 SELECT
-    empid, 
-    YEAR(orderdate) AS orderyear,
-    COUNT(*) AS numorders 
-FROM Sales.Orders 
-WHERE custid = 71 
-GROUP BY empid, YEAR(orderdate) 
-HAVING COUNT(*) > 1;
+    empid
+    , YEAR (orderdate) AS orderyear
+    , COUNT (*) as numorders
+FROM Sales.Orders
+WHERE custid = 71
+GROUP BY
+    empid
+    , YEAR (orderdate)
+HAVING COUNT (*) > 1; -- filters groups with more than one record (order)
 
 
 -- The SELECT CLause
 SELECT
-    orderid,
-    SUM(freight) AS totalfreight -- aliased column
+    orderid
+    , SUM (freight) AS totalfreight -- aliased column, cannot be referenced in any phases prior to SELECT
 FROM Sales.Orders
 GROUP BY orderid;
 
 SELECT DISTINCT 
-    empid, 
-    YEAR(orderdate) AS orderyear 
+    empid 
+    , YEAR(orderdate) AS orderyear 
 FROM Sales.Orders 
 WHERE custid = 71;
 
 
 -- The ORDER BY Clause
 SELECT 
-    empid, 
-    YEAR(orderdate) AS orderyear, 
-    COUNT(*) AS numorders 
+    empid 
+    , YEAR (orderdate) AS orderyear
+    , COUNT (*) AS numorders 
 FROM Sales.Orders 
 WHERE custid = 71 
-GROUP BY empid, YEAR(orderdate) 
-HAVING COUNT(*) > 1 
-ORDER BY empid ASC, orderyear DESC;
+GROUP BY
+    empid
+    , YEAR (orderdate) 
+HAVING COUNT (*) > 1 
+ORDER BY
+    empid ASC -- ASC is the default, be explicit
+    , orderyear DESC;
+-- ORDER BY can reference columns not in the SELECT clause, unless DISTINCT is used
 
 
 -- The TOP Filter
