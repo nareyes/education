@@ -1,3 +1,4 @@
+-- Create Table w/ Specified Distribution and Index
 CREATE TABLE [dbo].[Trip]
 (
     [DateID]                INT NOT NULL

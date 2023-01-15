@@ -1,3 +1,4 @@
+-- Copy Public NYC Dataset
 COPY INTO [dbo].[Trip]
 FROM 'https://nytaxiblob.blob.core.windows.net/2013/Trip2013/QID6392_20171107_05910_0.txt.gz'
 WITH (
