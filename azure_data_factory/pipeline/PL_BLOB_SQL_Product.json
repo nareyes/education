@@ -213,7 +213,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SourceDataset_6q5",
+						"referenceName": "DS_SRC_Product",
 						"type": "DatasetReference",
 						"parameters": {
 							"InputFile": {
@@ -225,7 +225,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "DestinationDataset_6q5",
+						"referenceName": "DS_DEST_Product",
 						"type": "DatasetReference",
 						"parameters": {
 							"OutputTable": {
