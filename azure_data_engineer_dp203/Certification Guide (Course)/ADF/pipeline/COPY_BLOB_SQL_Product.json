@@ -1,5 +1,5 @@
 {
-	"name": "PL_BLOB_SQL_Product",
+	"name": "COPY_BLOB_SQL_Product",
 	"properties": {
 		"description": "Copy Product data from Azure Blob Storage to Azure SQL Database.",
 		"activities": [

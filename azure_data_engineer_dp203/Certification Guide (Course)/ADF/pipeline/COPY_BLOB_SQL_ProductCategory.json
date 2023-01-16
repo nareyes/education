@@ -1,5 +1,5 @@
 {
-	"name": "PL_BLOB_SQL_ProductCategory",
+	"name": "COPY_BLOB_SQL_ProductCategory",
 	"properties": {
 		"description": "Copy Product Category data from Azure Blob Storage to SQL Database.",
 		"activities": [
