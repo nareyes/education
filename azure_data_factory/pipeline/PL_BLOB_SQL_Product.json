@@ -225,7 +225,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "DS_DEST_Product",
+						"referenceName": "DS_DST_Product",
 						"type": "DatasetReference",
 						"parameters": {
 							"OutputTable": {

@@ -105,7 +105,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "DS_DEST_ProductCategory",
+						"referenceName": "DS_DST_ProductCategory",
 						"type": "DatasetReference",
 						"parameters": {
 							"OutputTable": {
