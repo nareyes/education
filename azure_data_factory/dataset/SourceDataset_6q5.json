@@ -5,6 +5,11 @@
 			"referenceName": "LS_AzureBlobStorage",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"InputFile": {
+				"type": "string"
+			}
+		},
 		"folder": {
 			"name": "Azure DE Course"
 		},
@@ -13,7 +18,10 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "Product.csv",
+				"fileName": {
+					"value": "@dataset().InputFile",
+					"type": "Expression"
+				},
 				"container": "product"
 			},
 			"columnDelimiter": ",",
