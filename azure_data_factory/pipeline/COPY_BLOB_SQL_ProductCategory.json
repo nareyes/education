@@ -93,17 +93,37 @@
 				"inputs": [
 					{
 						"referenceName": "SourceDataset_1wo",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"InputFile": {
+								"value": "@pipeline().parameters.InputFilePipeline",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"outputs": [
 					{
 						"referenceName": "DestinationDataset_1wo",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"OutputTable": {
+								"value": "@pipeline().parameters.OutputTablePipeline",
+								"type": "Expression"
+							}
+						}
 					}
 				]
 			}
 		],
+		"parameters": {
+			"InputFilePipeline": {
+				"type": "string"
+			},
+			"OutputTablePipeline": {
+				"type": "string"
+			}
+		},
 		"folder": {
 			"name": "Azure DE Course"
 		},
