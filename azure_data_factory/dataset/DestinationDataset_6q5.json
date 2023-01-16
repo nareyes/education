@@ -5,6 +5,9 @@
 			"referenceName": "LS_AzureSqlDatabase",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "Azure DE Course"
+		},
 		"annotations": [],
 		"type": "AzureSqlTable",
 		"schema": [
