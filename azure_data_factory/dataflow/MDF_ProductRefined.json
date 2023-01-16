@@ -67,6 +67,8 @@
 				"     broadcast: 'auto')~> JoinProduct",
 				"JoinProduct sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     partitionFileNames:['ProductRefined.csv'],",
+				"     truncate: true,",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
 				"     mapColumn(",
@@ -85,7 +87,8 @@
 				"          SellStartDate,",
 				"          SellEndDate,",
 				"          ModifiedDate",
-				"     )) ~> SinkProductRefined"
+				"     ),",
+				"     partitionBy('hash', 1)) ~> SinkProductRefined"
 			]
 		}
 	}
