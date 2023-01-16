@@ -1,5 +1,5 @@
 {
-	"name": "DS_DEST_Product",
+	"name": "DS_DST_Product",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LS_AzureSqlDatabase",
