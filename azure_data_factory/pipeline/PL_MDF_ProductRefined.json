@@ -1,5 +1,5 @@
 {
-	"name": "PL_DF_ProductRefined",
+	"name": "PL_MDF_ProductRefined",
 	"properties": {
 		"activities": [
 			{
@@ -35,6 +35,9 @@
 				}
 			}
 		],
+		"folder": {
+			"name": "Azure DE Course"
+		},
 		"annotations": []
 	}
 }
