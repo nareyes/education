@@ -2,6 +2,8 @@
 This script creates two new tables in AdventureWorks:
 dbo.DimBigProduct
 dbo.FactTransactionHistory
+
+Export these tables to text files and upload in Azure Storage or ADLS Gen2 for PolyBase exercise.
 */
 
 

@@ -35,7 +35,7 @@ GO
 CREATE DATABASE SCOPED CREDENTIAL BlobStorageCredential
 WITH
     IDENTITY = 'blobuser',  
-	SECRET = 'x7NuCYNZIv7KnLa77eSx0tYi+XO0NnSd1RT1nZv9rKczs4tBLhbMdBsBDJkftAIyAU2TW5J39OwW+AStVfkYfQ==';
+	SECRET = 'ENTER KEY';
 GO
 
 
@@ -49,7 +49,7 @@ GO
 CREATE EXTERNAL DATA SOURCE AzureBlobStorage
 WITH (
     TYPE = HADOOP
-    , LOCATION = 'wasbs://aw-files@dp203blobstor.blob.core.windows.net'
+    , LOCATION = 'ENTER LOCATION'
     , CREDENTIAL = BlobStorageCredential
 );
 GO
@@ -104,7 +104,7 @@ CREATE EXTERNAL TABLE [stage].FactTransactionHistory (
 )
 
 WITH (
-	LOCATION = '/FileTransactionHistory.txt' 
+	LOCATION = 'ENTER FILE PATH' 
 	, DATA_SOURCE = AzureBlobStorage
 	, FILE_FORMAT = CSVFileFormat
 	, REJECT_TYPE = VALUE
@@ -138,7 +138,7 @@ CREATE EXTERNAL TABLE [stage].DimBigProduct (
 )
 
 WITH (
-	LOCATION = '/FileProductDimensions.txt' 
+	LOCATION = 'ENTER FILE PATH' 
 	, DATA_SOURCE = AzureBlobStorage
 	, FILE_FORMAT = CSVFileFormat
 	, REJECT_TYPE = VALUE

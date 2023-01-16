@@ -1,3 +1,5 @@
+USE Adventure_Works_DW;
+
 -- Create demo table with dynamic data masking
 DROP TABLE IF EXISTS dbo.DimEmployeeDDM;
 CREATE TABLE dbo.DimEmployeeDDM (
@@ -26,7 +28,7 @@ FROM dbo.DimEmployee;
 
 -- Create User
 CREATE LOGIN DemoUser
-WITH PASSWORD = 'DemoUser';
+WITH PASSWORD = 'DemoUser1234';
 
 CREATE USER DemoUser
 FROM LOGIN DemoUser
