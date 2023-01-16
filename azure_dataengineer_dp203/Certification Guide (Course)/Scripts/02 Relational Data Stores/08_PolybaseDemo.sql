@@ -21,8 +21,7 @@ PolyBase 6 steps Process
 	the Database Scoped Credential stores the service principal credentials set up in AAD. 
 	You can also use the Database Scoped Credential to store the storage account key for Blob storage.
 */
-DROP MASTER KEY;
-
+-- DROP MASTER KEY;
 CREATE MASTER KEY;
 GO
 
@@ -32,12 +31,11 @@ GO
 	IDENTITY: Provide any string, it is not used for authentication to Azure storage.
 	SECRET: Provide your Azure storage account key.
 */
-DROP DATABASE SCOPED CREDENTIAL BlobStorageCredential;
-
+-- DROP DATABASE SCOPED CREDENTIAL BlobStorageCredential;
 CREATE DATABASE SCOPED CREDENTIAL BlobStorageCredential
 WITH
     IDENTITY = 'blobuser',  
-	SECRET = 'ZYfcNUnKJLRqDpZDwly1dUb8bsXe3NP8Ti4nLXCbd8jhYwEoWaBUohGN3cK4eQ0mCKr6WAEBAaUSQmY8b3hhzA==';
+	SECRET = 'x7NuCYNZIv7KnLa77eSx0tYi+XO0NnSd1RT1nZv9rKczs4tBLhbMdBsBDJkftAIyAU2TW5J39OwW+AStVfkYfQ==';
 GO
 
 
@@ -47,12 +45,11 @@ GO
 	LOCATION: Provide Data Lake Storage blob account name and URI
 	CREDENTIAL: Provide the credential created in the previous step.
 */
-DROP EXTERNAL DATA SOURCE AzureBlobStorage;
-
+-- DROP EXTERNAL DATA SOURCE AzureBlobStorage;
 CREATE EXTERNAL DATA SOURCE AzureBlobStorage
 WITH (
     TYPE = HADOOP
-    , LOCATION = 'wasbs://demofiles@synapsestorage108.blob.core.windows.net'
+    , LOCATION = 'wasbs://aw-files@dp203blobstor.blob.core.windows.net'
     , CREDENTIAL = BlobStorageCredential
 );
 GO
@@ -65,8 +62,7 @@ GO
 	DATE_FORMAT: Specifies a custom format for all date and time data that might appear in a delimited text file.
 	Use_Type_Default: Store missing values as default for datatype.
 */
-DROP EXTERNAL FILE FORMAT CSVFileFormat;
-
+-- DROP EXTERNAL FILE FORMAT CSVFileFormat;
 CREATE EXTERNAL FILE FORMAT CSVFileFormat 
 WITH (
 	FORMAT_TYPE = DELIMITEDTEXT
@@ -94,44 +90,74 @@ External Tables are strongly typed.
 This means that each row of the data being ingested must satisfy the table schema definition. 
 If a row does not match the schema definition, the row is rejected from the load.
 */
-DROP SCHEMA [stage];
-
+-- DROP SCHEMA [stage];
 CREATE SCHEMA [stage];
 GO
 
-DROP EXTERNAL TABLE [stage].FactTransactionHistory ;
-
+-- DROP EXTERNAL TABLE [stage].FactTransactionHistory ;
 CREATE EXTERNAL TABLE [stage].FactTransactionHistory (
     TransactionID	INT NOT NULL
 	, ProductKey	INT NOT NULL
-	, OrderDate	DATETIME NULL
-	, Quantity	INT NULL
+	, OrderDate		DATETIME NULL
+	, Quantity		INT NULL
 	, ActualCost	MONEY NULL
 )
 
 WITH (
-	LOCATION='/FTH/' 
+	LOCATION = '/FileTransactionHistory.txt' 
 	, DATA_SOURCE = AzureBlobStorage
 	, FILE_FORMAT = CSVFileFormat
 	, REJECT_TYPE = VALUE
-	, REJECT_VALUE = 0
+	, REJECT_VALUE = 0 -- Entire load will fail if there is more than 0 errors
+)
+GO
+
+-- DROP EXTERNAL TABLE [stage].DimBigProduct ;
+CREATE EXTERNAL TABLE [stage].DimBigProduct (
+	[ProductKey] [INT] NOT NULL
+	, [EnglishProductName] [NVARCHAR](80) NULL
+	, [ProductAlternateKey] [NVARCHAR](56) NULL
+	, [FinishedGoodsFlag] [NVARCHAR](60) NOT NULL
+	, [Color] [NVARCHAR](15) NOT NULL
+	, [SafetyStockLevel] [SMALLINT] NULL
+	, [ReorderPoINT] [SMALLINT] NULL
+	, [StandardCost] [MONEY] NULL
+	, [ListPrice] [MONEY] NULL
+	, [Size] [NVARCHAR](50) NULL
+	, [SizeUnitMeasureCode] [NCHAR](3) NULL
+	, [WeightUnitMeasureCode] [NCHAR](3) NULL
+	, [Weight] [FLOAT] NULL
+	, [DaysToManufacture] [INT] NULL
+	, [ProductLine] [NCHAR](2) NULL
+	, [Class] [NCHAR](2) NULL
+	, [Style] [NCHAR](2) NULL
+	, [ProductSubcategoryKey] [INT] NULL
+	, [ModelName] [NVARCHAR](50) NULL
+	, [StartDate] [DATETIME] NULL
+	, [EndDate] [DATETIME] NULL
+)
+
+WITH (
+	LOCATION = '/FileProductDimensions.txt' 
+	, DATA_SOURCE = AzureBlobStorage
+	, FILE_FORMAT = CSVFileFormat
+	, REJECT_TYPE = VALUE
+	, REJECT_VALUE = 0 -- Entire load will fail if there is more than 0 errors
 )
 GO
 
 
 /* 
-6 CREATE TABLE AS  - CTAS
+6 CREATE TABLE AS  - CTAS and Load Data
 	CTAS creates a new table and populates it with the results of a select statement. 
 	CTAS defines the new table to have the same columns and data types as the results of the select statement. 
 	If you select all the columns from an external table, the new table is a replica of the columns and data types in the external table.
 */
-DROP SCHEMA [prod];
-
+-- DROP SCHEMA [prod];
 CREATE SCHEMA [prod];
 GO
 
-DROP TABLE [prod].[FactTransactionHistory];
-
+-- DROP TABLE [prod].[FactTransactionHistory];
 CREATE TABLE [prod].[FactTransactionHistory]       
 WITH (
 	DISTRIBUTION = HASH(ProductKey) 
@@ -143,19 +169,36 @@ OPTION (
 	LABEL = 'Load [prod].[FactTransactionHistory1]'
 );
 
+CREATE TABLE [prod].[DimBigProduct]       
+WITH (
+	DISTRIBUTION = ROUND_ROBIN
+) 
+
+AS 
+SELECT * FROM [stage].[BigDimProduct]        
+OPTION (
+	LABEL = 'Load [prod].[BigDimProduct]'
+);
+
+ALTER TABLE prod.DimBigProduct
+ADD CONSTRAINT PK_DimBigProduct PRIMARY KEY (ProductKey)
+GO
+
 
 -- Verify number of rows
 SELECT COUNT (*) FROM [prod].[FactTransactionHistory];
+SELECT COUNT (*) FROM [prod].[DimBigProduct];
 
 
 /*
 By default, tables are defined as a clustered columnstore index. 
-After a load completes, some of the data rows might not be compressed into the columnstore. 
+After a load completes, some of the data rows might not be compressed INTo the columnstore. 
 To optimize query performance and columnstore compression after a load, rebuild the table to force the columnstore index to compress all the rows.
 */
 ALTER INDEX ALL ON [prod].[FactTransactionHistory_Lake] REBUILD;
 
 
--- Verify the data was loaded into the 60 distributions
--- Find data skew for a distributed table
+-- Verify the data was loaded INTo the 60 distributions
+-- Verify distribution sizes are not skewed
 DBCC PDW_SHOWSPACEUSED('prod.FactTransactionHistory');
+DBCC PDW_SHOWSPACEUSED('prod.DimBigProduct');
