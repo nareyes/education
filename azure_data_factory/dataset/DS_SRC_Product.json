@@ -1,5 +1,5 @@
 {
-	"name": "SourceDataset_6q5",
+	"name": "DS_SRC_Product",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LS_AzureBlobStorage",

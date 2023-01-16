@@ -1,5 +1,5 @@
 {
-	"name": "DestinationDataset_6q5",
+	"name": "DS_DEST_Product",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "LS_AzureSqlDatabase",
