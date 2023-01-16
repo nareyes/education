@@ -213,17 +213,37 @@
 				"inputs": [
 					{
 						"referenceName": "SourceDataset_6q5",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"InputFile": {
+								"value": "@pipeline().parameters.InputFilePipeline",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"outputs": [
 					{
 						"referenceName": "DestinationDataset_6q5",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"OutputTable": {
+								"value": "@pipeline().parameters.OutputTablePipeline",
+								"type": "Expression"
+							}
+						}
 					}
 				]
 			}
 		],
+		"parameters": {
+			"InputFilePipeline": {
+				"type": "string"
+			},
+			"OutputTablePipeline": {
+				"type": "string"
+			}
+		},
 		"folder": {
 			"name": "Azure DE Course"
 		},
