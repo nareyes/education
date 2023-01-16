@@ -7,6 +7,7 @@ Author: Eshant Garg
 - Notes: Important Section Notes from Course
 - Scripts: Code Scripts in SQL and Spark (Scala, PySpark)
 - Slides: All Course Slides
+- ADF: Azure Data Facotry
 
 ## Course Contents
 - 00 Introduction and Azure Data Engineering Profiles
