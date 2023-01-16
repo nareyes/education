@@ -67,7 +67,7 @@
 				"     broadcast: 'auto')~> JoinProduct",
 				"JoinProduct sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     partitionFileNames:['ProductRefined.csv'],",
+				"     partitionFileNames:['MDFProductRefined.csv'],",
 				"     truncate: true,",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
