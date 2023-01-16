@@ -1,9 +1,0 @@
-{
-	"name": "dp203-data-factory-v2",
-	"location": "eastus",
-	"identity": {
-		"type": "SystemAssigned",
-		"principalId": "da8d4586-33e1-4461-b938-a5e0dea45abc",
-		"tenantId": "3a13b434-1a06-4a17-a219-b729b0bf3604"
-	}
-}
