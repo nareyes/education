@@ -1,0 +1,9 @@
+{
+	"name": "dp203azdatafactory",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "a8873527-bb5a-4b62-a49e-dff040d19846",
+		"tenantId": "3a13b434-1a06-4a17-a219-b729b0bf3604"
+	}
+}
