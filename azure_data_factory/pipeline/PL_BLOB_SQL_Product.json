@@ -13,7 +13,16 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": [],
+				"userProperties": [
+					{
+						"name": "Source",
+						"value": "product//Product.csv"
+					},
+					{
+						"name": "Destination",
+						"value": "dbo.Product"
+					}
+				],
 				"typeProperties": {
 					"source": {
 						"type": "DelimitedTextSource",
@@ -215,6 +224,9 @@
 				]
 			}
 		],
+		"folder": {
+			"name": "Azure DE Course"
+		},
 		"annotations": [],
 		"lastPublishTime": "2023-01-16T18:08:04Z"
 	},
