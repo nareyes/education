@@ -14,16 +14,7 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": [
-					{
-						"name": "Source",
-						"value": "product//Product.csv"
-					},
-					{
-						"name": "Destination",
-						"value": "dbo.Product"
-					}
-				],
+				"userProperties": [],
 				"typeProperties": {
 					"source": {
 						"type": "DelimitedTextSource",
@@ -214,17 +205,37 @@
 				"inputs": [
 					{
 						"referenceName": "SourceDataset_6q5",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"InputFile": {
+								"value": "@pipeline().parameters.InputFilePipeline",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"outputs": [
 					{
 						"referenceName": "DestinationDataset_6q5",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"OutputTable": {
+								"value": "@pipeline().parameters.OutputTablePipeline",
+								"type": "Expression"
+							}
+						}
 					}
 				]
 			}
 		],
+		"parameters": {
+			"InputFilePipeline": {
+				"type": "string"
+			},
+			"OutputTablePipeline": {
+				"type": "string"
+			}
+		},
 		"folder": {
 			"name": "Azure DE Course"
 		},
