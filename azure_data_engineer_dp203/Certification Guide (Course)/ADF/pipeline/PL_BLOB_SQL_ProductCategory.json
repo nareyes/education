@@ -4,7 +4,7 @@
 		"description": "Copy Product Category data from Azure Blob Storage to SQL Database.",
 		"activities": [
 			{
-				"name": "Copy_1wo",
+				"name": "CopyProductCategory",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
