@@ -5,7 +5,7 @@
 		"activities": [
 			{
 				"name": "CopyProduct",
-				"description": "Copy Activity: Load Product Table from Azure Blob to Azure SQL DB.",
+				"description": "Copy Activity: Load Product Data from Azure Blob to Azure SQL DB.",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
