@@ -5,6 +5,7 @@
 		"activities": [
 			{
 				"name": "CopyProductCategory",
+				"description": "Copy Activity: Load Product Category Table from Azure Blob to Azure SQL DB.",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
