@@ -4,6 +4,7 @@
 		"activities": [
 			{
 				"name": "CopyProductCategory",
+				"description": "Pipeline: Load Product Category Data from Azure Blob to Azure SQL DB.",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
