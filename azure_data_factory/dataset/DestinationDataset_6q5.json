@@ -5,6 +5,11 @@
 			"referenceName": "LS_AzureSqlDatabase",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"OutputTable": {
+				"type": "string"
+			}
+		},
 		"folder": {
 			"name": "Azure DE Course"
 		},
@@ -92,7 +97,10 @@
 		],
 		"typeProperties": {
 			"schema": "dbo",
-			"table": "Product"
+			"table": {
+				"value": "@dataset().OutputTable",
+				"type": "Expression"
+			}
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/datasets"
