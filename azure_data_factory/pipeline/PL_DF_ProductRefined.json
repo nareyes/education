@@ -17,7 +17,15 @@
 				"typeProperties": {
 					"dataflow": {
 						"referenceName": "MDF_ProductRefined",
-						"type": "DataFlowReference"
+						"type": "DataFlowReference",
+						"datasetParameters": {
+							"SourceProduct": {
+								"InputFile": "Product.csv"
+							},
+							"SourceProductCat": {
+								"InputFile": "ProductCategory.csv"
+							}
+						}
 					},
 					"compute": {
 						"coreCount": 8,
