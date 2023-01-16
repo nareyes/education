@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "DF_ProductJoinCategory",
+				"name": "MDF_ProductRefined",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
