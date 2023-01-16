@@ -93,7 +93,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "SourceDataset_1wo",
+						"referenceName": "DS_SRC_ProductCategory",
 						"type": "DatasetReference",
 						"parameters": {
 							"InputFile": {
@@ -105,7 +105,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "DestinationDataset_1wo",
+						"referenceName": "DS_DEST_ProductCategory",
 						"type": "DatasetReference",
 						"parameters": {
 							"OutputTable": {
