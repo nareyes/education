@@ -101,44 +101,107 @@ ORDER BY empid ASC, orderyear DESC; -- ASC is the default, be explicit
 
 
 -- The TOP Filter
-SELECT TOP (5)
-    orderid,
-    orderdate,
-    custid,
-    empid
-FROM Sales.Orders
-ORDER BY orderdate DESC; -- returns 5 rows
-
-SELECT TOP (5) WITH TIES 
-    orderid, 
-    orderdate, 
-    custid, 
-    empid 
-FROM Sales.Orders 
-ORDER BY orderdate DESC; -- returns 8 rows due to duplicate orderdate results
-
 SELECT TOP (100) *
 FROM Sales.Orders; -- this query can be used to explore the table without pulling all rows
 
-SELECT TOP (1) PERCENT
-    orderid,
-    orderdate,
-    custid,
-    empid
+SELECT TOP (5)
+    orderid
+    , orderdate
+    , custid
+    , empid
 FROM Sales.Orders
-ORDER BY orderdate DESC; -- returns the first 1% of records
+ORDER BY orderdate DESC; -- returns 5 rows, non-deterministic (more than one result can be considered correct)
+
+SELECT TOP (1) PERCENT -- rounded up
+    orderid
+    , orderdate
+    , custid
+    , empid
+FROM Sales.Orders
+ORDER BY orderdate DESC;
+
+SELECT TOP (5)
+    orderid
+    , orderdate
+    , custid
+    , empid
+FROM Sales.Orders
+ORDER BY orderdate DESC, orderid DESC; -- additional ordering property makes result deterministic (tiebreaker)
+
+SELECT TOP (5) WITH TIES
+    orderid
+    , orderdate
+    , custid
+    , empid
+FROM Sales.Orders
+ORDER BY orderdate DESC; -- returns more than 5 rows if there are duplicates in the ordering property
 
 
 -- The OFFSET-FETCH Filter
-SELECT 
-    orderid, 
-    orderdate, 
-    custid, 
-    empid 
-FROM Sales.Orders 
+SELECT
+    orderid
+    , orderdate
+    , custid
+    , empid
+FROM Sales.Orders
 ORDER BY orderdate ASC, orderid ASC
-	OFFSET 50 ROWS FETCH NEXT 25 ROWS ONLY;
+    OFFSET 50 ROWS FETCH NEXT 25 ROWS ONLY; -- offset skips, fetch returns
 
+SELECT
+    orderid
+    , orderdate
+    , custid
+    , empid
+FROM Sales.Orders
+ORDER BY orderdate ASC, orderid ASC
+    OFFSET 0 ROWS FETCH FIRST 25 ROWS ONLY; -- next and first are interchangeable
+
+SELECT
+    orderid
+    , orderdate
+    , custid
+    , empid
+FROM Sales.Orders
+ORDER BY orderdate ASC, orderid ASC
+    OFFSET 1 ROW FETCH NEXT 1 ROW ONLY; -- row and rows are interchangeable
+
+SELECT
+    orderid
+    , orderdate
+    , custid
+    , empid
+FROM Sales.Orders
+ORDER BY orderdate ASC, orderid ASC
+    OFFSET 50 ROWS; -- offset will work by itself, fetch will not
+
+
+-- The ROW_NUMBER Window Function
+-- Window Functions are explained thouroughly in Ch 7
+SELECT
+    orderid
+    , custid
+    , val 
+    , ROW_NUMBER () OVER (ORDER BY custid ASC, val ASC) AS RowNum -- orders the window
+FROM Sales.OrderValues
+ORDER BY custid ASC, val ASC; -- order for presentation (same ordering properties in this case)
+
+SELECT
+    orderid
+    , custid
+    , val 
+    , ROW_NUMBER () OVER (PARTITION BY custid ORDER BY val ASC) AS RowNum -- partitions and orders the window
+FROM Sales.OrderValues
+ORDER BY custid ASC, val ASC; -- each partition (custid) returns a group of row nums which are unnique to each cust
+-- above two query is still non-deterministic due to the ordering property in the window not being unique
+-- we can add a tiebreaker to the window to make the query deterministic
+
+SELECT
+    orderid
+    , custid
+    , val 
+    , ROW_NUMBER () OVER (PARTITION BY custid ORDER BY custid ASC, val ASC) AS RowNum
+FROM Sales.OrderValues
+ORDER BY custid ASC, val ASC;
 
 -- Predicates and Operators
 SELECT 
