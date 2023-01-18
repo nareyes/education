@@ -203,56 +203,76 @@ SELECT
 FROM Sales.OrderValues
 ORDER BY custid ASC, val ASC;
 
--- Predicates and Operators
-SELECT 
-    orderid, 
-    empid, 
-    orderdate
+
+-- The IN Predicate
+SELECT
+    orderid
+    , empid
+    , orderdate
 FROM Sales.Orders
-WHERE orderid IN(10248, 10249, 10250);
+WHERE orderid IN (10248, 10249, 10250);
 
--- Predicates and Logical Operators
+
+-- The BETWEEN Predicate (same result as above query)
 SELECT 
-    orderid, 
-    empid, 
-    orderdate
+    orderid
+    , empid
+    , orderdate
 FROM Sales.Orders 
-WHERE orderid BETWEEN 10300 AND 10310; -- inclusive
+WHERE orderid BETWEEN 10248 AND 10250; -- inclusive
 
+
+-- The LIKE Predicate
 SELECT  
-    empid, 
-    firstname, 
-    lastname
+    empid,
+    , firstname
+    , lastname
 FROM HR.Employees 
 WHERE lastname LIKE N'D%'; -- N (NCHAR or NVARCHAR data types), % is a wild card, anything follows
 
+
 -- Comparison Operators
 SELECT 
-    orderid, 
-    empid, 
-    orderdate
+    orderid
+    , empid
+    , orderdate
 FROM Sales.Orders 
 WHERE orderdate >= '2016-01-01';
 
--- Predicates and Comparison Operators
+-- Comparison and Logical Operators
 SELECT 
-    orderid, 
-    empid, 
-    orderdate
+    orderid
+    , empid
+    , orderdate
 FROM Sales.Orders
-WHERE orderdate >= '2016-01-01' AND empid IN (1, 3, 5);
+WHERE 
+    orderdate >= '2016-01-01' 
+    AND empid IN (1, 3, 5);
+
+-- Comparison and Logical Operators
+SELECT 
+    orderid
+    , empid
+    , orderdate
+FROM Sales.Orders
+WHERE 
+    orderdate >= '2016-01-01' 
+    AND empid NOT IN (1, 3, 5);
+
 
 -- Arithmetic
 SELECT 
-    orderid, 
-    productid, 
-    qty, 
-    unitprice, 
-    discount, 
-    qty * unitprice * (1 - discount) AS val
+    orderid
+    , productid
+    , qty
+    , unitprice
+    , discount
+    , qty * unitprice * (1 - discount) AS val
 FROM Sales.OrderDetails;
 
--- Precedence (AND has precedence over OR, despite the order query is written
+
+-- Precedence (AND has precedence over OR, despite the order query is written)
+-- Use PEMDAS to force precedence and improve readability
 SELECT 
     orderid, 
     custid, 
@@ -260,10 +280,9 @@ SELECT
     orderdate 
 FROM Sales.Orders 
 WHERE  
-    custid = 1 AND 
-    empid IN(1, 3, 5) OR  
-    custid = 85 AND 
-    empid IN(2, 4, 6);
+    (custid = 1 AND  empid IN (1, 3, 5)) 
+    OR 
+    (custid = 85 AND empid IN(2, 4, 6));
 
 
 -- CASE Expressions
