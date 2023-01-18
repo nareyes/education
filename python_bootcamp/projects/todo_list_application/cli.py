@@ -2,7 +2,7 @@
 # python version 3.11.1
 
 # variables
-user_input_action = "Type Add, Show, Edit, Complete or Exit: "
+user_input_action = "Type Add, Show, Edit, Complete, Clear or Exit: "
 user_input_todo = "Enter a Todo: "
 user_input_position = "Enter a Valid Todo Number to Edit: "
 user_input_new = "Enter New Item: "
@@ -21,6 +21,10 @@ def add_todos():
 
     with open('todos.txt', 'w') as file:
         file.writelines(todos)
+    
+    message = f"Added: {todo}"
+    print(message)
+
 
 def show_todos():
     with open('todos.txt', 'r') as file:
@@ -31,59 +35,60 @@ def show_todos():
         output = f"{index + 1}: {item}"
         print(output)
 
+
 def edit_todos():
+    with open('todos.txt', 'r') as file:
+        todos = file.readlines()
+
     position = int(input(user_input_position))
-    index = position - 1
-    todo_replace = todos[index].strip('\n')
+    old_todo = todos[position - 1]
+            
+    if position >= 1 and position <= len(todos):
+        new_todo = input(user_input_new).strip().title()
+        todos[position - 1] = new_todo + '\n'
+    else:
+        while position < 1 or position > len(todos):
+            position = int(input(user_input_position).strip())
 
-    with open('todos.txt', 'r') as file:
-        todos = file.readlines()
-    
-    new_todo = input(user_input_new).strip().title()
-    todos[index] = new_todo + '\n'
+            if position >= 1 and position <= len(todos):
+                new_todo = input(user_input_new).strip().title()
+                todos[position - 1] = new_todo + '\n'
 
     with open('todos.txt', 'w') as file:
         file.writelines(todos)
-    
-    message = f"Todo {todo_replace} Replaced with {new_todo}."
+
+    message = f"Replaced: {old_todo} With: {new_todo}"
     print(message)
 
-    # if position >= 1 and position <= len(todos):
-    #     new_todo = input(user_input_new).strip().title()
-    #     todos[position - 1] = new_todo
-    # else:
-    #     while position < 1 or position > len(todos):
-    #         position = int(input(user_input_position))
 
-    #         if position >= 1 and position <= len(todos):
-    #             new_todo = input(user_input_new).strip().title()
-    #             todos[position - 1] = new_todo
+def complete_todos():
+    with open('todos.txt', 'r') as file:
+        todos = file.readlines()
 
-
-def complete_todo():
     position = int(input(user_input_complete).strip())
-    index = position - 1
-    todo_remove = todos[index].strip('\n')
+    completed_todo = todos[position - 1]
+            
+    if position >= 1 and position <= len(todos):
+        todos.pop(position - 1)
+    else:
+        while position < 1 or position > len(todos):
+            position = int(input(user_input_complete).strip())
 
-    with open('todos.txt', 'r') as file:
-        todos = file.readlines()
-    
-    todos.pop(index)
+            if position >= 1 and position <= len(todos):
+                todos.pop(position - 1)
 
     with open('todos.txt', 'w') as file:
         file.writelines(todos)
-    
-    message = f"Todo {todo_remove} Removed."
+
+    message = f"Completed Todo: {completed_todo}"
     print(message)
 
-    # if position >= 1 and position <= len(todos):
-    #     todos.pop(position - 1)
-    # else:
-    #     while position < 1 or position > len(todos):
-    #         position = int(input(user_input_complete).strip())
 
-    #         if position >= 1 and position <= len(todos):
-    #             todos.pop(position - 1)
+def clear_todos():
+    open('todos.txt', 'w').close()
+    
+    message = "All Todos Cleared\n"
+    print(message)
 
 
 # application logic
@@ -104,7 +109,10 @@ while True:
 
         case 'complete':
             show_todos()
-            complete_todo()
+            complete_todos()
+        
+        case 'clear':
+            clear_todos()
 
         case 'exit':
             break
