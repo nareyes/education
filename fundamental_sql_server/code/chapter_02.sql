@@ -20,7 +20,7 @@ ORDER BY empid, orderyear
     -- ORDER BY empid, orderyear
 
 
--- The FROM Clause
+-- FROM Clause
 SELECT
     orderid
     , custid
@@ -30,7 +30,7 @@ SELECT
 FROM Sales.Orders;
 
 
--- The WHERE Clause
+-- WHERE Clause
 SELECT
     orderid
     , custid
@@ -40,7 +40,7 @@ SELECT
 FROM Sales.Orders
 WHERE custid = 71;
 
--- The GROUP BY Clause
+-- GROUP BY Clause
 SELECT
     empid
     , YEAR (orderdate) AS orderyear
@@ -62,7 +62,7 @@ FROM Sales.Orders
 GROUP BY empid, YEAR (orderdate);
 
 
--- The HAVING Clause
+-- HAVING Clause
 SELECT
     empid
     , YEAR (orderdate) AS orderyear
@@ -73,7 +73,7 @@ GROUP BY empid, YEAR (orderdate)
 HAVING COUNT (*) > 1; -- filters groups with more than one record (order)
 
 
--- The SELECT CLause
+-- SELECT CLause
 SELECT
     orderid
     , SUM (freight) AS totalfreight -- aliased column, cannot be referenced in any phases prior to SELECT
@@ -87,7 +87,7 @@ FROM Sales.Orders
 WHERE custid = 71;
 
 
--- The ORDER BY Clause
+-- ORDER BY Clause
 SELECT 
     empid 
     , YEAR (orderdate) AS orderyear
@@ -100,7 +100,7 @@ ORDER BY empid ASC, orderyear DESC; -- ASC is the default, be explicit
 -- ORDER BY can reference columns not in the SELECT clause, unless DISTINCT is used
 
 
--- The TOP Filter
+-- TOP Filter
 SELECT TOP (100) *
 FROM Sales.Orders; -- this query can be used to explore the table without pulling all rows
 
@@ -137,7 +137,7 @@ FROM Sales.Orders
 ORDER BY orderdate DESC; -- returns more than 5 rows if there are duplicates in the ordering property
 
 
--- The OFFSET-FETCH Filter
+-- OFFSET-FETCH Filter
 SELECT
     orderid
     , orderdate
@@ -175,7 +175,7 @@ ORDER BY orderdate ASC, orderid ASC
     OFFSET 50 ROWS; -- offset will work by itself, fetch will not
 
 
--- The ROW_NUMBER Window Function
+-- ROW_NUMBER Window Function
 -- Window Functions are explained thouroughly in Ch 7
 SELECT
     orderid
@@ -204,7 +204,7 @@ FROM Sales.OrderValues
 ORDER BY custid ASC, val ASC;
 
 
--- The IN Predicate
+-- IN Predicate
 SELECT
     orderid
     , empid
@@ -213,7 +213,7 @@ FROM Sales.Orders
 WHERE orderid IN (10248, 10249, 10250);
 
 
--- The BETWEEN Predicate (same result as above query)
+-- BETWEEN Predicate (same result as above query)
 SELECT 
     orderid
     , empid
@@ -222,13 +222,49 @@ FROM Sales.Orders
 WHERE orderid BETWEEN 10248 AND 10250; -- inclusive
 
 
--- The LIKE Predicate
+-- LIKE Predicate
+-- Percent Wildcard
 SELECT  
-    empid,
+    empid
     , firstname
     , lastname
 FROM HR.Employees 
 WHERE lastname LIKE N'D%'; -- N (NCHAR or NVARCHAR data types), % is a wild card, anything follows
+
+-- Underscore Wildcard
+SELECT
+    empid
+    , lastname
+FROM HR.Employees
+WHERE lastname LIKE N'_e%'; -- Returns any lastname with an e for the second character, with any length after the wildcard.
+
+-- [List] Wildcard
+SELECT
+    empid,
+    lastname
+FROM HR.Employees
+WHERE lastname LIKE N'[ABC]%'; -- Returns any lastname with A, B, or C as a first character, with any length. 
+
+-- [Range] Wildcarad
+SELECT
+    empid
+    , lastname
+FROM HR.Employees
+WHERE lastname LIKE N'[A-E]%'; -- Returns any lastname with A, B, C, D, or E as a first character, with any length.
+
+-- [^ List or Range] Wildcard
+SELECT
+    empid,
+    lastname
+FROM HR.Employees
+WHERE lastname LIKE N'[^A-E]%'; -- Returns any last name that does NOT start with A, B, C, D, or E, with and length. 
+
+-- ESCAPE Character
+SELECT
+    empid
+    , lastname
+FROM HR.Employees
+WHERE lastname LIKE N'%!_%' ESCAPE '!'; -- Returns any last name with an underscore in the name (zero results)
 
 
 -- Comparison Operators
@@ -287,10 +323,10 @@ WHERE
 
 -- CASE Expressions
 SELECT
-    productid,
-    productname,
-    categoryid,
-    CASE categoryid
+    productid
+    , productname
+    , categoryid
+    , CASE categoryid
         WHEN 1 THEN 'Beverages' 
         WHEN 2 THEN 'Condiments' 
         WHEN 3 THEN 'Confections' 
@@ -301,74 +337,77 @@ SELECT
         WHEN 8 THEN 'Seafood' 
         ELSE 'Unknown Category' -- Optional, Defaults to ELSE IS NULL
     END AS categoryname
-FROM Production.Products; -- Simple CASE expression
+FROM Production.Products; -- Simple CASE expression: Checks for equality
 
 SELECT
-    orderid,
-    custid,
-    val,
-    CASE
-        WHEN val < 1000.00 THEN 'Less than 1000'
-        WHEN val BETWEEN 1000.00 and 3000.00 THEN 'Between 1000 and 3000'
-        WHEN val > 3000.00 THEN 'More than 3000'
+    orderid
+    , custid
+    , val
+    , CASE
+        WHEN val < 1000.00                      THEN 'Less than 1000'
+        WHEN val BETWEEN 1000.00 and 3000.00    THEN 'Between 1000 and 3000'
+        WHEN val > 3000.00                      THEN 'More than 3000'
         ELSE 'Unknown'
     END AS valuecategory
-FROM Sales.OrderValues; -- Searched CASE expression
+FROM Sales.OrderValues; -- Searched CASE expression: Checks for predicate logic
 
 
--- ISNULL (Returns first non NULL value)
-SELECT ISNULL('Hello', 'World'); -- Returns 'Hello'
-SELECT ISNULL(NULL, 'World'); -- Returns 'World'
-SELECT ISNULL(NULL, NULL); -- Return NULL (there isn't a non-NULL value)
+-- ISNULL (Returns first non NULL value, or NULL if there isn't one)
+SELECT ISNULL ('Hello', 'World'); -- Returns 'Hello'
+SELECT ISNULL (NULL, 'World'); -- Returns 'World'
+SELECT ISNULL (NULL, NULL); -- Return NULL (there isn't a non-NULL value)
 
 
--- COALESCE (Returns first non NULL value)
-SELECT COALESCE('Hello', NULL, 'World', NULL, NULL); -- Returns 'Hello'
-SELECT COALESCE(NULL, NULL, 'Hello', NULL, 'World'); -- Returns 'Hello'
+-- COALESCE (Returns first non NULL value, or NULL if there isn't one)
+-- COALESCE is standard and allows more than 2 arguments
+SELECT COALESCE ('Hello', NULL, 'World', NULL, NULL); -- Returns 'Hello'
+SELECT COALESCE (NULL, NULL, 'Hello', NULL, 'World'); -- Returns 'Hello'
+SELECT COALESCE (NULL, NULL, NULL, NULL, NULL_Value); -- Returns NULL
 
 
--- The LIKE Predicate
--- Percent Wildcard
+-- IIF (Returns an expression based on a logical test)
 SELECT
-    empid,
-    lastname
-FROM HR.Employees
-WHERE lastname LIKE N'D%'; -- Returns any lastname starts with D, with any length. 
+    orderid
+    , freight
+    , IIF (freight > 10, 'Heavy', 'Standard') AS freight_category
+FROM Sales.Orders;
 
--- Underscore Wildcard
-SELECT
-    empid,
-    lastname
-FROM HR.Employees
-WHERE lastname LIKE N'_e%'; -- Returns any lastname with an e for the second character, with any length after the wildcard.
 
--- [List] Wildcard
+-- Three Value Predicate Logic (True, False, Unknown)
 SELECT
-    empid,
-    lastname
-FROM HR.Employees
-WHERE lastname LIKE N'[ABC]%'; -- Returns any lastname with A, B, or C as a first character, with any length. 
+    custid
+    , country
+    , region
+    , city
+FROM Sales.Customers
+WHERE Region = N'WA'; -- Result as expected, returns rows where predicate evaluates to True
 
--- [Range] Wildcarad
 SELECT
-    empid,
-    lastname
-FROM HR.Employees
-WHERE lastname LIKE N'[A-E]%'; -- Returns any lastname with A, B, C, D, or E as a first character, with any length.
+    custid
+    , country
+    , region
+    , city
+FROM Sales.Customers
+WHERE Region <> N'WA'; -- Result not always as expected, returns rows where predicate evaluates to True, discarding Unknowns (NULL)
 
--- [^ List or Range] Wildcard
 SELECT
-    empid,
-    lastname
-FROM HR.Employees
-WHERE lastname LIKE N'[^A-E]%'; -- Returns any last name that does NOT start with A, B, C, D, or E, with and length. 
+    custid
+    , country
+    , region
+    , city
+FROM Sales.Customers
+WHERE
+    Region <> N'WA'
+    OR region IS NULL; -- Explicit query and result, returns rows where predicate evaluates to True or Unknown
 
--- ESCAPE Character
-SELECT
-    empid,
-    lastname
-FROM HR.Employees
-WHERE lastname LIKE N'%!_%' ESCAPE '!'; -- Returns any last name with an underscore in the name (zero results)
+
+-- All At Once Operations
+/* 
+All expressions appearing in the same logical query processing phase are evaluated at the same point in time.
+The expressions that appear in the same logical query processing phase are treated as a set, and a set has no order.
+To bypass this behavior for filtering, we can use CASE expressions or PEMDAS with logical operators in the WHERE clause.
+This forces the processing in a particular phase to occur in a specified order. 
+ */
 
 
 -- Converting to DATE
