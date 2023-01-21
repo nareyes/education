@@ -17,4 +17,5 @@ Author: Eshant Garg
 - 05 Monitor Data Storage
 - 06 Monitor Data Processing
 - 07 Optimize Azure Data Solutions
-- 08 Design an Azure Data Solution
+- 08 Managing the Data Life Cycle
+- 09 Design an Azure Data Solution

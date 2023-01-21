@@ -410,6 +410,13 @@ This forces the processing in a particular phase to occur in a specified order.
  */
 
 
+ -- Collation Helo
+ SELECT
+    name
+    , description
+FROM SYS.FN_HelpCollations();
+
+
 -- Converting to DATE
 SELECT CONVERT(DATE, '02/12/2016', 101); -- YYYY-MM-DD
 SELECT CONVERT(DATE, '02/12/2016', 103); -- YYYY-DD-MM
