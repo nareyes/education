@@ -4,8 +4,7 @@
 Author: Eshant Garg
 
 ## Repository Contents
-- Notes: Important Section Notes from Course
-- Scripts: Code Scripts in SQL and Spark (Scala, PySpark)
+- Code: Code Scripts in SQL and Spark (Scala, PySpark)
 - Slides: All Course Slides
 
 ## Course Contents
