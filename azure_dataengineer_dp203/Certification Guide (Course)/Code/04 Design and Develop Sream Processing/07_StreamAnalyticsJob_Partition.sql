@@ -8,4 +8,4 @@ SELECT *
 INTO StreamOutput 
 FROM StreamInput
 PARTITION BY [PartitionKey_Column]
-INTO 10; -- Required with PARTITION BY, Specifies # of Partitions
+INTO 10; 
