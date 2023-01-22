@@ -1,4 +1,4 @@
-# Azure Data Engineer Associate Certification Guide
+# Azure Data Engineer Associate Certification Guide (Book)
 
 <a href="https://www.packtpub.com/product/dp-203-azure-data-engineer-associate-certification-guide/9781801816069?utm_source=github&utm_medium=repository&utm_campaign=9781801816069"><img src="https://static.packt-cdn.com/products/9781801816069/cover/smaller" alt="Azure Data Engineer Associate Certification Guide" height="256px" align="right"></a>
 
@@ -11,7 +11,7 @@ The DP-203: Azure Data Engineer Associate Certification Guide offers complete co
 this book also provides you with additional knowledge to enable you to succeed in your real-life Azure data engineering projects.
 
 
-This book covers the following exciting features: 
+## This book covers the following exciting features: 
 * Gain intermediate-level knowledge of Azure the data infrastructure
 * Design and implement data lake solutions with batch and stream pipelines
 * Identify the partition strategies available in Azure storage technologies
