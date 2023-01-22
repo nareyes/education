@@ -18,5 +18,4 @@ Author: Eshant Garg
 - 04 Design and Develop Stream Processing
 - 05 Monitoring Data Storage and Processing
 - 06 Optimize Azure Data Solutions
-- 07 Managing the Data Life Cycle
-- 08 Design an Azure Data Solution
+- 07 Design an Azure Data Solution
