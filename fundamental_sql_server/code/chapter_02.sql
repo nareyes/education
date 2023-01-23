@@ -222,51 +222,6 @@ FROM Sales.Orders
 WHERE orderid BETWEEN 10248 AND 10250; -- inclusive
 
 
--- LIKE Predicate
--- Percent Wildcard
-SELECT  
-    empid
-    , firstname
-    , lastname
-FROM HR.Employees 
-WHERE lastname LIKE N'D%'; -- N (NCHAR or NVARCHAR data types), % is a wild card, anything follows
-
--- Underscore Wildcard
-SELECT
-    empid
-    , lastname
-FROM HR.Employees
-WHERE lastname LIKE N'_e%'; -- Returns any lastname with an e for the second character, with any length after the wildcard.
-
--- [List] Wildcard
-SELECT
-    empid,
-    lastname
-FROM HR.Employees
-WHERE lastname LIKE N'[ABC]%'; -- Returns any lastname with A, B, or C as a first character, with any length. 
-
--- [Range] Wildcarad
-SELECT
-    empid
-    , lastname
-FROM HR.Employees
-WHERE lastname LIKE N'[A-E]%'; -- Returns any lastname with A, B, C, D, or E as a first character, with any length.
-
--- [^ List or Range] Wildcard
-SELECT
-    empid,
-    lastname
-FROM HR.Employees
-WHERE lastname LIKE N'[^A-E]%'; -- Returns any last name that does NOT start with A, B, C, D, or E, with and length. 
-
--- ESCAPE Character
-SELECT
-    empid
-    , lastname
-FROM HR.Employees
-WHERE lastname LIKE N'%!_%' ESCAPE '!'; -- Returns any last name with an underscore in the name (zero results)
-
-
 -- Comparison Operators
 SELECT 
     orderid
@@ -410,11 +365,175 @@ This forces the processing in a particular phase to occur in a specified order.
  */
 
 
- -- Collation Helo
+ -- Collation Help
  SELECT
     name
     , description
 FROM SYS.FN_HelpCollations();
+
+
+-- Concatenation with + Operator
+SELECT
+    empid
+    , firstname
+    , lastname
+    , firstname + N' ' + lastname AS fullname
+FROM HR.Employees;
+
+
+-- Concatenation with + Operator when NULLs Present, and CONCAT Function
+SELECT
+    custid
+    , country
+    , region
+    , city
+    , country + N', ' + region + N', ' + city AS location -- A single NULL will return NULL for the entire operation
+    , country + COALESCE (N', ' + region, N'') + N', ' + city AS location -- Programatically bypassing NULL behavior
+    , CONCAT (country + N', ', region + N', ', city) AS location -- CONCAT automatically converts NULLs to strings
+FROM Sales.Customers;
+
+
+-- SUBSTRING Function
+SELECT
+    custid
+    , companyname
+    , SUBSTRING (companyname, 10, 5) AS companysub
+    , SUBSTRING (companyname, 10, LEN (companyname)) AS companysubdynamic
+FROM Sales.Customers;
+
+
+-- LEFT and RIGHT Functions
+SELECT
+    custid
+    , companyname
+    , RIGHT (companyname, 5) AS companynameshort
+    , LEFT (UPPER (country), 3) AS countryshort -- Passing a function in the column parameter
+FROM Sales.Customers;
+
+
+-- LEN and DATALENGTH Functions
+SELECT
+    custid
+    , companyname
+    , LEN (companyname) AS companynamelen
+    , DATALENGTH (companyname) AS companynamebytes -- Typically 2x Bytes per Len for UNICODE
+FROM Sales.Customers;
+
+
+-- CHARINDEX and PATINDEX Functions
+SELECT
+    companyname
+    , CHARINDEX (' ', companyname) AS spaceindex
+    , address
+    , PATINDEX (N'%[0-9]%', address) AS spaceindex
+FROM Sales.Customers;
+
+
+-- REPLACE Function
+SELECT
+    companyname
+    , REPLACE (companyname, N' ', N'-') AS companyname
+FROM Sales.Customers;
+
+
+-- REPLICATE Function
+SELECT REPLICATE ('ABC', 3);
+
+SELECT
+    supplierid
+    , REPLICATE ('0', 9) + CAST (supplierid AS VARCHAR (10)) AS supplierid
+    , RIGHT (REPLICATE ('0', 9) + CAST (supplierid AS VARCHAR (10)), 10) AS supplieridreplicate -- Creates a 10 digit ID
+    , FORMAT (supplierid, 'd10') AS supplieridfromat -- Same result, but more expensive
+FROM Production.Suppliers;
+
+
+-- STUFF Function (str, position, delete_len, insert_str)
+SELECT STUFF ('axyze', 2, 3, 'bcd')
+
+
+-- UPPER and LOWER Functions
+SELECT
+    city 
+    , country
+    , UPPER (city) AS cityupper
+    , LOWER (country) AS countrylower
+FROM HR.Employees
+
+
+-- LTRIM and RTRIM Functions
+SELECT
+    '     abc     ' AS fieldtotrim
+    , LEN ('     abc     ') AS fulllen
+    , LTRIM (RTRIM ('     abc     ')) AS trimedfield
+    , LEN (LTRIM (RTRIM ('     abc     '))) AS trimlen;
+
+
+-- COMPRESS and DECOMPRESS Functions
+WITH
+CTE AS (
+    SELECT COMPRESS (N'This is a CV. Imagine a very long CV') AS cvcompressed
+)
+SELECT
+    cvcompressed
+    , CAST (
+        DECOMPRESS (cvcompressed) AS NVARCHAR (MAX)
+    ) AS cvdecompressed -- 
+FROM CTE;
+
+
+-- STRING_SPLIT Function
+SELECT CAST (value as INT) orderid -- table function returns value
+FROM STRING_SPLIT ('10248, 10249, 10250', ',') AS S;
+
+
+-- LIKE Predicate
+-- Percent Wildcard
+SELECT  
+    empid
+    , firstname
+    , lastname
+FROM HR.Employees 
+WHERE lastname LIKE N'D%'; -- N (NCHAR or NVARCHAR data types), % is a wild card, anything follows
+
+-- Underscore Wildcard
+SELECT
+    empid
+    , lastname
+FROM HR.Employees
+WHERE lastname LIKE N'_e%'; -- Returns any lastname with an e for the second character, with any length after the wildcard.
+
+-- [List] Wildcard
+SELECT
+    empid,
+    lastname
+FROM HR.Employees
+WHERE lastname LIKE N'[ABCDE]%'; -- Returns any lastname with A, B, or C as a first character, with any length. 
+
+-- [Range] Wildcarad
+SELECT
+    empid
+    , lastname
+FROM HR.Employees
+WHERE lastname LIKE N'[A-E]%'; -- Returns any lastname with A, B, C, D, or E as a first character, with any length.
+
+-- [^ List or Range] Wildcard (NOT IN)
+SELECT
+    empid,
+    lastname
+FROM HR.Employees
+WHERE lastname LIKE N'[^A-E]%'; -- Returns any last name that does NOT start with A, B, C, D, or E, with and length. 
+
+-- ESCAPE Character
+SELECT
+    empid
+    , lastname
+FROM HR.Employees
+WHERE lastname LIKE N'%!_%' ESCAPE '!'; -- Returns any last name with an underscore in the name (zero results)
+
+
+
+
+
 
 
 -- Converting to DATE
