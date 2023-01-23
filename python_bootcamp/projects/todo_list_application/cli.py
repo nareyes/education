@@ -1,11 +1,11 @@
-# TODO LIST CLI APPLICATION
+# TO DO LIST CLI APPLICATION
 # PYTHON VERSION 3.11.1
 
 # VARIABLES
 user_input_action = "Type Add, Show, Edit, Complete, Clear or Exit: "
 user_input_todo = "Enter a Todo: "
 user_input_position = "Enter a Valid Todo Number to Edit: "
-user_input_new = "Enter New Item: "
+user_input_new = "Enter a New Item: "
 user_input_complete = "Enter a Valid Todo Number to Complete: "
 todos = []
 
@@ -118,7 +118,7 @@ while True:
             break
 
         case _:
-            print("Unknown Command!")
+            print("Unknown Command")
             
 
-print('Bye!')
+print('Program Terminated')
