@@ -67,6 +67,7 @@ def complete_todos():
 
     position = int(input(user_input_complete).strip())
     completed_todo = todos[position - 1]
+    
             
     if position >= 1 and position <= len(todos):
         todos.pop(position - 1)
@@ -104,12 +105,22 @@ while True:
             show_todos()
 
         case 'edit':
-            show_todos()
-            edit_todos()
+            try:
+                show_todos()
+                edit_todos()
+            
+            except IndexError:
+                print("Invalid Entry")
+                continue
 
         case 'complete':
-            show_todos()
-            complete_todos()
+            try:
+                show_todos()
+                complete_todos()
+            
+            except IndexError:
+                print("Invalid Entry")
+                continue
         
         case 'clear':
             clear_todos()
@@ -118,7 +129,7 @@ while True:
             break
 
         case _:
-            print("Unknown Command")
+            print("Invalid Entry")
             
 
 print('Program Terminated')
