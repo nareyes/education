@@ -531,82 +531,94 @@ FROM HR.Employees
 WHERE lastname LIKE N'%!_%' ESCAPE '!'; -- Returns any last name with an underscore in the name (zero results)
 
 
+-- Converting to DATE (Not Recommended)
+-- Use language neutral format 'YYYYMMDD' for string representations of dates
+SELECT CONVERT (DATE, '02/12/2016', 101); -- YYYY-MM-DD
+SELECT CONVERT (DATE, '02/12/2016', 103); -- YYYY-DD-MM
 
 
+-- CAST (Language Neutral String-Literal)
+SELECT CAST ('20160212' AS DATE);
 
 
-
--- Converting to DATE
-SELECT CONVERT(DATE, '02/12/2016', 101); -- YYYY-MM-DD
-SELECT CONVERT(DATE, '02/12/2016', 103); -- YYYY-DD-MM
-
-
--- Date Filter Functions (does not maintain index improvements)
+-- Date Filter Functions (Does not maintain index improvements)
 SELECT
-    orderid,
-    custid,
-    empid,
-    orderdate
+    orderid
+    , custid
+    , empid
+    , orderdate
 FROM Sales.Orders
-WHERE YEAR(orderdate) = 2015 AND MONTH(orderdate) = 01;
+WHERE YEAR (orderdate) = 2015 AND MONTH (orderdate) = 01;
 
 
--- Date Filter Range (maintains index improvements)
+-- Date Filter Range (Maintains index improvements)
 SELECT
-    orderid,
-    custid,
-    empid,    
-    orderdate
+    orderid
+    , custid
+    , empid
+    , orderdate
 FROM Sales.Orders
 WHERE orderdate >= '2016-01-01' AND orderdate < '2016-02-01';
 
 
 -- Current Date & Time Functions
 SELECT 
-  GETDATE()           AS [GETDATE], 
-  CURRENT_TIMESTAMP   AS [CURRENT_TIMESTAMP], 
-  GETUTCDATE()        AS [GETUTCDATE], 
-  SYSDATETIME()       AS [SYSDATETIME], 
-  SYSUTCDATETIME()    AS [SYSUTCDATETIME], 
-  SYSDATETIMEOFFSET() AS [SYSDATETIMEOFFSET];
+  GETDATE()             AS [GETDATE]
+  , CURRENT_TIMESTAMP   AS [CURRENT_TIMESTAMP]
+  , GETUTCDATE()        AS [GETUTCDATE]
+  , SYSDATETIME()       AS [SYSDATETIME]
+  , SYSUTCDATETIME()    AS [SYSUTCDATETIME]
+  , SYSDATETIMEOFFSET() AS [SYSDATETIMEOFFSET];
 
 
+-- System DATETIME (CAST to Date and Time)
+SELECT
+    CAST (SYSDATETIME() AS DATE) AS [SYSTEMDATE]
+    , CAST (SYSDATETIME() AS TIME) AS [SYSTEMTIME];
+
+
+-- TRY Returns NULL if Input Isn't Convertible)
 -- TRY_CAST
-SELECT TRY_CAST('20160212' AS DATE);
-SELECT TRY_CAST(SYSDATETIME() AS DATE);
-SELECT TRY_CAST(SYSDATETIME() AS TIME); 
-
+SELECT
+    TRY_CAST ('20160212' AS DATE) AS [DATE]
+    , TRY_CAST (SYSDATETIME() AS DATE) AS [DATE]
+    , TRY_CAST (SYSDATETIME() AS TIME) AS [TIME];
 -- TRY_CONVERT
-SELECT TRY_CONVERT(CHAR(8), CURRENT_TIMESTAMP, 112); 
-SELECT TRY_CONVERT(CHAR(12), CURRENT_TIMESTAMP, 114); 
+SELECT
+    TRY_CONVERT (CHAR(8), CURRENT_TIMESTAMP, 112) AS [DATE]
+    , TRY_CONVERT (CHAR(12), CURRENT_TIMESTAMP, 114) AS [TIME];
 
 
 -- DATEADD
-SELECT DATEADD(YEAR, 1, '20160212'); 
-SELECT DATEADD(MONTH, 3, '2016-02-01'); 
-SELECT DATEADD(MONTH, -1, CAST('2016-02-1' AS DATE));
+SELECT 
+    DATEADD (YEAR, 1, '20160212') AS [DATETIME]
+    , DATEADD (MONTH, 3, '2016-02-01') AS [DATETIME]
+    , DATEADD (MONTH, -1, CAST ('2016-02-01' AS DATE)) AS [DATE]
 
 
 -- DATEDIFF and DATEDIFF_BIG
-SELECT DATEDIFF(DAY, '2016-01-01', '2016-12-31');
-SELECT DATEDIFF(MONTH, '2016-01-01', '2016-12-31');
+SELECT
+    DATEDIFF (DAY, '2016-01-01', '2016-12-31') AS DayDiff
+    , DATEDIFF (MONTH, '2016-01-01', '2016-12-31') AS MonthDiff;
 
 
 -- DATEPART
-SELECT DATEPART(MONTH, '2016-01-01');
-SELECT DATEPART(YEAR, '2016-01-01');
+SELECT
+    DATEPART (MONTH, '2016-01-01') AS MonthPart
+    , DATEPART (YEAR, '2016-01-01'); AS YearPart
 
 
 -- YEAR, MONTH, DAY
 SELECT 
-  DAY('20160212') AS TheDay, 
-  MONTH('20160212') AS TheMonth, 
-  YEAR('20160212') AS TheYear;
+  DAY ('20160212') AS TheDay
+  , MONTH ('20160212') AS TheMonth 
+  , YEAR ('20160212') AS TheYear;
 
 
 -- DATENAME
-SELECT DATENAME(MONTH, '2016-01-01'); -- Returns January
-SELECT DATENAME(YEAR, '2016-01-01'); -- Returns 2016 (year does not have a name)
+SELECT
+    DATENAME(MONTH, '2016-01-01') AS MonthName -- Returns January
+    , DATENAME(YEAR, '2016-01-01') AS YearName; -- Returns 2016 as a string (year does not have a name)
 
 
 -- ISDATE
@@ -617,23 +629,23 @@ SELECT ISDATE('TEST'); -- Returns 0 (No)
 
 -- FROMPARTS Functions
 SELECT 
-  DATEFROMPARTS(2016, 02, 12), -- Returns 2016-02-12
-  DATETIME2FROMPARTS(2016, 02, 12, 13, 30, 5, 1, 7), -- Returns 2016-02-12 13:30:05.0000001
-  DATETIMEFROMPARTS(2016, 02, 12, 13, 30, 5, 997), -- Returns 2016-02-12 13:30:05.997
-  DATETIMEOFFSETFROMPARTS(2016, 02, 12, 13, 30, 5, 1, -8, 0, 7), -- Returns 2016-02-12 13:30:05.0000001 -08:00
-  SMALLDATETIMEFROMPARTS(2016, 02, 12, 13, 30), -- Returns 2016-02-12 13:30:00
-  TIMEFROMPARTS(13, 30, 5, 1, 7); -- Returns 13:30:05.0000001
+  DATEFROMPARTS(2016, 02, 12) AS [DATE] -- Returns 2016-02-12
+  , DATETIME2FROMPARTS(2016, 02, 12, 13, 30, 5, 1, 7) AS [DATETIME] -- Returns 2016-02-12 13:30:05.0000001
+  , DATETIMEFROMPARTS(2016, 02, 12, 13, 30, 5, 997) AS [DATETIME] -- Returns 2016-02-12 13:30:05.997
+  , DATETIMEOFFSETFROMPARTS(2016, 02, 12, 13, 30, 5, 1, -8, 0, 7) AS [DATETIME] -- Returns 2016-02-12 13:30:05.0000001 -08:00
+  , SMALLDATETIMEFROMPARTS(2016, 02, 12, 13, 30) AS [DATETIME] -- Returns 2016-02-12 13:30:00
+  , TIMEFROMPARTS(13, 30, 5, 1, 7) AS [DATETIME]; -- Returns 13:30:05.0000001
 
 
 -- EOMONTH Function
-SELECT EOMONTH('2016-01-01'); -- Returns 2016-01-31
-
-SELECT EOMONTH('2016-01-01', 3); -- Returns 2016-04-30
+SELECT
+    EOMONTH('2016-01-01') AS [DATE] -- Returns 2016-01-31
+    , EOMONTH('2016-01-01', 3) AS [DATE]; -- Returns 2016-04-30
 
 SELECT
-    orderid,
-    orderdate,
-    custid,
-    empid
+    orderid
+    , orderdate
+    , custid
+    , empid
 FROM Sales.Orders
-WHERE orderdate = EOMONTH(orderdate); -- Returns all orders placed on the last day of the month
+WHERE orderdate = EOMONTH (orderdate); -- Returns all orders placed on the last day of the month
