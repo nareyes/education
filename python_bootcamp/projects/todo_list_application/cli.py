@@ -11,11 +11,24 @@ todos = []
 
 
 # FUNCTIONS
+def read_todos():
+    with open('data/todos.txt', 'r') as file_local:
+        todos_local = file_local.readlines()
+
+    return todos_local
+
+
+# def write_todos():
+#     with open('data/todos.txt', 'w') as file:
+#         file.writelines(todos)
+    
+#     return todos
+
+
 def add_todos():
     todo = input(user_input_todo).strip().title() + '\n'
 
-    with open('data/todos.txt', 'r') as file:
-        todos = file.readlines()
+    todos = read_todos()
 
     todos.append(todo) 
 
@@ -27,8 +40,7 @@ def add_todos():
 
 
 def show_todos():
-    with open('data/todos.txt', 'r') as file:
-        todos = file.readlines()
+    todos = read_todos()
     
     for index, item in enumerate(todos):
         item = item.strip('\n')
@@ -37,8 +49,7 @@ def show_todos():
 
 
 def edit_todos():
-    with open('data/todos.txt', 'r') as file:
-        todos = file.readlines()
+    todos = read_todos()
 
     position = int(input(user_input_position).strip())
     old_todo = todos[position - 1]
@@ -62,8 +73,7 @@ def edit_todos():
 
 
 def complete_todos():
-    with open('data/todos.txt', 'r') as file:
-        todos = file.readlines()
+    todos = read_todos()
 
     position = int(input(user_input_complete).strip())
     completed_todo = todos[position - 1]
