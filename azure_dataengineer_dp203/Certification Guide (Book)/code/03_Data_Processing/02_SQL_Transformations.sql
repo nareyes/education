@@ -1,6 +1,6 @@
 -- SQL Transformation Examples
 
--- CLean up the workspace
+-- Clean up the workspace
 
 --DROP TABLE dbo.Driver;
 --DROP TABLE dbo.TripTable;
