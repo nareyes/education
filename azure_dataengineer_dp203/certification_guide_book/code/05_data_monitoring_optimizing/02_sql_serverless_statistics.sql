@@ -38,10 +38,19 @@ GO
 SELECT TOP 100 * FROM dbo.TripsExtTable
 GO
 
--- Now that we have the table, let us create stats on the tripsId column:
-
+-- Now that we have the external table, let us create stats on the tripsId column:
+-- We can only create statisitics on a single column
 CREATE STATISTICS TripStats
 ON dbo.TripsExtTable ( tripsId )
     WITH FULLSCAN
+GO
 
+-- Updating statistics (requires dropping and recreating)
+DROP STATISTICS TripStats
+GO
+
+CREATE STATISTICS TripStats
+ON dbo.TripsExtTable ( tripsId )
+    WITH SAMPLE 40 PERCENT,
+	NORECOMPUTE
 GO

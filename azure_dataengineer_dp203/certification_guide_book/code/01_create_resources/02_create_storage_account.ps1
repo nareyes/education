@@ -8,7 +8,7 @@ az storage account create \
     --name $storageAccount \
     --resource-group $resourceGroup \
     --location $region \
-    --kind StorageV2
+    --kind StorageV2 \
     --sku Standard_LRS
 
 # Create Storage Account ADLS Gen2

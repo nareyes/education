@@ -6,3 +6,21 @@ SELECT * FROM sys.dm_pdw_exec_requests;
 
 -- sys.dm_pdw_waits – contains details of the wait states in a query, including locks and waits on transmission queues. 
 SELECT * FROM sys.dm_pdw_waits;
+
+
+-- Enable query store for Synapse SQL
+ALTER DATABASE <database_name> 
+SET QUERY_STORE = ON (OPERATION_MODE = READ_WRITE);
+
+
+-- Query Store System Tables
+-- Query detailes
+SELECT * FROM sys.query_store_query;
+SELECT * FROM sys.query_store_query_text;
+
+-- Plan Details
+SELECT * FROM sys.query_store_plan;
+
+-- Runtime statistics
+SELECT * FROM sys.query_store_runtime_stats;
+SELECT * FROM sys.query_store_runtime_stats_interval;

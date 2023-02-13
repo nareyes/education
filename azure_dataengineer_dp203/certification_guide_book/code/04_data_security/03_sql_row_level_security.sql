@@ -76,4 +76,4 @@ REVERT;
 
 -- Turn off the filter
 ALTER SECURITY POLICY PrivFilter  
-WITH (STATE = ON);  
+WITH (STATE = OFF);  

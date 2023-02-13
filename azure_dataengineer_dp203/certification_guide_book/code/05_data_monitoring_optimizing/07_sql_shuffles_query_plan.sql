@@ -36,8 +36,7 @@ Select [gender], AVG([salary]) AS 'AVG salary' from dbo.DimDriver GROUP BY [gend
 -- Use the EXPLAIN option to see the query plan
 EXPLAIN WITH_RECOMMENDATIONS
 SELECT
-        [gender],SUM([salary]) as Totalsalary
-    FROM
-       dbo.DimDriver
-    GROUP BY
-        [gender]
+    gender
+    , SUM(salary) as totalsalary
+FROM dbo.DimDriver
+GROUP BY gender;

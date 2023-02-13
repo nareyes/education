@@ -31,13 +31,13 @@ GO
 SELECT * from dbo.FactTrips;
 
 -- You can enable statistics in Synapse SQL dedicated pools using the following command 
-ALTER DATABASE <INSERT DATABASE NAME> SET AUTO_CREATE_STATISTICS ON
+ALTER DATABASE <INSERT DATABASE NAME> SET AUTO_CREATE_STATISTICS ON;
 
 -- Once the AUTO_CREATE_STATISTICS is ON, any of SELECT, INSERT-SELECT, CTAS, UPDATE, DELETE or EXPLAIN 
 -- statements will automatically trigger the creation of statistics for the columns involved in the query, if not already present. 
 -- Automatic creation of statistics is not available for temporary or external tables.
--- You can create statistics on-demand using the following command.
 
+-- You can create statistics on-demand using the following command.
 CREATE STATISTICS TripStats
     ON dbo.FactTrips (tripId)
     WITH SAMPLE 40 PERCENT;
@@ -47,3 +47,6 @@ CREATE STATISTICS TripStats
 CREATE STATISTICS TripStats
     ON dbo.FactTrips (tripId)
     WITH FULLSCAN;
+
+-- Updating statistics. Recommended on data loads.
+UPDATE STATISTICS dbo.FactTrips (tripId);

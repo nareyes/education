@@ -4,6 +4,7 @@ $storageAccount ="<INSERT STORAGE ACCOUNT NAME>"
 $storageKey = "<INSERT STORAGE KEY>" # Use AAD
 $region = "<INSERT REGION NAME>"
 $fileshareName = "<INSERT FILE SHARE NAME>"
+$filePath = Data/testfile.txt
 
 $env:AZURE_STORAGE_ACCOUNT=$storageAccount
 $env:AZURE_STORAGE_KEY=$storageKey
@@ -22,7 +23,7 @@ az storage share list \
 # Add File
 az storage file upload \
     --share-name $fileshareName \
-    --source Data/testfile.txt
+    --source $filePath
 
 # List Files
 az storage file list \

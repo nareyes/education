@@ -7,12 +7,13 @@ GO
 CREATE FUNCTION dbo.isValidEmail(@EMAIL VARCHAR(100))
 RETURNS VARCHAR(100) AS
 BEGIN     
-  DECLARE @returnValue AS VARCHAR(100)
-  DECLARE @EmailText VARCHAR(100)
-  SET @EmailText= isnull(@EMAIL,'')
-  SET @returnValue = CASE WHEN @EmailText NOT LIKE '_%@_%._%' THEN 'Not Available'
+  DECLARE @returnValue  AS VARCHAR(100)
+  DECLARE @EmailText    AS VARCHAR(100)
+  SET @EmailText =      ISNULL(@EMAIL,'')
+  SET @returnValue =    CASE
+                          WHEN @EmailText NOT LIKE '_%@_%._%' THEN 'Not Available'
                           ELSE @EmailText
-                      end
+                        END
   RETURN @returnValue
 END
 GO
