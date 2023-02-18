@@ -9,8 +9,8 @@ PolyBase 6 steps Process
 */
 
 
--- USE <enter database>
--- GO
+USE <ENTER DATABASE>
+GO
 
 /*
 1. Create a Database Master Key. Only necessary if one does not already exist.
@@ -21,7 +21,7 @@ PolyBase 6 steps Process
 	the Database Scoped Credential stores the service principal credentials set up in AAD. 
 	You can also use the Database Scoped Credential to store the storage account key for Blob storage.
 */
--- DROP MASTER KEY;
+DROP MASTER KEY;
 CREATE MASTER KEY;
 GO
 
@@ -31,7 +31,7 @@ GO
 	IDENTITY: Provide any string, it is not used for authentication to Azure storage.
 	SECRET: Provide your Azure storage account key.
 */
--- DROP DATABASE SCOPED CREDENTIAL BlobStorageCredential;
+DROP DATABASE SCOPED CREDENTIAL BlobStorageCredential;
 CREATE DATABASE SCOPED CREDENTIAL BlobStorageCredential
 WITH
     IDENTITY = 'blobuser',  
@@ -45,7 +45,7 @@ GO
 	LOCATION: Provide Data Lake Storage blob account name and URI
 	CREDENTIAL: Provide the credential created in the previous step.
 */
--- DROP EXTERNAL DATA SOURCE AzureBlobStorage;
+DROP EXTERNAL DATA SOURCE AzureBlobStorage;
 CREATE EXTERNAL DATA SOURCE AzureBlobStorage
 WITH (
     TYPE = HADOOP
@@ -60,9 +60,9 @@ GO
 	FIELD_TERMINATOR: Marks the end of each field (column) in a delimited text file
 	STRING_DELIMITER: Specifies the field terminator for data of type string in the text-delimited file.
 	DATE_FORMAT: Specifies a custom format for all date and time data that might appear in a delimited text file.
-	Use_Type_Default: Store missing values as default for datatype.
+	USE_TYPE_DEFAULT: Store missing values as default for datatype.
 */
--- DROP EXTERNAL FILE FORMAT CSVFileFormat;
+DROP EXTERNAL FILE FORMAT CSVFileFormat;
 CREATE EXTERNAL FILE FORMAT CSVFileFormat 
 WITH (
 	FORMAT_TYPE = DELIMITEDTEXT
@@ -90,11 +90,12 @@ External Tables are strongly typed.
 This means that each row of the data being ingested must satisfy the table schema definition. 
 If a row does not match the schema definition, the row is rejected from the load.
 */
--- DROP SCHEMA [stage];
-CREATE SCHEMA [stage];
+DROP SCHEMA [stage]
+GO
+CREATE SCHEMA [stage]
 GO
 
--- DROP EXTERNAL TABLE [stage].FactTransactionHistory ;
+DROP EXTERNAL TABLE [stage].FactTransactionHistory ;
 CREATE EXTERNAL TABLE [stage].FactTransactionHistory (
     TransactionID	INT NOT NULL
 	, ProductKey	INT NOT NULL
@@ -112,29 +113,29 @@ WITH (
 )
 GO
 
--- DROP EXTERNAL TABLE [stage].DimBigProduct ;
+DROP EXTERNAL TABLE [stage].DimBigProduct ;
 CREATE EXTERNAL TABLE [stage].DimBigProduct (
-	[ProductKey] [INT] NOT NULL
-	, [EnglishProductName] [NVARCHAR](80) NULL
-	, [ProductAlternateKey] [NVARCHAR](56) NULL
-	, [FinishedGoodsFlag] [NVARCHAR](60) NOT NULL
-	, [Color] [NVARCHAR](15) NOT NULL
-	, [SafetyStockLevel] [SMALLINT] NULL
-	, [ReorderPoINT] [SMALLINT] NULL
-	, [StandardCost] [MONEY] NULL
-	, [ListPrice] [MONEY] NULL
-	, [Size] [NVARCHAR](50) NULL
-	, [SizeUnitMeasureCode] [NCHAR](3) NULL
-	, [WeightUnitMeasureCode] [NCHAR](3) NULL
-	, [Weight] [FLOAT] NULL
-	, [DaysToManufacture] [INT] NULL
-	, [ProductLine] [NCHAR](2) NULL
-	, [Class] [NCHAR](2) NULL
-	, [Style] [NCHAR](2) NULL
-	, [ProductSubcategoryKey] [INT] NULL
-	, [ModelName] [NVARCHAR](50) NULL
-	, [StartDate] [DATETIME] NULL
-	, [EndDate] [DATETIME] NULL
+	[ProductKey] 				INT NOT NULL
+	, [EnglishProductName] 		NVARCHAR(80) NULL
+	, [ProductAlternateKey] 	NVARCHAR(56) NULL
+	, [FinishedGoodsFlag] 		NVARCHAR(60) NOT NULL
+	, [Color] 					NVARCHAR(15) NOT NULL
+	, [SafetyStockLevel] 		SMALLINT NULL
+	, [ReorderPoINT] 			SMALLINT NULL
+	, [StandardCost] 			MONEY NULL
+	, [ListPrice] 				MONEY NULL
+	, [Size] 					NVARCHAR(50) NULL
+	, [SizeUnitMeasureCode] 	NCHAR(3) NULL
+	, [WeightUnitMeasureCode]	NCHAR(3) NULL
+	, [Weight] 					FLOAT NULL
+	, [DaysToManufacture] 		INT NULL
+	, [ProductLine] 			NCHAR(2) NULL
+	, [Class] 					NCHAR(2) NULL
+	, [Style] 					NCHAR(2) NULL
+	, [ProductSubcategoryKey] 	INT NULL
+	, [ModelName] 				NVARCHAR(50) NULL
+	, [StartDate] 				DATETIME NULL
+	, [EndDate] 				DATETIME NULL
 )
 
 WITH (
@@ -153,8 +154,9 @@ GO
 	CTAS defines the new table to have the same columns and data types as the results of the select statement. 
 	If you select all the columns from an external table, the new table is a replica of the columns and data types in the external table.
 */
--- DROP SCHEMA [prod];
-CREATE SCHEMA [prod];
+DROP SCHEMA [prod]
+GO
+CREATE SCHEMA [prod]
 GO
 
 -- DROP TABLE [prod].[FactTransactionHistory];
@@ -192,13 +194,13 @@ SELECT COUNT (*) FROM [prod].[DimBigProduct];
 
 /*
 By default, tables are defined as a clustered columnstore index. 
-After a load completes, some of the data rows might not be compressed INTo the columnstore. 
+After a load completes, some of the data rows might not be compressed into the columnstore. 
 To optimize query performance and columnstore compression after a load, rebuild the table to force the columnstore index to compress all the rows.
 */
 ALTER INDEX ALL ON [prod].[FactTransactionHistory_Lake] REBUILD;
 
 
--- Verify the data was loaded INTo the 60 distributions
+-- Verify the data was loaded into the 60 distributions
 -- Verify distribution sizes are not skewed
 DBCC PDW_SHOWSPACEUSED('prod.FactTransactionHistory');
 DBCC PDW_SHOWSPACEUSED('prod.DimBigProduct');

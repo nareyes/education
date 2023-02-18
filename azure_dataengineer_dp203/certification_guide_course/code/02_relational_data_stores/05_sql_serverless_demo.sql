@@ -3,13 +3,13 @@ CREATE DATABASE DemoDB
 
 
 -- Create Master Key
-CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'sknfd#isfnasdkf!bsk1'
+CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'INSERT PASSWORD'
 
 
 -- Create Credentials for Containers in Demo Storage Account
 CREATE DATABASE SCOPED CREDENTIAL SQLOnDemand
 WITH IDENTITY = 'SHARED ACCESS SIGNATURE',  
-SECRET = 'sv=2018-03-28&ss=bf&srt=sco&sp=rl&st=2019-10-14T12%3A10%3A25Z&se=2061-12-31T12%3A10%3A00Z&sig=KlSU2ullCscyTS0An0nozEpo4tO5JAgGBvw%2FJX2lguw%3D'
+SECRET = 'INSERT SECRET'
 GO
 
 
@@ -30,10 +30,10 @@ FROM OPENROWSET (
 )
 
 WITH (
-      [Country_Code] VARCHAR (5)
-    , [Country_Name] VARCHAR (100)
-    , [Year] smallint
-    , [Population] bigint
+    [Country_Code]  VARCHAR (5)
+  , [Country_Name]  VARCHAR (100)
+  , [Year]          SMALLINT
+  , [Population]    BIGINT
 ) AS R
 
 WHERE

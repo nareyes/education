@@ -23,7 +23,7 @@ FROM (
     FROM dbo.FactTransactionHistory
 ) AS SUBQ
     CROSS APPLY (
-        SELECT RowNum % 60 [Distribution]
+        SELECT RowNum % 60 AS [Distribution]
     ) AS CP
 GROUP BY [Distribution]
 ORDER BY [Distribution];
@@ -67,7 +67,7 @@ FROM (
     GROUP BY ProductKey
 ) AS SUBQ
     CROSS APPLY (
-        SELECT RowNum % 60 [Distribution]
+        SELECT RowNum % 60 AS [Distribution]
         ) AS CP
 GROUP BY [Distribution]
 ORDER BY [Distribution];
