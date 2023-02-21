@@ -8,7 +8,7 @@ SELECT
     , Temperature
     , Humidity
     , EventProcessedUtcTime
-    , *
+    , * -- ALL
 INTO StreamOutput 
 FROM StreamInput
 HAVING Temperature > 27;
