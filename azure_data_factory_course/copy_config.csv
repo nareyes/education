@@ -1,0 +1,3 @@
+Source_Table,Dest_Dataset,Columns,Filter_Col,Filter_Value
+dbo.employee,employee.csv,"Name, Dept",Gender,F
+dbo.dept,dept.csv,*,Dept_Name,HR

@@ -1,0 +1,199 @@
+
+-------------------------- AZURE SQL Table creation and data insertion -----------
+create table employee
+(
+    Name varchar(max),
+    Gender varchar(max),
+    Dept varchar(max),
+
+)
+
+select * from employee;
+
+insert into dbo.employee(Name, Gender, Dept) VALUES ('Tanmoy', 'M', 'IT');
+insert into dbo.employee(Name, Gender, Dept) VALUES ('Roop', 'M', 'HR');
+insert into dbo.employee(Name, Gender, Dept) VALUES ('Malathy', 'F', 'IT');
+insert into dbo.employee(Name, Gender, Dept) VALUES ('Kranthi', 'M', 'HR');
+insert into dbo.employee(Name, Gender, Dept) VALUES ('Bhuvi', 'F', 'Payrole');
+
+-------------------------- Copy Data Fault Tolerance  -----------
+
+create table employee_new
+(
+    Name varchar(8),
+    Gender char(1),
+    Salary INT,
+    Dept char(1),
+    DOJ DATE
+
+)
+
+select * from employee_new;
+
+
+
+
+------------------------------- Dept Table creation and data insertion  -------------------------
+create table dept
+(
+    Dept_id INT,
+    Dept_Name varchar(max),
+
+)
+
+insert into dbo.dept(Dept_id, Dept_Name) Values (1,'IT');
+insert into dbo.dept(Dept_id, Dept_Name) Values (2,'HR');
+insert into dbo.dept(Dept_id, Dept_Name) Values (3,'Payrole');
+
+select * from dept;
+
+
+-------------- Real world Scenario 3 Dynamically add filename while copy --------------
+
+create table Sales
+(
+    Customer varchar(max),
+    Gender varchar(max),
+    Product_code varchar(max),
+    Price varchar(max),
+    Filename varchar(max)
+
+)
+
+select * from Sales;
+
+
+
+
+---------------Bulk Table load using Lookup Activity ----------------------
+
+select TABLE_SCHEMA, TABLE_NAME from information_schema.TABLES
+where TABLE_TYPE = 'BASE TABLE' and TABLE_SCHEMA = 'dbo';
+
+
+----------------------Stroed Procedure------------------------------
+
+CREATE PROCEDURE sp_delete_dept
+@p_dept_name varchar(max)
+AS
+BEGIN
+	DELETE FROM dbo.dept
+	WHERE Dept_Name = @p_dept_name
+END
+
+---------------------------Real world scenario - Logging pipeline run details in table  ---------
+
+create table pipeline_runs
+(
+    name varchar(max),
+    run_id varchar(max),
+    trigger_type varchar(max),
+
+)
+
+
+CREATE PROCEDURE sp_log_pipeline_rundetails
+@p_pipeline_name varchar(max),
+@p_pipeline_run_id varchar(max),
+@p_trigger_type varchar(max)
+AS
+BEGIN
+	INSERT INTO dbo.pipeline_runs(name, run_id,trigger_type) 
+	Values (@p_pipeline_name,@p_pipeline_run_id,@p_trigger_type)
+END
+
+
+------------------------------  ALTER ROW Transformation -------------------
+
+create table employees_tbl
+(
+    Emp_key INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+    Emp_id INT NOT NULL,
+    Name varchar(max),
+    Gender varchar(max),
+    Salary INT,
+    Dept_id INT
+
+)
+select * from employees_tbl;
+
+
+
+insert into dbo.employees_tbl(Emp_id,Name,Gender,Salary,Dept_id) Values (4,'Abhro','M',35000,1);
+
+---------------------------  Expression Language  --------------------------
+
+create table marks
+(
+    name varchar(20),
+    marks INT
+)
+
+select * from marks;
+
+
+insert into dbo.marks Values ('Ram',75);
+insert into dbo.marks Values ('Shyam',80);
+insert into dbo.marks Values ('Jadu',85);
+insert into dbo.marks Values ('Madhu',92);
+
+
+
+---------------------------  Create Table employees_SCD2  -------------------
+
+
+create table employees_SCD2
+(
+    Emp_key INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+    Emp_id INT NOT NULL,
+    Name varchar(max),
+    Gender varchar(max),
+    Salary INT,
+    Dept_id INT,
+    Is_Active    char(1)
+
+)
+
+select * from employees_SCD2;
+
+
+
+
+insert into dbo.employees_SCD2(Emp_id,Name,Gender,Salary,Dept_id,Is_Active) Values (4,'Abhro','M',35000,1,'Y');
+insert into dbo.employees_SCD2(Emp_id,Name,Gender,Salary,Dept_id,Is_Active) Values (9,'Happy','M',20000,2,'Y');
+
+----------------------------------------------  Incremental Load  -------------------------------------
+
+create table config
+(
+    table_name varchar(50),
+    waterMark DATETIME
+)
+
+Truncate table config;
+
+insert into dbo.config Values ('transactions','2022-05-20 00:00:00');
+
+select * from config;
+
+
+create table transactions
+(
+    trans_id INT,
+    trans_amount decimal(12,2),
+    trans_timestamp DATETIME
+)
+
+insert into dbo.transactions Values (10000001,23.33,'2022-04-20 10:30:24');
+insert into dbo.transactions Values (10000002,25.14,'2022-03-10 09:50:14');
+insert into dbo.transactions Values (10000003,102.65,'2022-06-10 11:27:34');
+insert into dbo.transactions Values (10000004,94.50,'2022-05-25 05:40:55');
+
+select * from transactions;
+
+******* Query to update config table after copy *******
+
+update dbo.config set waterMark = (select max(@{pipeline().parameters.Source_Timestamp_col}) from @{pipeline().parameters.Source_Table}) where table_name = '@{pipeline().parameters.Source_Table}'
+select 1
+
+-------------------------
