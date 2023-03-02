@@ -125,6 +125,7 @@ FROM Sales.Customers AS C
     LEFT OUTER JOIN Sales.Orders AS O 
         ON C.custid = O.custid
 WHERE O.orderid IS NULL; -- Returns outer rows only. Customers without a matching order id
+-- In both queries above, orderid is a primary key in the Customers table so NULLs are not expected on the preserved side
 
 SELECT
     D.Date 
