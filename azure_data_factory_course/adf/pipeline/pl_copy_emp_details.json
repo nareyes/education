@@ -14,7 +14,16 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": [],
+				"userProperties": [
+					{
+						"name": "input",
+						"value": "blob/input/emp_details.csv"
+					},
+					{
+						"name": "output",
+						"value": "adls/output/emp_details.csv"
+					}
+				],
 				"typeProperties": {
 					"source": {
 						"type": "DelimitedTextSource",
