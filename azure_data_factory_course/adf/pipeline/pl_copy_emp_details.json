@@ -1,11 +1,11 @@
 {
 	"name": "pl_copy_emp_details",
 	"properties": {
-		"description": "Copy Employee Details from Az Blob to ADLS.",
+		"description": "copy emp details from az blob to adls",
 		"activities": [
 			{
 				"name": "copyEmpDetails",
-				"description": "Copy Employee Details from Az Blob to ADLS.",
+				"description": "copy emp details from az blob to adls",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
