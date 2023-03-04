@@ -1,5 +1,5 @@
 {
-	"name": "ds_adls_output_emp_details",
+	"name": "ds_adls_output_sales_details",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_azdatalake",
@@ -10,8 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "emp_details.csv",
-				"folderPath": "emp",
+				"folderPath": "sales",
 				"fileSystem": "output"
 			},
 			"columnDelimiter": ",",
@@ -20,6 +19,5 @@
 			"quoteChar": "\""
 		},
 		"schema": []
-	},
-	"type": "Microsoft.DataFactory/factories/datasets"
+	}
 }
