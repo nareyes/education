@@ -11,6 +11,7 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"fileName": "emp_details.csv",
+				"folderPath": "emp",
 				"fileSystem": "output"
 			},
 			"columnDelimiter": ",",
