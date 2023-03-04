@@ -48,7 +48,14 @@
 							"fileExtension": ".txt"
 						}
 					},
-					"enableStaging": false,
+					"enableStaging": true,
+					"stagingSettings": {
+						"linkedServiceName": {
+							"referenceName": "ls_azblob",
+							"type": "LinkedServiceReference"
+						},
+						"path": "staging"
+					},
 					"logSettings": {
 						"enableCopyActivityLog": true,
 						"copyActivityLogSettings": {
