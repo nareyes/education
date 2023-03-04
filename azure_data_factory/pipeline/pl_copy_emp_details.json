@@ -4,7 +4,7 @@
 		"activities": [
 			{
 				"name": "copyEmpDetails",
-				"description": "Copy Employee Details \nSources: Blob\nSink: ADLS Gen2",
+				"description": "Copy Employee Details from Az Blob to ADLS.",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
