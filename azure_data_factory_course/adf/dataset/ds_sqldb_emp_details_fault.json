@@ -1,0 +1,38 @@
+{
+	"name": "ds_sqldb_emp_details_fault",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azsqldb",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Gender",
+				"type": "char"
+			},
+			{
+				"name": "Salary",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Dept",
+				"type": "char"
+			},
+			{
+				"name": "DOJ",
+				"type": "date"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "EmployeeDetailsFault"
+		}
+	}
+}

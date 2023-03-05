@@ -1,0 +1,44 @@
+{
+	"name": "ds_blob_input_emp_details_fault",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azblob",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "emp_details_datatype_mismatch.csv",
+				"container": "input"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Name",
+				"type": "String"
+			},
+			{
+				"name": "Gender",
+				"type": "String"
+			},
+			{
+				"name": "Salary",
+				"type": "String"
+			},
+			{
+				"name": "Dept_id",
+				"type": "String"
+			},
+			{
+				"name": "Date_of_Join",
+				"type": "String"
+			}
+		]
+	}
+}
