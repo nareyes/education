@@ -5,7 +5,7 @@
 		"activities": [
 			{
 				"name": "copySalesDetails",
-				"description": "Copy sales files from az blob to adls.",
+				"description": "",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
