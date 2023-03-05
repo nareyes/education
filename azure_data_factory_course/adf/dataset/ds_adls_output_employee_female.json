@@ -1,5 +1,5 @@
 {
-	"name": "ds_adle_output_employee_female",
+	"name": "ds_adls_output_employee_female",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_azdatalake",
