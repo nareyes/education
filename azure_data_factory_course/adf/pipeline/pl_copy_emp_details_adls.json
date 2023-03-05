@@ -80,7 +80,8 @@
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "Emp_Id",
+									"name": "Emp_id",
+									"type": "String",
 									"physicalType": "String"
 								}
 							},
