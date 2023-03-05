@@ -1,0 +1,24 @@
+{
+	"name": "ds_adle_output_employee_female",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azdatalake",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "employee_female.csv",
+				"folderPath": "employee",
+				"fileSystem": "output"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
