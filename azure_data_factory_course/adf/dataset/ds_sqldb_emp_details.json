@@ -7,23 +7,10 @@
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
-		"schema": [
-			{
-				"name": "Name",
-				"type": "varchar"
-			},
-			{
-				"name": "Gender",
-				"type": "varchar"
-			},
-			{
-				"name": "Dept",
-				"type": "varchar"
-			}
-		],
+		"schema": [],
 		"typeProperties": {
 			"schema": "dbo",
-			"table": "Employee"
+			"table": "EmployeeDetails"
 		}
 	}
 }
