@@ -112,7 +112,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "ds_adle_output_employee_female",
+						"referenceName": "ds_adls_output_employee_female",
 						"type": "DatasetReference"
 					}
 				]
