@@ -1,0 +1,26 @@
+{
+	"name": "pl_copy_sales_details_sqldb",
+	"properties": {
+		"description": "Copy sales files from az blob to sqldb.",
+		"activities": [
+			{
+				"name": "copySalesDetails",
+				"description": "Copy sales files from az blob to sqldb.",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"enableStaging": false
+				}
+			}
+		],
+		"annotations": []
+	}
+}
