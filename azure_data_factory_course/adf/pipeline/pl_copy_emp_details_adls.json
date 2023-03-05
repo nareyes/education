@@ -22,7 +22,7 @@
 					},
 					{
 						"name": "output",
-						"value": "adls/output/emp_details.csv"
+						"value": "adls/output/employee-details/emp_details.csv"
 					}
 				],
 				"typeProperties": {
