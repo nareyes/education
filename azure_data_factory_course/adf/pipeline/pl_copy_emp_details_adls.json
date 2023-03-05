@@ -1,5 +1,5 @@
 {
-	"name": "pl_copy_emp_details",
+	"name": "pl_copy_emp_details_adls",
 	"properties": {
 		"description": "copy emp details from az blob to adls",
 		"activities": [
