@@ -1,5 +1,5 @@
 {
-	"name": "pl_copy_sales_details",
+	"name": "pl_copy_sales_details_adls",
 	"properties": {
 		"description": "copy sales files from az blob to adls",
 		"activities": [
