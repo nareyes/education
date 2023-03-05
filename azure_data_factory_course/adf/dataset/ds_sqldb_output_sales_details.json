@@ -1,0 +1,37 @@
+{
+	"name": "ds_sqldb_output_sales_details",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azsqldb",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Customer",
+				"type": "varchar"
+			},
+			{
+				"name": "Gender",
+				"type": "varchar"
+			},
+			{
+				"name": "Product_Code",
+				"type": "varchar"
+			},
+			{
+				"name": "Price",
+				"type": "varchar"
+			},
+			{
+				"name": "File_Name",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Sales"
+		}
+	}
+}
