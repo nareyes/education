@@ -144,6 +144,9 @@
 				]
 			}
 		],
+		"folder": {
+			"name": "Copy Activity"
+		},
 		"annotations": []
 	}
 }
