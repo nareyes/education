@@ -1,11 +1,11 @@
 {
 	"name": "pl_copy_sales_details_adls",
 	"properties": {
-		"description": "copy sales files from az blob to adls",
+		"description": "Copy sales files from az blob to adls.",
 		"activities": [
 			{
 				"name": "copySalesDetails",
-				"description": "copy sales files from az blob to adls",
+				"description": "Copy sales files from az blob to adls.",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
