@@ -1,0 +1,12 @@
+{
+	"name": "ds_sqldb_Input_dynamic",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azsqldb",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}

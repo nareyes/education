@@ -105,7 +105,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "ds_sqldb_employee",
+						"referenceName": "ds_sqldb_Input_employee",
 						"type": "DatasetReference"
 					}
 				],

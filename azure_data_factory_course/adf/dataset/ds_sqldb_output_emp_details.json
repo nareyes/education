@@ -1,5 +1,5 @@
 {
-	"name": "ds_sqldb_emp_details",
+	"name": "ds_sqldb_output_emp_details",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_azsqldb",

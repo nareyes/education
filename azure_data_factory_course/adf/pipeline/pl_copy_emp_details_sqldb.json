@@ -148,7 +148,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "ds_sqldb_emp_details",
+						"referenceName": "ds_sqldb_output_emp_details",
 						"type": "DatasetReference"
 					}
 				]

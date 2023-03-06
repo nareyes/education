@@ -134,7 +134,7 @@
 				],
 				"outputs": [
 					{
-						"referenceName": "ds_sqldb_emp_details_fault",
+						"referenceName": "ds_sqldb_output_emp_details_fault",
 						"type": "DatasetReference"
 					}
 				]
