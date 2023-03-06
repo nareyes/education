@@ -97,7 +97,7 @@
 						"type": "DatasetReference",
 						"parameters": {
 							"tableName": {
-								"value": "@pipeline().parameters.tableNamePipeline",
+								"value": "@pipeline().parameters.tableName",
 								"type": "Expression"
 							}
 						}
