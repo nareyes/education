@@ -1,7 +1,7 @@
 {
 	"name": "pl_variable_demo",
 	"properties": {
-		"description": "Set a pipeline variable and set with set variable activity.",
+		"description": "Create a pipeline variable and set with set variable activity.",
 		"activities": [
 			{
 				"name": "variableDemo",
