@@ -1,7 +1,7 @@
 {
-	"name": "pl_copy_cat_details_adls_vars",
+	"name": "pl_copy_cat_details_adls_sysvars",
 	"properties": {
-		"description": "Copy category details from blob to adls using variables for pipeline metadata.",
+		"description": "Copy category details from blob to adls using system variables for pipeline metadata.",
 		"activities": [
 			{
 				"name": "copyCatDetails",
