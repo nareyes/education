@@ -1,5 +1,5 @@
 {
-	"name": "ds_sqldb_employee",
+	"name": "ds_sqldb_Input_employee",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_azsqldb",
