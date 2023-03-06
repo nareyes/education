@@ -1,7 +1,7 @@
 {
 	"name": "pl_copy_cat_details_adls",
 	"properties": {
-		"description": "Copy category details from blob to adls",
+		"description": "Copy category details from blob to adls.",
 		"activities": [
 			{
 				"name": "copyCatDetails",

@@ -1,7 +1,7 @@
 {
 	"name": "pl_copy_rest_employee_adls",
 	"properties": {
-		"description": "Copy employee from rest api to adls",
+		"description": "Copy employee from rest api to adls.",
 		"activities": [
 			{
 				"name": "copyEmployeeJSON",
