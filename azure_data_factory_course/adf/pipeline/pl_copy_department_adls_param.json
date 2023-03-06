@@ -96,7 +96,10 @@
 						"referenceName": "ds_sqldb_Input_dynamic",
 						"type": "DatasetReference",
 						"parameters": {
-							"tableName": "Department"
+							"tableName": {
+								"value": "@pipeline().parameters.tableNamePipeline",
+								"type": "Expression"
+							}
 						}
 					}
 				],
@@ -108,6 +111,11 @@
 				]
 			}
 		],
+		"parameters": {
+			"tableNamePipeline": {
+				"type": "string"
+			}
+		},
 		"folder": {
 			"name": "Copy Activity"
 		},
