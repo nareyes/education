@@ -112,7 +112,7 @@
 			}
 		],
 		"parameters": {
-			"tableNamePipeline": {
+			"tableName": {
 				"type": "string"
 			}
 		},
