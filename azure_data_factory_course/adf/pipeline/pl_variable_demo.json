@@ -1,0 +1,35 @@
+{
+	"name": "pl_variable_demo",
+	"properties": {
+		"description": "Set a pipeline variable and set with set variable activity.",
+		"activities": [
+			{
+				"name": "variableDemo",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "fileName",
+					"value": {
+						"value": "@concat(pipeline().parameters.triggerFileName, string(', Time: '), string(utcnow()))",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"triggerFileName": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"fileName": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Copy Activity"
+		},
+		"annotations": []
+	}
+}
