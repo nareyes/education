@@ -1,7 +1,7 @@
 {
-	"name": "pl_copy_cat_details_adls",
+	"name": "pl_copy_cat_details_adls_vars",
 	"properties": {
-		"description": "Copy category details from blob to adls.",
+		"description": "Copy category details from blob to adls using variables for pipeline metadata.",
 		"activities": [
 			{
 				"name": "copyCatDetails",
@@ -31,6 +31,20 @@
 							{
 								"name": "File_Name",
 								"value": "$$FILEPATH"
+							},
+							{
+								"name": "Pipeline_Name",
+								"value": {
+									"value": "@pipeline().Pipeline",
+									"type": "Expression"
+								}
+							},
+							{
+								"name": "Pipeline_Run_Id",
+								"value": {
+									"value": "@pipeline().RunId",
+									"type": "Expression"
+								}
 							}
 						],
 						"storeSettings": {
@@ -85,7 +99,8 @@
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "Product_Id",
+									"name": "Product_id",
+									"type": "String",
 									"physicalType": "String"
 								}
 							},
@@ -96,7 +111,8 @@
 									"physicalType": "String"
 								},
 								"sink": {
-									"name": "Product_Name",
+									"name": "Product_name",
+									"type": "String",
 									"physicalType": "String"
 								}
 							},
@@ -119,6 +135,28 @@
 								},
 								"sink": {
 									"name": "File_Name",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Pipeline_Name",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Pipeline_Name",
+									"type": "String",
+									"physicalType": "String"
+								}
+							},
+							{
+								"source": {
+									"name": "Pipeline_Run_Id",
+									"type": "String"
+								},
+								"sink": {
+									"name": "Pipeline_Run_Id",
 									"type": "String",
 									"physicalType": "String"
 								}
