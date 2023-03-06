@@ -1,0 +1,20 @@
+{
+	"name": "ds_adls_output_employee_json",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azdatalake",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "employee.json",
+				"folderPath": "employee",
+				"fileSystem": "output"
+			}
+		},
+		"schema": {}
+	}
+}

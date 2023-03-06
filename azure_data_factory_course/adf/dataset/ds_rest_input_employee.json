@@ -1,0 +1,12 @@
+{
+	"name": "ds_rest_input_employee",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_restapi",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"schema": []
+	}
+}
