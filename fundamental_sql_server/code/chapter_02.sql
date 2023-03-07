@@ -23,30 +23,30 @@ ORDER BY empid, orderyear
 -- FROM Clause
 SELECT
     orderid
-    , custid
-    , empid
-    , orderdate
-    , freight
+    ,custid
+    ,empid
+    ,orderdate
+    ,freight
 FROM Sales.Orders;
 
 
 -- WHERE Clause
 SELECT
     orderid
-    , custid
-    , empid
-    , orderdate
-    , freight
+    ,custid
+    ,empid
+    ,orderdate
+    ,freight
 FROM Sales.Orders
 WHERE custid = 71;
 
 -- GROUP BY Clause
 SELECT
     empid
-    , YEAR (orderdate) AS orderyear
-    , SUM (freight) as totalfreight
-    , COUNT (*) as numorders -- counts nulls
-    , COUNT (orderid) as numorders -- counts known values (same in this case since there are no NULL orderids)
+    ,YEAR (orderdate) AS orderyear
+    ,SUM (freight) as totalfreight
+    ,COUNT (*) as numorders -- counts nulls
+    ,COUNT (orderid) as numorders -- counts known values (same in this case since there are no NULL orderids)
                                                                                                 -- SELECT orderid
                                                                                                 -- FROM Sales.Orders
                                                                                                 -- WHERE orderid IS NULL;
@@ -56,8 +56,8 @@ GROUP BY empid, YEAR (orderdate);
 
 SELECT
     empid
-    , YEAR (orderdate) AS orderyear
-    , COUNT (DISTINCT custid) AS numcusts -- distinct customers handled by each employee
+    ,YEAR (orderdate) AS orderyear
+    ,COUNT (DISTINCT custid) AS numcusts -- distinct customers handled by each employee
 FROM Sales.Orders
 GROUP BY empid, YEAR (orderdate);
 
@@ -65,8 +65,8 @@ GROUP BY empid, YEAR (orderdate);
 -- HAVING Clause
 SELECT
     empid
-    , YEAR (orderdate) AS orderyear
-    , COUNT (*) as numorders
+    ,YEAR (orderdate) AS orderyear
+    ,COUNT (*) as numorders
 FROM Sales.Orders
 WHERE custid = 71
 GROUP BY empid, YEAR (orderdate)
@@ -76,13 +76,13 @@ HAVING COUNT (*) > 1; -- filters groups with more than one record (order)
 -- SELECT CLause
 SELECT
     orderid
-    , SUM (freight) AS totalfreight -- aliased column, cannot be referenced in any phases prior to SELECT
+    ,SUM (freight) AS totalfreight -- aliased column, cannot be referenced in any phases prior to SELECT
 FROM Sales.Orders
 GROUP BY orderid;
 
 SELECT DISTINCT 
     empid 
-    , YEAR(orderdate) AS orderyear 
+    ,YEAR(orderdate) AS orderyear 
 FROM Sales.Orders 
 WHERE custid = 71;
 
@@ -90,8 +90,8 @@ WHERE custid = 71;
 -- ORDER BY Clause
 SELECT 
     empid 
-    , YEAR (orderdate) AS orderyear
-    , COUNT (*) AS numorders 
+    ,YEAR (orderdate) AS orderyear
+    ,COUNT (*) AS numorders 
 FROM Sales.Orders 
 WHERE custid = 71 
 GROUP BY empid, YEAR (orderdate) 
@@ -106,33 +106,33 @@ FROM Sales.Orders; -- this query can be used to explore the table without pullin
 
 SELECT TOP (5)
     orderid
-    , orderdate
-    , custid
-    , empid
+    ,orderdate
+    ,custid
+    ,empid
 FROM Sales.Orders
 ORDER BY orderdate DESC; -- returns 5 rows, non-deterministic (more than one result can be considered correct)
 
 SELECT TOP (1) PERCENT -- rounded up
     orderid
-    , orderdate
-    , custid
-    , empid
+    ,orderdate
+    ,custid
+    ,empid
 FROM Sales.Orders
 ORDER BY orderdate DESC;
 
 SELECT TOP (5)
     orderid
-    , orderdate
-    , custid
-    , empid
+    ,orderdate
+    ,custid
+    ,empid
 FROM Sales.Orders
 ORDER BY orderdate DESC, orderid DESC; -- additional ordering property makes result deterministic (tiebreaker)
 
 SELECT TOP (5) WITH TIES
     orderid
-    , orderdate
-    , custid
-    , empid
+    ,orderdate
+    ,custid
+    ,empid
 FROM Sales.Orders
 ORDER BY orderdate DESC; -- returns more than 5 rows if there are duplicates in the ordering property
 
@@ -140,36 +140,36 @@ ORDER BY orderdate DESC; -- returns more than 5 rows if there are duplicates in 
 -- OFFSET-FETCH Filter
 SELECT
     orderid
-    , orderdate
-    , custid
-    , empid
+    ,orderdate
+    ,custid
+    ,empid
 FROM Sales.Orders
 ORDER BY orderdate ASC, orderid ASC
     OFFSET 50 ROWS FETCH NEXT 25 ROWS ONLY; -- offset skips, fetch returns
 
 SELECT
     orderid
-    , orderdate
-    , custid
-    , empid
+    ,orderdate
+    ,custid
+    ,empid
 FROM Sales.Orders
 ORDER BY orderdate ASC, orderid ASC
     OFFSET 0 ROWS FETCH FIRST 25 ROWS ONLY; -- next and first are interchangeable
 
 SELECT
     orderid
-    , orderdate
-    , custid
-    , empid
+    ,orderdate
+    ,custid
+    ,empid
 FROM Sales.Orders
 ORDER BY orderdate ASC, orderid ASC
     OFFSET 1 ROW FETCH NEXT 1 ROW ONLY; -- row and rows are interchangeable
 
 SELECT
     orderid
-    , orderdate
-    , custid
-    , empid
+    ,orderdate
+    ,custid
+    ,empid
 FROM Sales.Orders
 ORDER BY orderdate ASC, orderid ASC
     OFFSET 50 ROWS; -- offset will work by itself, fetch will not
@@ -179,17 +179,17 @@ ORDER BY orderdate ASC, orderid ASC
 -- Window Functions are explained thouroughly in Ch 7
 SELECT
     orderid
-    , custid
-    , val 
-    , ROW_NUMBER () OVER (ORDER BY custid ASC, val ASC) AS RowNum -- orders the window
+    ,custid
+    ,val 
+    ,ROW_NUMBER () OVER (ORDER BY custid ASC, val ASC) AS RowNum -- orders the window
 FROM Sales.OrderValues
 ORDER BY custid ASC, val ASC; -- order for presentation (same ordering properties in this case)
 
 SELECT
     orderid
-    , custid
-    , val 
-    , ROW_NUMBER () OVER (PARTITION BY custid ORDER BY val ASC) AS RowNum -- partitions and orders the window
+    ,custid
+    ,val 
+    ,ROW_NUMBER () OVER (PARTITION BY custid ORDER BY val ASC) AS RowNum -- partitions and orders the window
 FROM Sales.OrderValues
 ORDER BY custid ASC, val ASC; -- each partition (custid) returns a group of row nums which are unnique to each cust
 -- above two query is still non-deterministic due to the ordering property in the window not being unique
@@ -197,9 +197,9 @@ ORDER BY custid ASC, val ASC; -- each partition (custid) returns a group of row 
 
 SELECT
     orderid
-    , custid
-    , val 
-    , ROW_NUMBER () OVER (PARTITION BY custid ORDER BY custid ASC, val ASC) AS RowNum
+    ,custid
+    ,val 
+    ,ROW_NUMBER () OVER (PARTITION BY custid ORDER BY custid ASC, val ASC) AS RowNum
 FROM Sales.OrderValues
 ORDER BY custid ASC, val ASC;
 
@@ -207,8 +207,8 @@ ORDER BY custid ASC, val ASC;
 -- IN Predicate
 SELECT
     orderid
-    , empid
-    , orderdate
+    ,empid
+    ,orderdate
 FROM Sales.Orders
 WHERE orderid IN (10248, 10249, 10250);
 
@@ -216,8 +216,8 @@ WHERE orderid IN (10248, 10249, 10250);
 -- BETWEEN Predicate (same result as above query)
 SELECT 
     orderid
-    , empid
-    , orderdate
+    ,empid
+    ,orderdate
 FROM Sales.Orders 
 WHERE orderid BETWEEN 10248 AND 10250; -- inclusive
 
@@ -225,16 +225,16 @@ WHERE orderid BETWEEN 10248 AND 10250; -- inclusive
 -- Comparison Operators
 SELECT 
     orderid
-    , empid
-    , orderdate
+    ,empid
+    ,orderdate
 FROM Sales.Orders 
 WHERE orderdate >= '2016-01-01';
 
 -- Comparison and Logical Operators
 SELECT 
     orderid
-    , empid
-    , orderdate
+    ,empid
+    ,orderdate
 FROM Sales.Orders
 WHERE 
     orderdate >= '2016-01-01' 
@@ -243,8 +243,8 @@ WHERE
 -- Comparison and Logical Operators
 SELECT 
     orderid
-    , empid
-    , orderdate
+    ,empid
+    ,orderdate
 FROM Sales.Orders
 WHERE 
     orderdate >= '2016-01-01' 
@@ -254,21 +254,21 @@ WHERE
 -- Arithmetic
 SELECT 
     orderid
-    , productid
-    , qty
-    , unitprice
-    , discount
-    , qty * unitprice * (1 - discount) AS val
+    ,productid
+    ,qty
+    ,unitprice
+    ,discount
+    ,qty * unitprice * (1 - discount) AS val
 FROM Sales.OrderDetails;
 
 
 -- Precedence (AND has precedence over OR, despite the order query is written)
 -- Use PEMDAS to force precedence and improve readability
 SELECT 
-    orderid, 
-    custid, 
-    empid, 
-    orderdate 
+    orderid
+    ,custid
+    ,empid
+    ,orderdate 
 FROM Sales.Orders 
 WHERE  
     (custid = 1 AND  empid IN (1, 3, 5)) 
@@ -279,9 +279,9 @@ WHERE
 -- CASE Expressions
 SELECT
     productid
-    , productname
-    , categoryid
-    , CASE categoryid
+    ,productname
+    ,categoryid
+    ,CASE categoryid
         WHEN 1 THEN 'Beverages' 
         WHEN 2 THEN 'Condiments' 
         WHEN 3 THEN 'Confections' 
@@ -296,9 +296,9 @@ FROM Production.Products; -- Simple CASE expression: Checks for equality
 
 SELECT
     orderid
-    , custid
-    , val
-    , CASE
+    ,custid
+    ,val
+    ,CASE
         WHEN val < 1000.00                      THEN 'Less than 1000'
         WHEN val BETWEEN 1000.00 and 3000.00    THEN 'Between 1000 and 3000'
         WHEN val > 3000.00                      THEN 'More than 3000'
@@ -323,33 +323,33 @@ SELECT COALESCE (NULL, NULL, NULL, NULL, NULL_Value); -- Returns NULL
 -- IIF (Returns an expression based on a logical test)
 SELECT
     orderid
-    , freight
-    , IIF (freight > 10, 'Heavy', 'Standard') AS freight_category
+    ,freight
+    ,IIF (freight > 10, 'Heavy', 'Standard') AS freight_category
 FROM Sales.Orders;
 
 
 -- Three Value Predicate Logic (True, False, Unknown)
 SELECT
     custid
-    , country
-    , region
-    , city
+    ,country
+    ,region
+    ,city
 FROM Sales.Customers
 WHERE Region = N'WA'; -- Result as expected, returns rows where predicate evaluates to True
 
 SELECT
     custid
-    , country
-    , region
-    , city
+    ,country
+    ,region
+    ,city
 FROM Sales.Customers
 WHERE Region <> N'WA'; -- Result not always as expected, returns rows where predicate evaluates to True, discarding Unknowns (NULL)
 
 SELECT
     custid
-    , country
-    , region
-    , city
+    ,country
+    ,region
+    ,city
 FROM Sales.Customers
 WHERE
     Region <> N'WA'
@@ -368,71 +368,71 @@ This forces the processing in a particular phase to occur in a specified order.
  -- Collation Help
  SELECT
     name
-    , description
+    ,description
 FROM SYS.FN_HelpCollations();
 
 
 -- Concatenation with + Operator
 SELECT
     empid
-    , firstname
-    , lastname
-    , firstname + N' ' + lastname AS fullname
+    ,firstname
+    ,lastname
+    ,firstname + N' ' + lastname AS fullname
 FROM HR.Employees;
 
 
 -- Concatenation with + Operator when NULLs Present, and CONCAT Function
 SELECT
     custid
-    , country
-    , region
-    , city
-    , country + N', ' + region + N', ' + city AS location -- A single NULL will return NULL for the entire operation
-    , country + COALESCE (N', ' + region, N'') + N', ' + city AS location -- Programatically bypassing NULL behavior
-    , CONCAT (country + N', ', region + N', ', city) AS location -- CONCAT automatically converts NULLs to strings
+    ,country
+    ,region
+    ,city
+    ,country + N', ' + region + N', ' + city AS location -- A single NULL will return NULL for the entire operation
+    ,country + COALESCE (N', ' + region, N'') + N', ' + city AS location -- Programatically bypassing NULL behavior
+    ,CONCAT (country + N', ', region + N', ', city) AS location -- CONCAT automatically converts NULLs to strings
 FROM Sales.Customers;
 
 
 -- SUBSTRING Function
 SELECT
     custid
-    , companyname
-    , SUBSTRING (companyname, 10, 5) AS companysub
-    , SUBSTRING (companyname, 10, LEN (companyname)) AS companysubdynamic
+    ,companyname
+    ,SUBSTRING (companyname, 10, 5) AS companysub
+    ,SUBSTRING (companyname, 10, LEN (companyname)) AS companysubdynamic
 FROM Sales.Customers;
 
 
 -- LEFT and RIGHT Functions
 SELECT
     custid
-    , companyname
-    , RIGHT (companyname, 5) AS companynameshort
-    , LEFT (UPPER (country), 3) AS countryshort -- Passing a function in the column parameter
+    ,companyname
+    ,RIGHT (companyname, 5) AS companynameshort
+    ,LEFT (UPPER (country), 3) AS countryshort -- Passing a function in the column parameter
 FROM Sales.Customers;
 
 
 -- LEN and DATALENGTH Functions
 SELECT
     custid
-    , companyname
-    , LEN (companyname) AS companynamelen
-    , DATALENGTH (companyname) AS companynamebytes -- Typically 2x Bytes per Len for UNICODE
+    ,companyname
+    ,LEN (companyname) AS companynamelen
+    ,DATALENGTH (companyname) AS companynamebytes -- Typically 2x Bytes per Len for UNICODE
 FROM Sales.Customers;
 
 
 -- CHARINDEX and PATINDEX Functions
 SELECT
     companyname
-    , CHARINDEX (' ', companyname) AS spaceindex
-    , address
-    , PATINDEX (N'%[0-9]%', address) AS spaceindex
+    ,CHARINDEX (' ', companyname) AS spaceindex
+    ,address
+    ,PATINDEX (N'%[0-9]%', address) AS spaceindex
 FROM Sales.Customers;
 
 
 -- REPLACE Function
 SELECT
     companyname
-    , REPLACE (companyname, N' ', N'-') AS companyname
+    ,REPLACE (companyname, N' ', N'-') AS companyname
 FROM Sales.Customers;
 
 
@@ -441,9 +441,9 @@ SELECT REPLICATE ('ABC', 3);
 
 SELECT
     supplierid
-    , REPLICATE ('0', 9) + CAST (supplierid AS VARCHAR (10)) AS supplierid
-    , RIGHT (REPLICATE ('0', 9) + CAST (supplierid AS VARCHAR (10)), 10) AS supplieridreplicate -- Creates a 10 digit ID
-    , FORMAT (supplierid, 'd10') AS supplieridfromat -- Same result, but more expensive
+    ,REPLICATE ('0', 9) + CAST (supplierid AS VARCHAR (10)) AS supplierid
+    ,RIGHT (REPLICATE ('0', 9) + CAST (supplierid AS VARCHAR (10)), 10) AS supplieridreplicate -- Creates a 10 digit ID
+    ,FORMAT (supplierid, 'd10') AS supplieridfromat -- Same result, but more expensive
 FROM Production.Suppliers;
 
 
@@ -454,18 +454,18 @@ SELECT STUFF ('axyze', 2, 3, 'bcd')
 -- UPPER and LOWER Functions
 SELECT
     city 
-    , country
-    , UPPER (city) AS cityupper
-    , LOWER (country) AS countrylower
+    ,country
+    ,UPPER (city) AS cityupper
+    ,LOWER (country) AS countrylower
 FROM HR.Employees
 
 
 -- LTRIM and RTRIM Functions
 SELECT
     '     abc     ' AS fieldtotrim
-    , LEN ('     abc     ') AS fulllen
-    , LTRIM (RTRIM ('     abc     ')) AS trimedfield
-    , LEN (LTRIM (RTRIM ('     abc     '))) AS trimlen;
+    ,LEN ('     abc     ') AS fulllen
+    ,LTRIM (RTRIM ('     abc     ')) AS trimedfield
+    ,LEN (LTRIM (RTRIM ('     abc     '))) AS trimlen;
 
 
 -- COMPRESS and DECOMPRESS Functions
@@ -475,7 +475,7 @@ CTE AS (
 )
 SELECT
     cvcompressed
-    , CAST (
+    ,CAST (
         DECOMPRESS (cvcompressed) AS NVARCHAR (MAX)
     ) AS cvdecompressed -- 
 FROM CTE;
@@ -490,43 +490,43 @@ FROM STRING_SPLIT ('10248, 10249, 10250', ',') AS S;
 -- Percent Wildcard
 SELECT  
     empid
-    , firstname
-    , lastname
+    ,firstname
+    ,lastname
 FROM HR.Employees 
 WHERE lastname LIKE N'D%'; -- N (NCHAR or NVARCHAR data types), % is a wild card, anything follows
 
 -- Underscore Wildcard
 SELECT
     empid
-    , lastname
+    ,lastname
 FROM HR.Employees
 WHERE lastname LIKE N'_e%'; -- Returns any lastname with an e for the second character, with any length after the wildcard.
 
 -- [List] Wildcard
 SELECT
-    empid,
-    lastname
+    empid
+    ,lastname
 FROM HR.Employees
 WHERE lastname LIKE N'[ABCDE]%'; -- Returns any lastname with A, B, or C as a first character, with any length. 
 
 -- [Range] Wildcarad
 SELECT
     empid
-    , lastname
+    ,lastname
 FROM HR.Employees
 WHERE lastname LIKE N'[A-E]%'; -- Returns any lastname with A, B, C, D, or E as a first character, with any length.
 
 -- [^ List or Range] Wildcard (NOT IN)
 SELECT
-    empid,
-    lastname
+    empid
+    ,lastname
 FROM HR.Employees
 WHERE lastname LIKE N'[^A-E]%'; -- Returns any last name that does NOT start with A, B, C, D, or E, with and length. 
 
 -- ESCAPE Character
 SELECT
     empid
-    , lastname
+    ,lastname
 FROM HR.Employees
 WHERE lastname LIKE N'%!_%' ESCAPE '!'; -- Returns any last name with an underscore in the name (zero results)
 
@@ -544,9 +544,9 @@ SELECT CAST ('20160212' AS DATE);
 -- Date Filter Functions (Does not maintain index improvements)
 SELECT
     orderid
-    , custid
-    , empid
-    , orderdate
+    ,custid
+    ,empid
+    ,orderdate
 FROM Sales.Orders
 WHERE YEAR (orderdate) = 2015 AND MONTH (orderdate) = 01;
 
@@ -554,9 +554,9 @@ WHERE YEAR (orderdate) = 2015 AND MONTH (orderdate) = 01;
 -- Date Filter Range (Maintains index improvements)
 SELECT
     orderid
-    , custid
-    , empid
-    , orderdate
+    ,custid
+    ,empid
+    ,orderdate
 FROM Sales.Orders
 WHERE orderdate >= '2016-01-01' AND orderdate < '2016-02-01';
 
@@ -601,26 +601,26 @@ SELECT
 -- DATEDIFF and DATEDIFF_BIG
 SELECT
     DATEDIFF (DAY, '2016-01-01', '2016-12-31') AS DayDiff
-    , DATEDIFF (MONTH, '2016-01-01', '2016-12-31') AS MonthDiff;
+    ,DATEDIFF (MONTH, '2016-01-01', '2016-12-31') AS MonthDiff;
 
 
 -- DATEPART
 SELECT
     DATEPART (MONTH, '2016-01-01') AS MonthPart
-    , DATEPART (YEAR, '2016-01-01') AS YearPart;
+    ,DATEPART (YEAR, '2016-01-01') AS YearPart;
 
 
 -- YEAR, MONTH, DAY
 SELECT 
   DAY ('20160212') AS TheDay
-  , MONTH ('20160212') AS TheMonth 
-  , YEAR ('20160212') AS TheYear;
+  ,MONTH ('20160212') AS TheMonth 
+  ,YEAR ('20160212') AS TheYear;
 
 
 -- DATENAME
 SELECT
-    DATENAME(MONTH, '2016-01-01') AS MonthName -- Returns January
-    , DATENAME(YEAR, '2016-01-01') AS YearName; -- Returns 2016 as a string (year does not have a name)
+   DATENAME(MONTH, '2016-01-01') AS MonthName -- Returns January
+   ,DATENAME(YEAR, '2016-01-01') AS YearName; -- Returns 2016 as a string (year does not have a name)
 
 
 -- ISDATE
@@ -632,28 +632,25 @@ SELECT ISDATE('TEST'); -- Returns 0 (No)
 -- FROMPARTS Functions
 SELECT 
   DATEFROMPARTS(2016, 02, 12) AS [DATE] -- Returns 2016-02-12
-  , DATETIME2FROMPARTS(2016, 02, 12, 13, 30, 5, 1, 7) AS [DATETIME] -- Returns 2016-02-12 13:30:05.0000001
-  , DATETIMEFROMPARTS(2016, 02, 12, 13, 30, 5, 997) AS [DATETIME] -- Returns 2016-02-12 13:30:05.997
-  , DATETIMEOFFSETFROMPARTS(2016, 02, 12, 13, 30, 5, 1, -8, 0, 7) AS [DATETIME] -- Returns 2016-02-12 13:30:05.0000001 -08:00
-  , SMALLDATETIMEFROMPARTS(2016, 02, 12, 13, 30) AS [DATETIME] -- Returns 2016-02-12 13:30:00
-  , TIMEFROMPARTS(13, 30, 5, 1, 7) AS [DATETIME]; -- Returns 13:30:05.0000001
+  ,DATETIME2FROMPARTS(2016, 02, 12, 13, 30, 5, 1, 7) AS [DATETIME] -- Returns 2016-02-12 13:30:05.0000001
+  ,DATETIMEFROMPARTS(2016, 02, 12, 13, 30, 5, 997) AS [DATETIME] -- Returns 2016-02-12 13:30:05.997
+  ,DATETIMEOFFSETFROMPARTS(2016, 02, 12, 13, 30, 5, 1, -8, 0, 7) AS [DATETIME] -- Returns 2016-02-12 13:30:05.0000001 -08:00
+  ,SMALLDATETIMEFROMPARTS(2016, 02, 12, 13, 30) AS [DATETIME] -- Returns 2016-02-12 13:30:00
+  ,TIMEFROMPARTS(13, 30, 5, 1, 7) AS [DATETIME]; -- Returns 13:30:05.0000001
 
 
 -- EOMONTH Function
 SELECT
     EOMONTH('2016-01-01') AS [DATE] -- Returns 2016-01-31
-    , EOMONTH('2016-01-01', 3) AS [DATE]; -- Returns 2016-04-30
+    ,EOMONTH('2016-01-01', 3) AS [DATE]; -- Returns 2016-04-30
 
 SELECT
     orderid
-    , orderdate
-    , custid
-    , empid
+    ,orderdate
+    ,custid
+    ,empid
 FROM Sales.Orders
 WHERE orderdate = EOMONTH (orderdate); -- Returns all orders placed on the last day of the month
-
-
-USE data_mart;
 
 
 -- Qyerying Metadata
@@ -663,7 +660,7 @@ USE data_mart;
 -- Return Schema and Table Names
 SELECT
     SCHEMA_NAME(schema_id) AS schema_name
-    , Name AS table_name
+    ,Name AS table_name
 FROM sys.tables
 ORDER BY schema_name, table_name;
 
@@ -671,10 +668,10 @@ ORDER BY schema_name, table_name;
 -- Return Column Information for a Specified Table
 SELECT
   Name AS column_name
-  , TYPE_NAME(system_type_id) AS column_type
-  , max_length
-  , collation_name
-  , is_nullable
+  ,TYPE_NAME(system_type_id) AS column_type
+  ,max_length
+  ,collation_name
+  ,is_nullable
 FROM sys.columns
 WHERE object_id = OBJECT_ID(N'SchemaName.TableName');
 
@@ -692,7 +689,7 @@ WHERE object_id = OBJECT_ID(N'CL.VW_AppointmentEvent');
 -- Return Schema and Table Names
 SELECT
     TABLE_SCHEMA
-    , TABLE_NAME
+    ,TABLE_NAME
 FROM INFORMATION_SCHEMA.TABLES
 WHERE TABLE_TYPE = N'BASE TABLE'
 ORDER BY TABLE_SCHEMA, TABLE_NAME;
@@ -701,10 +698,10 @@ ORDER BY TABLE_SCHEMA, TABLE_NAME;
 -- Return Column Information for a Specified Table
 SELECT
     COLUMN_NAME
-    , DATA_TYPE
-    , CHARACTER_MAXIMUM_LENGTH
-    , COLLATION_NAME
-    , IS_NULLABLE
+    ,DATA_TYPE
+    ,CHARACTER_MAXIMUM_LENGTH
+    ,COLLATION_NAME
+    ,IS_NULLABLE
 FROM INFORMATION_SCHEMA.COLUMNS
 WHERE
     TABLE_SCHEMA = N'SchemaName'
@@ -737,9 +734,9 @@ EXEC sys.sp_helpconstraint
 -- Query system w/ DDM functions
 SELECT
     c.name 
-    , t.name 
-    , c.is_masked 
-    , c.masking_function
+    ,t.name 
+    ,c.is_masked 
+    ,c.masking_function
 FROM sys.masked_columns AS C
     INNER JOIN sys.tables AS T
         ON c.object_id = t.object_id;

@@ -6,9 +6,9 @@
 -- Tables Involved: TSQLV4 database and the Sales.Orders table.
 SELECT
     orderid
-    , orderdate
-    , custid
-    , empid
+    ,orderdate
+    ,custid
+    ,empid
 FROM Sales.Orders
 WHERE orderdate BETWEEN '2015-06-01' AND '2015-06-30'
 
@@ -17,9 +17,9 @@ WHERE orderdate BETWEEN '2015-06-01' AND '2015-06-30'
 -- Tables Involved: TSQLV4 database and the Sales.Orders table.
 SELECT
     orderid
-    , orderdate
-    , custid
-    , empid
+    ,orderdate
+    ,custid
+    ,empid
 FROM Sales.Orders
 WHERE orderdate = EOMONTH(orderdate);
 
@@ -28,8 +28,8 @@ WHERE orderdate = EOMONTH(orderdate);
 -- Tables Involved: TSQLV4 database and the HR.Employees table.
 SELECT
     empid
-    , firstname
-    , lastname
+    ,firstname
+    ,lastname
 FROM HR.Employees
 WHERE lastname LIKE N'%e%e%';
 
@@ -38,7 +38,7 @@ WHERE lastname LIKE N'%e%e%';
 -- Tables Involved: TSQLV4 database and the Sales.OrderDetails table.
 SELECT
     orderid
-    , SUM (qty * unitprice) AS totalvalue
+    ,SUM (qty * unitprice) AS totalvalue
 FROM Sales.OrderDetails
 GROUP BY orderid
 HAVING SUM (qty * unitprice) > 10000
@@ -50,7 +50,7 @@ ORDER BY totalvalue DESC;
 -- Tables Involved: TSQLV4 database and the HR.Employees table.
 SELECT
     empid
-    , lastname
+    ,lastname
 FROM HR.Employees
 WHERE lastname COLLATE Latin1_General_CS_AS LIKE N'[abcdefghijklmnopqrstuvwxyz]%';
 
@@ -83,7 +83,7 @@ Then it computes the order count in each employee group. The query discards the 
 -- Tables Involved: TSQLV4 database and the Sales.Orders table.
 SELECT TOP 3
     shipcountry
-    , AVG (freight) AS avgfreight
+    ,AVG (freight) AS avgfreight
 FROM Sales.Orders
 WHERE orderdate >= '20150101' AND orderdate < '20160101'
 GROUP BY shipcountry
@@ -91,7 +91,7 @@ ORDER BY avgfreight DESC;
 
 SELECT
     shipcountry
-    , AVG (freight) AS avgfreight
+    ,AVG (freight) AS avgfreight
 FROM Sales.Orders
 WHERE orderdate >= '20150101' AND orderdate < '20160101'
 GROUP BY shipcountry
@@ -103,9 +103,9 @@ OFFSET 0 ROWS FETCH NEXT 3 ROWS ONLY;
 -- Tables Involved: TSQLV4 database and the Sales.Orders table.
 SELECT
     custid
-    , orderdate
-    , orderid
-    , ROW_NUMBER() OVER (ORDER BY orderdate ASC, orderid ASC) as rownum
+    ,orderdate
+    ,orderid
+    ,ROW_NUMBER() OVER (ORDER BY orderdate ASC, orderid ASC) as rownum
 FROM Sales.Orders;
 
 
@@ -114,10 +114,10 @@ FROM Sales.Orders;
 -- Tables Involved: TSQLV4 database and the HR.Employees table
 SELECT
     empid
-    , firstname
-    , lastname
-    , titleofcourtesy
-    , CASE
+    ,firstname
+    ,lastname
+    ,titleofcourtesy
+    ,CASE
         WHEN titleofcourtesy IN ('Ms.', 'Mrs.') THEN 'Female'
         WHEN titleofcourtesy = 'Mr.' THEN 'Male'
         ELSE 'Unknown'
@@ -130,6 +130,6 @@ FROM HR.Employees;
 -- Tables Involved: TSQLV4 database and the Sales.Customers table.
 SELECT
     custid
-    , region
+    ,region
 FROM Sales.Customers
 ORDER BY CASE WHEN region IS NULL THEN 1 ELSE 0 END, region;

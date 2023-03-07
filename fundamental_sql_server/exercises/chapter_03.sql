@@ -6,9 +6,9 @@
 -- Tables Invovled: HR.Employees and dbo.Nums
 SELECT
     E.empid
-    , E.firstname
-    , E.lastname
-    , N.n
+    ,E.firstname
+    ,E.lastname
+    ,N.n
 FROM HR.Employees AS E
     CROSS JOIN dbo.Nums AS N
 WHERE N.n <= 5
@@ -18,7 +18,7 @@ ORDER BY N.n ASC, E.empid ASC;
 -- Tables Invovled: HR.Employees and dbo.Nums
 SELECT 
     E.empid
-    , DATEADD (DAY, N.n-1, CAST ('20160612' AS DATE)) AS date
+    ,DATEADD (DAY, N.n-1, CAST ('20160612' AS DATE)) AS date
 FROM HR.Employees AS E
     CROSS JOIN dbo.Nums AS N
 WHERE N.n <= DATEDIFF (DAY, '20160612', '20160616') + 1
@@ -37,9 +37,9 @@ ON Customers.custid = Orders.custid;
 -- Solution (Using specified aliases)
 SELECT
     C.custid
-    , C.companyname
-    , O.orderid
-    , O.orderdate
+    ,C.companyname
+    ,O.orderid
+    ,O.orderdate
 FROM Sales.Customers AS C
 INNER JOIN Sales.Orders AS O
 ON C.custid = O.custid;
@@ -49,8 +49,8 @@ ON C.custid = O.custid;
 -- Tables Involved: Sales.Customers, Sales.Orders, and Sales.OrderDetails
 SELECT
     C.custid
-    , COUNT (DISTINCT O.orderid) AS numorders
-    , SUM (D.qty) AS totalqty
+    ,COUNT (DISTINCT O.orderid) AS numorders
+    ,SUM (D.qty) AS totalqty
 FROM Sales.Customers AS C
     INNER JOIN Sales.Orders AS O
         ON C.custid = O.custid
@@ -65,9 +65,9 @@ ORDER BY C.custid ASC;
 -- Tables Involved: Sales.Customers and Sales.Orders
 SELECT
     C.custid
-    , C.companyname
-    , O.orderid
-    , O.orderdate
+    ,C.companyname
+    ,O.orderid
+    ,O.orderdate
 FROM Sales.Customers AS C
     LEFT OUTER JOIN Sales.Orders AS O 
         ON C.custid = O.custid -- Customers without an order will have a NULL for orderid
@@ -77,9 +77,9 @@ FROM Sales.Customers AS C
 -- Tables involved: Sales.Customers and Sales.Orders
 SELECT
     C.custid
-    , C.companyname
-    , O.orderid
-    , O.orderdate
+    ,C.companyname
+    ,O.orderid
+    ,O.orderdate
 FROM Sales.Customers AS C
     LEFT OUTER JOIN Sales.Orders AS O 
         ON C.custid = O.custid
@@ -92,9 +92,9 @@ to get nulls in this query, is of it's an outter row with no associated order*/
 -- Tables involved: Sales.Customers and Sales.Orders
 SELECT
     C.custid
-    , C.companyname
-    , O.orderid
-    , O.orderdate
+    ,C.companyname
+    ,O.orderid
+    ,O.orderdate
 FROM Sales.Customers AS C
     INNER JOIN Sales.Orders AS O 
         ON C.custid = O.custid
@@ -105,9 +105,9 @@ WHERE O.orderdate = '2016-02-12';
 -- Tables involved: Sales.Customers and Sales.Orders
 SELECT
     C.custid
-    , C.companyname
-    , O.orderid 
-    , O.orderdate
+    ,C.companyname
+    ,O.orderid 
+    ,O.orderdate
 FROM Sales.Customers AS C
     LEFT OUTER JOIN Sales.Orders AS O 
         ON C.custid = O.custid
@@ -130,8 +130,8 @@ WHERE O.orderdate = '20160212' OR O.orderid IS NULL;
 -- Tables involved: Sales.Customers and Sales.Orders
 SELECT
     C.custid
-    , C.companyname
-    , CASE
+    ,C.companyname
+    ,CASE
         WHEN O.orderid IS NULL THEN 'No'
         ELSE 'Yes'
     END AS hasorder

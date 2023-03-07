@@ -6,7 +6,7 @@ USE tsql_fundamentals;
 -- CROSS JOIN
 SELECT
     C.custid
-    , E.empid
+    ,E.empid
 FROM Sales.Customers AS C
     CROSS JOIN HR.Employees AS E;
 
@@ -14,7 +14,7 @@ FROM Sales.Customers AS C
 -- SELF CROSS JOIN
 SELECT
     E1.empid, E1.firstname, E1.lastname
-    , E2.empid, E2.firstname, E2.lastname
+    ,E2.empid, E2.firstname, E2.lastname
 FROM HR.Employees AS E1
     CROSS JOIN HR.Employees AS E2;
 
@@ -28,6 +28,7 @@ INSERT INTO dbo.Digits(digit)
     VALUES (0), (1), (2), (3), (4), (5), (6), (7), (8), (9);
 
 SELECT * FROM dbo.Digits;
+
 
 -- Create Sequence of 1,000 Numbers
 SELECT
@@ -43,9 +44,9 @@ ORDER BY n;
 -- INNER JOIN
 SELECT
     E.empid
-    , E.firstname
-    , E.lastname
-    , O.orderid
+    ,E.firstname
+    ,E.lastname
+    ,O.orderid
 FROM HR.Employees AS E
     INNER JOIN Sales.Orders AS O -- All rows have a match, so none are discarded
         ON E.empid = O.empid;
@@ -79,7 +80,7 @@ FROM dbo.TableA AS A
 -- NON_EQUI JOINS
 SELECT
     E1.empid, E1.firstname, E1.lastname
-    , E2.empid, E2.firstname, E2.lastname
+    ,E2.empid, E2.firstname, E2.lastname
 FROM HR.Employees AS E1
     INNER JOIN HR.Employees AS E2
         ON E1.empid < E2.empid;
@@ -88,10 +89,10 @@ FROM HR.Employees AS E1
 -- MULTI-JOIN QUERIES
 SELECT
     C.custid
-    , C.companyname
-    , O.orderid
-    , OD.productid
-    , OD.qty
+    ,C.companyname
+    ,O.orderid
+    ,OD.productid
+    ,OD.qty
 FROM Sales.Customers AS C 
     INNER JOIN Sales.Orders AS O -- Results in all records from Customers with a matching record from Orders
         ON C.custid = O.custid
@@ -102,16 +103,16 @@ FROM Sales.Customers AS C
 -- OUTER JOINS
 SELECT
     C.custid
-    , C.companyname
-    , O.orderid
+    ,C.companyname
+    ,O.orderid
 FROM Sales.Customers AS C 
     LEFT OUTER JOIN Sales.Orders AS O 
         ON C.custid = O.custid; -- Customers that have not placed an order will be in the result table with NULLs for orderid
 
 SELECT
     C.custid
-    , C.companyname
-    , O.orderid
+    ,C.companyname
+    ,O.orderid
 FROM Sales.Customers AS C 
     LEFT OUTER JOIN Sales.Orders AS O 
         ON C.custid = O.custid
@@ -119,8 +120,8 @@ WHERE O.orderid IS NOT NULL; -- Returns inner rows only. Customers with a matchi
 
 SELECT
     C.custid
-    , C.companyname
-    , O.orderid
+    ,C.companyname
+    ,O.orderid
 FROM Sales.Customers AS C 
     LEFT OUTER JOIN Sales.Orders AS O 
         ON C.custid = O.custid
@@ -129,9 +130,9 @@ WHERE O.orderid IS NULL; -- Returns outer rows only. Customers without a matchin
 
 SELECT
     D.Date 
-    , O.orderid 
-    , O.custid 
-    , O.empid
+    ,O.orderid 
+    ,O.custid 
+    ,O.empid
 FROM dbo.DateDetail AS D 
     LEFT JOIN Sales.Orders AS O
         ON D.Date = O.orderdate
@@ -140,9 +141,9 @@ ORDER BY D.Date ASC; -- Returns ever day in range with associated order (if ther
 
 SELECT
     C.custid
-    , C.companyname
-    , O.orderid 
-    , O.orderdate
+    ,C.companyname
+    ,O.orderid 
+    ,O.orderdate
 FROM Sales.Customers AS C
     LEFT OUTER JOIN Sales.Orders AS O
         ON C.custid = O.custid
@@ -154,9 +155,9 @@ This is essentially an inner join, and either the wrong join was used, or the pr
 
 SELECT
     C.custid
-    , O.orderid 
-    , OD.productid
-    , OD.qty
+    ,O.orderid 
+    ,OD.productid
+    ,OD.qty
 FROM Sales.Customers AS C
     LEFT OUTER JOIN Sales.Orders AS O
         ON C.custid = O.custid
@@ -167,8 +168,8 @@ to using inner joins for both join operations.*/
 
 SELECT
     C.custid
-    , COUNT (*) AS numorderswrong -- counts all rows (including nulls)
-    , COUNT (orderid) AS numorders -- counts all rows with an associated orderid
+    ,COUNT (*) AS numorderswrong -- counts all rows (including nulls)
+    ,COUNT (orderid) AS numorders -- counts all rows with an associated orderid
 FROM Sales.Customers AS C
     LEFT OUTER JOIN Sales.Orders AS O
         ON C.custid = O.custid
