@@ -83,17 +83,47 @@ ORDER BY custid ASC;
 
 -- Write a query that returns customers who ordered product 12.
 -- Tables Involved: Sales.Customers, Sales.Orders, and Sales.OrderDetails
+SELECT
+    C.custid
+    ,C.companyname
+FROM Sales.Customers AS C
+WHERE custid IN (SELECT O.custid
+                 FROM Sales.Orders AS O
+                    INNER JOIN Sales.OrderDetails AS OD
+                        ON O.orderid = OD.orderid
+                WHERE OD.productid = 12)
+ORDER BY C.custid ASC;
 
 
-
--- Write a query that calculates a running-total quantity for each customer and month.
+-- Write a query that calculates a running-total quantity for each customer and month (using subquery).
 -- Table Involved: Sales.CustOrders
-
+SELECT 
+    C1.custid 
+    ,C1.ordermonth
+    ,C1.qty
+    ,(SELECT SUM (C2.qty)
+      FROM Sales.CustOrders AS C2
+      WHERE C2.custid = C1.custid AND C2.ordermonth <= C1.ordermonth) AS runqty
+FROM Sales.CustOrders AS C1
+ORDER BY C1.custid, C1.ordermonth;
 
 
 -- Write a query that returns for each order the number of days that passed since the same customer’s previous order.
 -- To determine recency among orders, use orderdate as the primary sort element and orderid as the tiebreaker.
 -- Table Involved: Sales.Orders
+SELECT
+    O1.custid
+    ,O1.orderdate
+    ,O1.orderid
+    ,DATEDIFF (DAY
+            ,(SELECT TOP (1) O2.orderdate
+            FROM Sales.Orders AS O2
+            WHERE O2.custid = O1.custid
+            AND (O2.orderdate = O1.orderdate AND O2.orderid < O1.orderid OR O2.orderdate < O1.orderdate)
+            ORDER BY O2.orderdate DESC, O2.orderid DESC)
+            ,orderdate) AS diff
+FROM Sales.Orders AS O1
+ORDER BY O1.custid, O1.orderdate, O1.orderid;
 
 
 -- Explain the difference between IN and EXISTS.

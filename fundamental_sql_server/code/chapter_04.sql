@@ -181,8 +181,8 @@ SELECT
     orderyear
     ,qty
     ,(SELECT SUM(O2.qty) 
-    FROM Sales.OrderTotalsByYear AS O2 
-    WHERE O2.orderyear <= O1.orderyear) AS runqty -- Sums all previous year with current year (running total) 
+      FROM Sales.OrderTotalsByYear AS O2 
+      WHERE O2.orderyear <= O1.orderyear) AS runqty -- Sums all previous year with current year (running total) 
 FROM Sales.OrderTotalsByYear AS O1 
 ORDER BY orderyear;
 
