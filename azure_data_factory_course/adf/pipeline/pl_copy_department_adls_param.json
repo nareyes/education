@@ -93,7 +93,7 @@
 				},
 				"inputs": [
 					{
-						"referenceName": "ds_sqldb_Input_dynamic",
+						"referenceName": "ds_sqldb_input_dynamic",
 						"type": "DatasetReference",
 						"parameters": {
 							"tableName": {
