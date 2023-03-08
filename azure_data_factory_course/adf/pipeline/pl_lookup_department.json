@@ -1,6 +1,7 @@
 {
 	"name": "pl_lookup_department",
 	"properties": {
+		"description": "Lookup department and set variable for each.",
 		"activities": [
 			{
 				"name": "lookupDepartment",
@@ -25,6 +26,41 @@
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "forEachDepartment",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "lookupDepartment",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('lookupDepartment').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "setVariable",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "varDeptName",
+								"value": {
+									"value": "@item().Dept_Name",
+									"type": "Expression"
+								}
+							}
+						}
+					]
 				}
 			}
 		],
