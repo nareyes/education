@@ -1,0 +1,26 @@
+{
+	"name": "ds_sqldb_input_department",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azsqldb",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Dept_Id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Dept_Name",
+				"type": "varchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "Department"
+		}
+	}
+}
