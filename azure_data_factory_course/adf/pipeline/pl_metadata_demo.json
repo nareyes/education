@@ -34,6 +34,25 @@
 						"type": "DelimitedTextReadSettings"
 					}
 				}
+			},
+			{
+				"name": "forEachFile",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "getSalesMetadata",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('getSalesMetadata').output.childItems.name",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"folder": {
