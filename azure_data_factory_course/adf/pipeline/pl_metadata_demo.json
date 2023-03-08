@@ -1,0 +1,44 @@
+{
+	"name": "pl_metadata_demo",
+	"properties": {
+		"description": "Get sales metadata from adls.",
+		"activities": [
+			{
+				"name": "getSalesMetadata",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_blob_input_sales_details",
+						"type": "DatasetReference"
+					},
+					"fieldList": [
+						"childItems",
+						"itemName",
+						"itemType",
+						"lastModified"
+					],
+					"storeSettings": {
+						"type": "AzureBlobStorageReadSettings",
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "DelimitedTextReadSettings"
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "Control Flow"
+		},
+		"annotations": []
+	}
+}
