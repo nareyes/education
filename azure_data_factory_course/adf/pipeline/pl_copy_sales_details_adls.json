@@ -147,6 +147,8 @@
 		"folder": {
 			"name": "Copy Activity"
 		},
-		"annotations": []
+		"annotations": [
+			"Copy Activity"
+		]
 	}
 }

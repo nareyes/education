@@ -146,7 +146,9 @@
 		"folder": {
 			"name": "Copy Activity"
 		},
-		"annotations": [],
+		"annotations": [
+			"Copy Activity"
+		],
 		"lastPublishTime": "2023-03-04T15:53:10Z"
 	},
 	"type": "Microsoft.DataFactory/factories/pipelines"
