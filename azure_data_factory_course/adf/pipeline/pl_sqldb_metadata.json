@@ -1,7 +1,7 @@
 {
 	"name": "pl_sqldb_metadata",
 	"properties": {
-		"description": "Backup sqldb to adls using lookup and for each.",
+		"description": "Copy sqld db metadata using lookup and for each.",
 		"activities": [
 			{
 				"name": "lookupSqlDb",
