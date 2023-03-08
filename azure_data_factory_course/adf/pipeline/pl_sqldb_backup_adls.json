@@ -1,5 +1,5 @@
 {
-	"name": "pl_backup_sqldb_adls",
+	"name": "pl_sqldb_backup_adls",
 	"properties": {
 		"description": "Backup sqldb to adls using lookup and for each.",
 		"activities": [
