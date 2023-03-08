@@ -4,7 +4,7 @@
 		"description": "Backup sqldb to adls using lookup and for each.",
 		"activities": [
 			{
-				"name": "lookupSQLDB",
+				"name": "lookupSqlDb",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -18,7 +18,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "select table_schema, table_name\nfrom information_schema.tables\nwhere table_type = 'base table' AND table_schema = 'dbo';",
+						"sqlReaderQuery": "select table_schema, table_name from information_schema.tables where table_type = 'base table' and table_schema = 'dbo';",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -37,7 +37,7 @@
 				"type": "ForEach",
 				"dependsOn": [
 					{
-						"activity": "lookupSQLDB",
+						"activity": "lookupSqlDb",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -62,7 +62,16 @@
 								"secureOutput": false,
 								"secureInput": false
 							},
-							"userProperties": [],
+							"userProperties": [
+								{
+									"name": "input",
+									"value": "sqldb"
+								},
+								{
+									"name": "output",
+									"value": "adls/output/sql-backup"
+								}
+							],
 							"typeProperties": {
 								"source": {
 									"type": "AzureSqlSource",
@@ -92,11 +101,15 @@
 							},
 							"inputs": [
 								{
-									"referenceName": "ds_sqldb_input_dynamic",
+									"referenceName": "ds_sqldb_input_all",
 									"type": "DatasetReference",
 									"parameters": {
+										"schema": {
+											"value": "@item().table_schema",
+											"type": "Expression"
+										},
 										"tableName": {
-											"value": "@item().value.table_name",
+											"value": "@item().table_name",
 											"type": "Expression"
 										}
 									}
@@ -105,7 +118,13 @@
 							"outputs": [
 								{
 									"referenceName": "ds_adls_output_sqldb_backup",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"fileName": {
+											"value": "@concat(item().table_name, '.csv')",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
