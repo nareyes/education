@@ -1,5 +1,5 @@
 {
-	"name": "ds_sqldb_Input_dynamic",
+	"name": "ds_sqldb_input_dynamic",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "ls_azsqldb",

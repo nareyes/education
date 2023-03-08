@@ -1,0 +1,123 @@
+{
+	"name": "pl_backup_sqldb_adls",
+	"properties": {
+		"description": "Backup sqldb to adls using lookup and for each.",
+		"activities": [
+			{
+				"name": "lookupSQLDB",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select table_schema, table_name\nfrom information_schema.tables\nwhere table_type = 'base table' AND table_schema = 'dbo';",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_sqldb_input_dynamic",
+						"type": "DatasetReference",
+						"parameters": {
+							"tableName": "dbo.*"
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "forEachTable",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "lookupSQLDB",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('lookupSQLDB').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "copyTables",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_sqldb_input_dynamic",
+									"type": "DatasetReference",
+									"parameters": {
+										"tableName": {
+											"value": "@item().value.table_name",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_adls_output_sqldb_backup",
+									"type": "DatasetReference"
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"folder": {
+			"name": "Control Flow"
+		},
+		"annotations": [
+			"Control Flow"
+		]
+	}
+}
