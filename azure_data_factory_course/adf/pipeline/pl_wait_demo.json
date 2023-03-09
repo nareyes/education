@@ -1,0 +1,20 @@
+{
+	"name": "pl_wait_demo",
+	"properties": {
+		"activities": [
+			{
+				"name": "waitTime",
+				"type": "Wait",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 15
+				}
+			}
+		],
+		"folder": {
+			"name": "Control Flow"
+		},
+		"annotations": []
+	}
+}
