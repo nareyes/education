@@ -10,7 +10,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@bool(pipeline().parameters.ifIndia)",
+						"value": "@bool(pipeline().parameters.ifInternational)",
 						"type": "Expression"
 					},
 					"ifFalseActivities": [
@@ -137,7 +137,7 @@
 			}
 		],
 		"parameters": {
-			"ifIndia": {
+			"ifInternational": {
 				"type": "bool"
 			}
 		},
