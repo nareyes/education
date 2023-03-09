@@ -1,7 +1,7 @@
 {
 	"name": "pl_validation_demo",
 	"properties": {
-		"description": "Validation demo on minimum file size.",
+		"description": "Validation demo on file existence.",
 		"activities": [
 			{
 				"name": "validateFileExists",
