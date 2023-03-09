@@ -1,5 +1,5 @@
 {
-	"name": "pl_if_cond_demo",
+	"name": "pl_ifelse_cond_demo",
 	"properties": {
 		"description": "Copy emp details from blob to adls using if else condition.",
 		"activities": [
