@@ -4,7 +4,7 @@
 		"description": "Validation demo on minimum file size.",
 		"activities": [
 			{
-				"name": "validateFileSize",
+				"name": "validateFileExists",
 				"description": "",
 				"type": "Validation",
 				"dependsOn": [],
@@ -15,8 +15,7 @@
 						"type": "DatasetReference"
 					},
 					"timeout": "0.00:00:10",
-					"sleep": 10,
-					"minimumSize": 10
+					"sleep": 10
 				}
 			},
 			{
@@ -24,7 +23,7 @@
 				"type": "Wait",
 				"dependsOn": [
 					{
-						"activity": "validateFileSize",
+						"activity": "validateFileExists",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -40,7 +39,7 @@
 				"type": "Fail",
 				"dependsOn": [
 					{
-						"activity": "validateFileSize",
+						"activity": "validateFileExists",
 						"dependencyConditions": [
 							"Failed"
 						]
