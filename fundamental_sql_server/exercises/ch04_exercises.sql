@@ -1,7 +1,10 @@
---------------------------
---  Chapter 4 Exercises --
---------------------------
+--------------------------------------
+--  Chapter 4 Exercises: Subqueries --
+--------------------------------------
+USE tsql_fundamentals
+GO
 
+-- EXERCISE 1
 -- Write a query that returns all orders placed on the last day of activity that can be found in the Orders table.
 -- Tables Invovled: Sales Orders
 SELECT
@@ -15,6 +18,7 @@ WHERE orderdate = (SELECT MAX(O.orderdate)
 ORDER BY orderid DESC;
 
 
+-- EXERCISE 2.1
 -- Write a query that returns all orders placed by the customer(s) who placed the highest number of orders. 
 -- Note that more than one customer might have the same number of orders.
 -- Tables Invovled: Sales.Orders
@@ -31,6 +35,7 @@ WHERE custid IN (SELECT TOP 1 WITH TIES O.custid
 ORDER BY custid ASC;
 
 
+-- EXERCISE 2.2
 -- Write a query that returns employees who did not place orders on or after May 1, 2016.
 -- Tables Invovled: HR.Employees and Sales.Orders
 SELECT
@@ -43,6 +48,8 @@ WHERE empid NOT IN (SELECT O.empid
                     WHERE orderdate >= '2016-05-01')
 ORDER BY empid ASC;
 
+
+-- EXERCISE 3.1
 -- Write a query that returns countries where there are customers but not employees.
 -- Tables Invovled: Sales.Customers and HR.Employees
 SELECT DISTINCT country 
@@ -52,6 +59,7 @@ WHERE country NOT IN (SELECT E.country
 ORDER BY country ASC;
 
 
+-- EXERCISE 3.2
 -- Write a query that returns for each customer all orders placed on the customer’s last day of activity.
 -- Table Involved: Sales.Orders
 SELECT
@@ -66,6 +74,7 @@ WHERE orderdate = (SELECT MAX (O2.orderdate)
 ORDER BY custid ASC;
 
 
+-- EXERCISE 4 (Advanced)
 -- Write a query that returns customers who placed orders in 2015 but not in 2016.
 -- Tables Involved: Sales.Customers and Sales.Orders
 SELECT
@@ -81,6 +90,7 @@ WHERE custid IN (SELECT O.custid
 ORDER BY custid ASC;
 
 
+-- EXERCISE 5.1
 -- Write a query that returns customers who ordered product 12.
 -- Tables Involved: Sales.Customers, Sales.Orders, and Sales.OrderDetails
 SELECT
@@ -95,6 +105,7 @@ WHERE custid IN (SELECT O.custid
 ORDER BY C.custid ASC;
 
 
+-- EXERCISE 5.2 (Advanced)
 -- Write a query that calculates a running-total quantity for each customer and month (using subquery).
 -- Table Involved: Sales.CustOrders
 SELECT 
@@ -108,6 +119,7 @@ FROM Sales.CustOrders AS C1
 ORDER BY C1.custid, C1.ordermonth;
 
 
+-- EXERCISE 6.1
 -- Write a query that returns for each order the number of days that passed since the same customer’s previous order.
 -- To determine recency among orders, use orderdate as the primary sort element and orderid as the tiebreaker.
 -- Table Involved: Sales.Orders
@@ -126,6 +138,7 @@ FROM Sales.Orders AS O1
 ORDER BY O1.custid, O1.orderdate, O1.orderid;
 
 
+-- EXERCISE 6.2
 -- Explain the difference between IN and EXISTS.
 /* Whereas the IN predicate uses three-valued logic, the EXISTS predicate uses two-valued logic. 
 When no NULLs are involved in the data, IN and EXISTS give you the same meaning in both their positive and negative forms (with NOT). 

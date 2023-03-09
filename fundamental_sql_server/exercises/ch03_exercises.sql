@@ -1,7 +1,10 @@
---------------------------
---  Chapter 3 Exercises --
---------------------------
+---------------------------------
+--  Chapter 3 Exercises: Joins --
+---------------------------------
+USE tsql_fundamentals
+GO
 
+-- EXERCISE 1.1
 -- Write a query that generates five copies of each employee row.
 -- Tables Invovled: HR.Employees and dbo.Nums
 SELECT
@@ -14,6 +17,8 @@ FROM HR.Employees AS E
 WHERE N.n <= 5
 ORDER BY N.n ASC, E.empid ASC;
 
+
+-- EXERCISE 1.2 (Advanced)
 -- Write a query that returns a row for each employee and day in the range June 12, 2016 through June 16, 2016.
 -- Tables Invovled: HR.Employees and dbo.Nums
 SELECT 
@@ -25,8 +30,9 @@ WHERE N.n <= DATEDIFF (DAY, '20160612', '20160616') + 1
 ORDER BY E.empid, date;
 
 
+-- EXERCISE 2
 -- Explain what’s wrong in the following query, and provide a correct alternative:
--- Explanation: A table aliase is used and then full table name is used to represent each attribute, resulting in multi-part identifier error.
+-- Answer: A table aliase is used and then full table name is used to represent each attribute, resulting in multi-part identifier error.
 /*
 SELECT Customers.custid, Customers.companyname, Orders.orderid, Orders.orderdate
 FROM Sales.Customers AS C
@@ -45,6 +51,7 @@ INNER JOIN Sales.Orders AS O
 ON C.custid = O.custid;
 
 
+-- EXERCISE 3
 -- Return US customers, and for each customer return the total number of orders and total quantities.
 -- Tables Involved: Sales.Customers, Sales.Orders, and Sales.OrderDetails
 SELECT
@@ -61,6 +68,7 @@ GROUP BY C.custid
 ORDER BY C.custid ASC;
 
 
+-- EXERCISE 4
 -- Return customers and their orders, including customers who placed no orders.
 -- Tables Involved: Sales.Customers and Sales.Orders
 SELECT
@@ -73,6 +81,7 @@ FROM Sales.Customers AS C
         ON C.custid = O.custid -- Customers without an order will have a NULL for orderid
 
 
+-- EXERCISE 5
 -- Return customers who placed no orders.
 -- Tables involved: Sales.Customers and Sales.Orders
 SELECT
@@ -88,6 +97,7 @@ WHERE O.orderid IS NULL; -- Returns customers with no associated orderid (refere
 to get nulls in this query, is of it's an outter row with no associated order*/
 
 
+-- EXERCISE 6
 -- Return customers with orders placed on February 12, 2016, along with their orders.
 -- Tables involved: Sales.Customers and Sales.Orders
 SELECT
@@ -101,6 +111,7 @@ FROM Sales.Customers AS C
 WHERE O.orderdate = '2016-02-12';
 
 
+-- EXERCISE 7 (Advanced)
 -- Write a query that returns all customers in the output, but matches them with their respective orders only if they were placed on February 12, 2016.
 -- Tables involved: Sales.Customers and Sales.Orders
 SELECT
@@ -115,8 +126,9 @@ FROM Sales.Customers AS C
 /*Date filter in on clause ensures customers without an order are still returned.*/
 
 
+-- EXERCISE 8 (Advanced)
 -- Explain why the following query isn’t a correct solution query for Exercise 7 (above):
--- Explanation: Because the non-preserved side filter in the where clause discards all UNKNOWN, so customers without an order are lost.
+-- Answer: Because the non-preserved side filter in the where clause discards all UNKNOWN, so customers without an order are lost.
 /*
 SELECT C.custid, C.companyname, O.orderid, O.orderdate
 FROM Sales.Customers AS C
@@ -126,6 +138,7 @@ WHERE O.orderdate = '20160212' OR O.orderid IS NULL;
 */
 
 
+-- EXERCISE 9 (Advanced)
 -- Return all customers, and for each return a Yes/No value depending on whether the customer placed orders on February 12, 2016.
 -- Tables involved: Sales.Customers and Sales.Orders
 SELECT
