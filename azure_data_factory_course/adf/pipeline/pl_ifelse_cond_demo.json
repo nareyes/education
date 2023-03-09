@@ -7,7 +7,20 @@
 				"name": "copyEmpDetails",
 				"type": "IfCondition",
 				"dependsOn": [],
-				"userProperties": [],
+				"userProperties": [
+					{
+						"name": "input",
+						"value": "blob/"
+					},
+					{
+						"name": "output-intl",
+						"value": "adls/output/employee-details/intl"
+					},
+					{
+						"name": "output-dom",
+						"value": "adls/output/employee-details/dom"
+					}
+				],
 				"typeProperties": {
 					"expression": {
 						"value": "@bool(pipeline().parameters.ifInternational)",
