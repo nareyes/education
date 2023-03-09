@@ -1,6 +1,7 @@
 {
 	"name": "pl_wait_demo",
 	"properties": {
+		"description": "Demo wait activity.",
 		"activities": [
 			{
 				"name": "waitTime",
