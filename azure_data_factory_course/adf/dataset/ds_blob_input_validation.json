@@ -1,0 +1,22 @@
+{
+	"name": "ds_blob_input_validation",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azblob",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "validation_input.csv",
+				"container": "validation"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
