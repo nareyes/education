@@ -43,7 +43,16 @@
 						]
 					}
 				],
-				"userProperties": [],
+				"userProperties": [
+					{
+						"name": "input",
+						"value": "sqldb"
+					},
+					{
+						"name": "output",
+						"value": "adls/sql-backup/metadata"
+					}
+				],
 				"typeProperties": {
 					"items": {
 						"value": "@activity('lookupSQLDB').output.value",
@@ -62,16 +71,7 @@
 								"secureOutput": false,
 								"secureInput": false
 							},
-							"userProperties": [
-								{
-									"name": "input",
-									"value": "sqldb"
-								},
-								{
-									"name": "output",
-									"value": "adls/sql-backup/metadata"
-								}
-							],
+							"userProperties": [],
 							"typeProperties": {
 								"dataset": {
 									"referenceName": "ds_sqldb_input_all",
