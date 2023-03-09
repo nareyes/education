@@ -1,5 +1,5 @@
 {
-	"name": "pl_lookup_department",
+	"name": "pl_lookup_demo",
 	"properties": {
 		"description": "Lookup department and set variable for each.",
 		"activities": [
