@@ -1,6 +1,7 @@
 {
 	"name": "pl_switch_demo",
 	"properties": {
+		"description": "Demo switch activity with wait activity.",
 		"activities": [
 			{
 				"name": "switchCountry",
