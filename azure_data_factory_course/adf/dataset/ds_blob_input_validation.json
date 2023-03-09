@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "validation_input.csv",
+				"fileName": "validation_demo.csv",
 				"container": "validation"
 			},
 			"columnDelimiter": ",",
