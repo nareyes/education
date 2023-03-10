@@ -1,0 +1,60 @@
+{
+	"name": "pl_validation_demo",
+	"properties": {
+		"description": "Validation demo on file existence.",
+		"activities": [
+			{
+				"name": "validateFileExists",
+				"description": "",
+				"type": "Validation",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_blob_input_validation",
+						"type": "DatasetReference"
+					},
+					"timeout": "0.00:00:10",
+					"sleep": 10
+				}
+			},
+			{
+				"name": "ValidateSuccess",
+				"type": "Wait",
+				"dependsOn": [
+					{
+						"activity": "validateFileExists",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 15
+				}
+			},
+			{
+				"name": "validateFailure",
+				"type": "Fail",
+				"dependsOn": [
+					{
+						"activity": "validateFileExists",
+						"dependencyConditions": [
+							"Failed"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"message": "No File in Directory",
+					"errorCode": "400"
+				}
+			}
+		],
+		"folder": {
+			"name": "Control Flow"
+		},
+		"annotations": []
+	}
+}

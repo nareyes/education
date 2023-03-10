@@ -1,0 +1,204 @@
+{
+	"name": "pl_ifelse_cond_demo",
+	"properties": {
+		"description": "Copy emp details from blob to adls using if else condition.",
+		"activities": [
+			{
+				"name": "copyEmpDetails",
+				"type": "IfCondition",
+				"dependsOn": [],
+				"userProperties": [
+					{
+						"name": "input",
+						"value": "blob/"
+					},
+					{
+						"name": "output-intl",
+						"value": "adls/output/employee-details/intl"
+					},
+					{
+						"name": "output-dom",
+						"value": "adls/output/employee-details/dom"
+					}
+				],
+				"typeProperties": {
+					"expression": {
+						"value": "@bool(pipeline().parameters.ifInternational)",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "copyDom",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "AzureBlobStorageReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": true,
+								"stagingSettings": {
+									"linkedServiceName": {
+										"referenceName": "ls_azblob",
+										"type": "LinkedServiceReference"
+									},
+									"path": "staging"
+								},
+								"logSettings": {
+									"enableCopyActivityLog": true,
+									"copyActivityLogSettings": {
+										"logLevel": "Info",
+										"enableReliableLogging": true
+									},
+									"logLocationSettings": {
+										"linkedServiceName": {
+											"referenceName": "ls_azblob",
+											"type": "LinkedServiceReference"
+										},
+										"path": "adf-logs"
+									}
+								},
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_blob_input_emp_details",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_adls_output_emp_details_us",
+									"type": "DatasetReference"
+								}
+							]
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "copyIntl",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "DelimitedTextSource",
+									"storeSettings": {
+										"type": "AzureBlobStorageReadSettings",
+										"recursive": true,
+										"enablePartitionDiscovery": false
+									},
+									"formatSettings": {
+										"type": "DelimitedTextReadSettings"
+									}
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": true,
+								"stagingSettings": {
+									"linkedServiceName": {
+										"referenceName": "ls_azblob",
+										"type": "LinkedServiceReference"
+									},
+									"path": "staging"
+								},
+								"logSettings": {
+									"enableCopyActivityLog": true,
+									"copyActivityLogSettings": {
+										"logLevel": "Info",
+										"enableReliableLogging": true
+									},
+									"logLocationSettings": {
+										"linkedServiceName": {
+											"referenceName": "ls_azblob",
+											"type": "LinkedServiceReference"
+										},
+										"path": "adf-logs"
+									}
+								},
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "ds_blob_input_emp_details",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "ds_adls_output_emp_details_india",
+									"type": "DatasetReference"
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"ifInternational": {
+				"type": "bool"
+			}
+		},
+		"folder": {
+			"name": "Control Flow"
+		},
+		"annotations": []
+	}
+}

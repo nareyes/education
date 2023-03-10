@@ -43,7 +43,16 @@
 						]
 					}
 				],
-				"userProperties": [],
+				"userProperties": [
+					{
+						"name": "input",
+						"value": "sqldb"
+					},
+					{
+						"name": "output",
+						"value": "adls/output/sql-backup"
+					}
+				],
 				"typeProperties": {
 					"items": {
 						"value": "@activity('lookupSQLDB').output.value",
@@ -62,16 +71,7 @@
 								"secureOutput": false,
 								"secureInput": false
 							},
-							"userProperties": [
-								{
-									"name": "input",
-									"value": "sqldb"
-								},
-								{
-									"name": "output",
-									"value": "adls/output/sql-backup"
-								}
-							],
+							"userProperties": [],
 							"typeProperties": {
 								"source": {
 									"type": "AzureSqlSource",
@@ -147,10 +147,10 @@
 			}
 		],
 		"folder": {
-			"name": "Control Flow"
+			"name": "Scenarios"
 		},
 		"annotations": [
-			"Control Flow"
+			"Scenarios"
 		]
 	}
 }

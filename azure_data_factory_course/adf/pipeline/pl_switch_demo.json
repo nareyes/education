@@ -1,0 +1,70 @@
+{
+	"name": "pl_switch_demo",
+	"properties": {
+		"description": "Demo switch activity with wait activity.",
+		"activities": [
+			{
+				"name": "switchCountry",
+				"type": "Switch",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"on": {
+						"value": "@pipeline().parameters.countryName",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": "USA",
+							"activities": [
+								{
+									"name": "waitUSA",
+									"type": "Wait",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"waitTimeInSeconds": 15
+									}
+								}
+							]
+						},
+						{
+							"value": "IND",
+							"activities": [
+								{
+									"name": "waitIndia",
+									"type": "Wait",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"waitTimeInSeconds": 15
+									}
+								}
+							]
+						}
+					],
+					"defaultActivities": [
+						{
+							"name": "waitDefault",
+							"type": "Wait",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"waitTimeInSeconds": 15
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"countryName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Control Flow"
+		},
+		"annotations": []
+	}
+}
