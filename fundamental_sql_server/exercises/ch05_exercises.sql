@@ -50,27 +50,53 @@ ORDER BY empid;
 -- Write a join query between the derived table and the Orders table.
 -- Return the orders with the maximum order date for each employee.
 -- Tables Involved: Sales.Orders
-
-/*
-Retention strategy
-Define explicit columns in ADF
-
-*/
+SELECT
+    O1.empid
+    ,O1.orderdate AS maxorderdate
+    ,O1.orderid
+    ,O1.custid
+FROM Sales.Orders AS O1
+    INNER JOIN (
+        SELECT
+            empid
+            ,MAX (orderdate) AS maxorderdate
+        FROM Sales.Orders
+        GROUP BY empid
+    ) AS O2
+        ON O1.empid = O2.empid
+        AND O1.orderdate = O2.maxorderdate
+ORDER BY O1.empid ASC;
 
 
 -- EXERCISE 3.1
 -- Write a query that calculates a row number for each order based on orderdate, orderid ordering.
 -- Table Involved: Sales.Orders
-
-
-
+SELECT
+    orderid
+    ,orderdate
+    ,custid
+    ,empid
+    ,ROW_NUMBER() OVER (ORDER BY orderdate, orderid) AS rownum
+FROM Sales.Orders;
 
 
 -- EXERCISE 3.2
 -- Write a query that returns rows with row numbers 11 through 20 based on the row-number definition in Exercise 3-1. 
 -- Use a CTE to encapsulate the code from Exercise 3-1.
 -- Table Involved: Sales.Orders
+WITH CTE_RowNum AS (
+    SELECT
+        orderid
+        ,orderdate
+        ,custid
+        ,empid
+        ,ROW_NUMBER() OVER (ORDER BY orderdate, orderid) AS rownum
+    FROM Sales.Orders
+)
 
+SELECT *
+FROM CTE_RowNum
+WHERE rownum BETWEEN 11 AND 20;
 
 
 -- EXERCISE 4 (Advanced)
@@ -81,8 +107,25 @@ Define explicit columns in ADF
 
 
 -- EXERCISE 5.1
--- Create a view that returns the total quantity for each employee and year.
+-- Create a view that returns the total quantity for each employee and year when running: SELECT * FROM Sales.VEmpOrders ORDER BY empid, orderyear;
 -- Tables Involved: Sales.Orders and Sales.OrderDetails
+DROP VIEW IF EXISTS Sales.VEmpOrders
+GO
+
+CREATE VIEW Sales.VEmpOrders AS (
+    SELECT
+        O.empid
+        ,YEAR (O.orderdate) AS orderyear
+        ,SUM (OD.qty) AS qty
+    FROM Sales.Orders AS O
+        INNER JOIN Sales.OrderDetails AS OD
+            ON O.orderid = OD.orderid
+    GROUP BY O.empid, YEAR (O.orderdate)
+)
+GO
+
+SELECT * FROM Sales.VEmpOrders
+ORDER BY empid, orderyear;
 
 
 
