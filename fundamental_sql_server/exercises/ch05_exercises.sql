@@ -44,7 +44,6 @@ GROUP BY empid
 ORDER BY empid;
 
 
-
 -- EXERCISE 2.2
 -- Encapsulate the query from Exercise 2-1 in a derived table. 
 -- Write a join query between the derived table and the Orders table.
@@ -102,8 +101,26 @@ WHERE rownum BETWEEN 11 AND 20;
 -- EXERCISE 4 (Advanced)
 -- Write a solution using a recursive CTE that returns the management chain leading to Patricia Doyle (employee ID 9).
 -- Table Involved: HR.Employees
+WITH
+EmpsCTE AS (
+    SELECT empid, mgrid, firstname, lastname
+    FROM HR.Employees
+    WHERE empid = 9
+    
+    UNION ALL
 
+    SELECT E2.empid, E2.mgrid, E2.firstname, E2.lastname
+    FROM EmpsCTE AS E1
+        INNER JOIN HR.Employees AS E2
+            ON E1.mgrid = E2.empid
+)
 
+SELECT
+    empid
+    ,mgrid
+    ,firstname
+    ,lastname
+FROM EmpsCTE;
 
 
 -- EXERCISE 5.1
@@ -128,24 +145,70 @@ SELECT * FROM Sales.VEmpOrders
 ORDER BY empid, orderyear;
 
 
-
-
 -- EXERCISE 5.2 (Advanced)
 -- Write a query against Sales.VEmpOrders that returns the running total quantity for each employee and year.
 -- Table Involved: Sales.VEmpOrders view
-
-
+SELECT
+    V1.empid
+    ,V1.orderyear
+    ,V1.qty
+    , (SELECT SUM (qty)
+       FROM Sales.VEmpOrders AS V2
+       WHERE V1.empid = V2.empid AND V1.orderyear >= V2.orderyear
+    ) AS runqty
+FROM  Sales.VEmpOrders AS V1
+ORDER BY V1.empid, V1.orderyear;
 
 
 -- EXERCISE 6.1
 -- Create an inline TVF that accepts as inputs a supplier ID (@supid AS INT) and a requested number of products (@n AS INT).
 -- The function should return @n products with the highest unit prices that are supplied by the specified supplier ID.
 -- Table Involved: Production.Products
+USE tsql_fundamentals
+GO
 
+DROP FUNCTION IF EXISTS Production.TopProducts
+GO
 
+CREATE FUNCTION Production.TopProducts (
+    @supid AS INT
+    ,@n AS INT
+)
+RETURNS TABLE AS
+RETURN
+    SELECT TOP (@n) productid, productname, unitprice
+    FROM Production.Products
+    WHERE supplierid = @supid
+    ORDER BY unitprice DESC
+
+    -- ALTERNATIVE USING OFFSET-FETCH
+    -- SELECT productid, productname, unitprice
+    -- FROM Production.Products
+    -- WHERE supplierid = @supid
+    -- ORDER BY unitprice DESC
+    -- OFFSET 0 ROWS FETCH NEXT @n ROWS ONLY
+
+GO
+
+SELECT * FROM Production.TopProducts(5, 2);
 
 
 -- EXERCISE 6.2
 -- Using the CROSS APPLY operator and the function you created in Exercise 6-1, return the two most expensive products for each supplier.
 -- Table Involved: Production.Suppliers
+SELECT
+    S.supplierid
+    ,S.companyname
+    ,P.productid
+    ,P.productname
+    ,P.unitprice
+FROM Production.Suppliers AS S
+    CROSS APPLY Production.TopProducts(S.supplierid, 2) AS P;
 
+
+-- CLEAN UP
+DROP VIEW IF EXISTS Sales.VEmpOrders
+GO
+
+DROP FUNCTION IF EXISTS Production.TopProducts
+GO
