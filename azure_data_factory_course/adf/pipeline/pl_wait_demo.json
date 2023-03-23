@@ -16,6 +16,8 @@
 		"folder": {
 			"name": "Control Flow"
 		},
-		"annotations": []
+		"annotations": [
+			"Control Flow"
+		]
 	}
 }
