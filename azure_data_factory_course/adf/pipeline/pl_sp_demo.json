@@ -19,7 +19,10 @@
 					"storedProcedureName": "[dbo].[sp_delete_dept]",
 					"storedProcedureParameters": {
 						"p_dept_name": {
-							"value": "Payroll",
+							"value": {
+								"value": "@pipeline().parameters.deptName",
+								"type": "Expression"
+							},
 							"type": "String"
 						}
 					}
@@ -30,9 +33,16 @@
 				}
 			}
 		],
-		"folder": {
-			"name": "Stored Procedure"
+		"parameters": {
+			"deptName": {
+				"type": "string"
+			}
 		},
-		"annotations": []
+		"folder": {
+			"name": "Pipeline Activities"
+		},
+		"annotations": [
+			"Pipeline Activities"
+		]
 	}
 }
