@@ -1,0 +1,46 @@
+{
+	"name": "pl_delete_demo",
+	"properties": {
+		"description": "Demo delete activity.",
+		"activities": [
+			{
+				"name": "deleteContainer",
+				"type": "Delete",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_adls_input_folder",
+						"type": "DatasetReference"
+					},
+					"logStorageSettings": {
+						"linkedServiceName": {
+							"referenceName": "ls_azblob",
+							"type": "LinkedServiceReference"
+						},
+						"path": "adf-logs"
+					},
+					"enableLogging": true,
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					}
+				}
+			}
+		],
+		"folder": {
+			"name": "Pipeline Activities"
+		},
+		"annotations": [
+			"Pipeline Activities"
+		]
+	}
+}

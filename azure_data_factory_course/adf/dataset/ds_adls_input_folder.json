@@ -1,0 +1,17 @@
+{
+	"name": "ds_adls_input_folder",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azdatalake",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "input"
+			}
+		}
+	}
+}
