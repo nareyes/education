@@ -1,0 +1,12 @@
+{
+	"name": "pl_execute_pipeline_child2_demo",
+	"properties": {
+		"description": "Child pipeline for execute activity.",
+		"folder": {
+			"name": "Additional Activities"
+		},
+		"annotations": [
+			"pl_execute_pipeline_demo"
+		]
+	}
+}
