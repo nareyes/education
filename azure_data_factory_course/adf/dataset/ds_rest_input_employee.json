@@ -5,7 +5,9 @@
 			"referenceName": "ls_restapi",
 			"type": "LinkedServiceReference"
 		},
-		"annotations": [],
+		"annotations": [
+			"REST"
+		],
 		"type": "RestResource",
 		"schema": []
 	}
