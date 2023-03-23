@@ -5,6 +5,9 @@
 			"referenceName": "ls_azblob",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "BLOB"
+		},
 		"annotations": [
 			"BLOB"
 		],

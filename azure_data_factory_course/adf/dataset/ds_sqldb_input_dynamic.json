@@ -10,7 +10,9 @@
 				"type": "string"
 			}
 		},
-		"annotations": [],
+		"annotations": [
+			"SQL DB"
+		],
 		"type": "AzureSqlTable",
 		"schema": [],
 		"typeProperties": {
