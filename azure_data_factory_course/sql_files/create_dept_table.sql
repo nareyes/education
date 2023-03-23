@@ -1,7 +1,6 @@
 CREATE TABLE dbo.Department (
-    Dept_Id   INT,
-    Dept_Name VARCHAR(MAX),
-
+    Dept_Id   INT
+    ,Dept_Name VARCHAR(MAX)
 );
 
 INSERT INTO dbo.Department(Dept_Id, Dept_Name) VALUES (1,'IT');
