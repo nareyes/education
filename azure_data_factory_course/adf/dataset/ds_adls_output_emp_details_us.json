@@ -5,6 +5,9 @@
 			"referenceName": "ls_azdatalake",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "ADLS"
+		},
 		"annotations": [
 			"ADLS"
 		],

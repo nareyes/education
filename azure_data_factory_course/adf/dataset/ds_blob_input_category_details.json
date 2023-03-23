@@ -5,7 +5,9 @@
 			"referenceName": "ls_azblob",
 			"type": "LinkedServiceReference"
 		},
-		"annotations": [],
+		"annotations": [
+			"BLOB"
+		],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
