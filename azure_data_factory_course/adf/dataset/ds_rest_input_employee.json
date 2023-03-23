@@ -5,6 +5,9 @@
 			"referenceName": "ls_restapi",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "API"
+		},
 		"annotations": [
 			"REST"
 		],
