@@ -4,12 +4,36 @@
 		"description": "Demo execute pipeline activity.",
 		"activities": [
 			{
-				"name": "waitTemp",
-				"type": "Wait",
+				"name": "executeFirstChild",
+				"type": "ExecutePipeline",
 				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
-					"waitTimeInSeconds": 1
+					"pipeline": {
+						"referenceName": "pl_execute_pipeline_child1_demo",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			},
+			{
+				"name": "executeSecondChild",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "executeFirstChild",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "pl_execute_pipeline_child2_demo",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
 				}
 			}
 		],
