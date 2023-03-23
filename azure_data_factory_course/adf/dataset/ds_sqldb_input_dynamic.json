@@ -10,6 +10,9 @@
 				"type": "string"
 			}
 		},
+		"folder": {
+			"name": "SQL DB"
+		},
 		"annotations": [
 			"SQL DB"
 		],

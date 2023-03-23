@@ -5,6 +5,9 @@
 			"referenceName": "ls_azsqldb",
 			"type": "LinkedServiceReference"
 		},
+		"folder": {
+			"name": "SQL DB"
+		},
 		"annotations": [
 			"SQL DB"
 		],
