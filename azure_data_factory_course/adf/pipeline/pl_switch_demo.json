@@ -1,7 +1,7 @@
 {
 	"name": "pl_switch_demo",
 	"properties": {
-		"description": "Demo switch activity with wait activity.",
+		"description": "Demo switch activity with wait and fail activity.",
 		"activities": [
 			{
 				"name": "switchCountry",
@@ -45,12 +45,13 @@
 					],
 					"defaultActivities": [
 						{
-							"name": "waitDefault",
-							"type": "Wait",
+							"name": "failNoCountry",
+							"type": "Fail",
 							"dependsOn": [],
 							"userProperties": [],
 							"typeProperties": {
-								"waitTimeInSeconds": 15
+								"message": "Country not available.",
+								"errorCode": "1000"
 							}
 						}
 					]
@@ -65,6 +66,8 @@
 		"folder": {
 			"name": "Control Flow"
 		},
-		"annotations": []
+		"annotations": [
+			"Control Flow"
+		]
 	}
 }
