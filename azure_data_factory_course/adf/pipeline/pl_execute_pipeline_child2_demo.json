@@ -2,11 +2,22 @@
 	"name": "pl_execute_pipeline_child2_demo",
 	"properties": {
 		"description": "Child pipeline for execute activity.",
+		"activities": [
+			{
+				"name": "waitChild",
+				"type": "Wait",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 1
+				}
+			}
+		],
 		"folder": {
 			"name": "Additional Activities"
 		},
 		"annotations": [
-			"pl_execute_pipeline_demo"
+			"Additional Activities"
 		]
 	}
 }
