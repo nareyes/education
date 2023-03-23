@@ -1,0 +1,12 @@
+{
+	"name": "pl_execute_pipeline_master_demo",
+	"properties": {
+		"description": "Demo execute pipeline activity.",
+		"folder": {
+			"name": "Additional Activities"
+		},
+		"annotations": [
+			"Additional Activities"
+		]
+	}
+}
