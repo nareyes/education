@@ -5,7 +5,9 @@
 			"referenceName": "ls_azdatalake",
 			"type": "LinkedServiceReference"
 		},
-		"annotations": [],
+		"annotations": [
+			"ADLS"
+		],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {

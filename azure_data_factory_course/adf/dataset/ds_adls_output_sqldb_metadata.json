@@ -10,7 +10,9 @@
 				"type": "string"
 			}
 		},
-		"annotations": [],
+		"annotations": [
+			"ADLS"
+		],
 		"type": "DelimitedText",
 		"typeProperties": {
 			"location": {
