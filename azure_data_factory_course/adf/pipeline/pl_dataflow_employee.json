@@ -14,7 +14,16 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": [],
+				"userProperties": [
+					{
+						"name": "input",
+						"value": "blob/df-input"
+					},
+					{
+						"name": "output",
+						"value": "adls/dataflow and sqldb"
+					}
+				],
 				"typeProperties": {
 					"dataflow": {
 						"referenceName": "df_employee",
