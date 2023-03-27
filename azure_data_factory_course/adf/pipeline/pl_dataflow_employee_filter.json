@@ -21,7 +21,7 @@
 					},
 					{
 						"name": "output",
-						"value": "adls/dataflow and sqldb"
+						"value": "sqldb"
 					}
 				],
 				"typeProperties": {
