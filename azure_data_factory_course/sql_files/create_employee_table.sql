@@ -1,5 +1,5 @@
 CREATE TABLE dbo.Employee (
-    Name        VARCHAR(MAX)
+    Name       VARCHAR(MAX)
     ,Gender    VARCHAR(MAX)
     ,Dept      VARCHAR(MAX)
 );
