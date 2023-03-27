@@ -29,9 +29,6 @@
 			],
 			"transformations": [
 				{
-					"name": "selectEmployee"
-				},
-				{
 					"name": "filterEmployeeDept",
 					"description": "Filtering rows using expressions on columns 'Dept_Id' equals to 1."
 				},
@@ -52,16 +49,7 @@
 				"     inferDriftedColumnTypes: true,",
 				"     ignoreNoFilesFound: true,",
 				"     partitionBy('hash', 1)) ~> blobEmployee",
-				"blobEmployee select(mapColumn(",
-				"          Emp_Id = Emp_id,",
-				"          Name,",
-				"          Gender,",
-				"          Salary,",
-				"          Dept_Id = Dept_id",
-				"     ),",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> selectEmployee",
-				"selectEmployee filter(equals(Dept_Id, 1)) ~> filterEmployeeDept",
+				"blobEmployee filter(equals(Dept_id, 1)) ~> filterEmployeeDept",
 				"filterEmployeeDept filter(equals(Gender, 'F')) ~> filterEmployeeGender",
 				"filterEmployeeGender sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
@@ -83,11 +71,11 @@
 				"     skipDuplicateMapOutputs: true,",
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
-				"          Emp_Id,",
+				"          Emp_Id = Emp_id,",
 				"          Name,",
 				"          Gender,",
 				"          Salary,",
-				"          Dept_Id",
+				"          Dept_Id = Dept_id",
 				"     )) ~> sqldbEmployeeDF"
 			]
 		}
