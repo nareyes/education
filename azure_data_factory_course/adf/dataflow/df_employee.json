@@ -33,7 +33,11 @@
 					}
 				}
 			],
-			"transformations": [],
+			"transformations": [
+				{
+					"name": "selectColumns"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          Emp_id as integer,",
@@ -46,8 +50,16 @@
 				"     validateSchema: false,",
 				"     inferDriftedColumnTypes: true,",
 				"     ignoreNoFilesFound: true,",
-				"     moveFiles: ['','processed/'],",
 				"     partitionBy('hash', 1)) ~> blobEmployee",
+				"blobEmployee select(mapColumn(",
+				"          Emp_Id = Emp_id,",
+				"          Name,",
+				"          Gender,",
+				"          Salary,",
+				"          Dept_Id = Dept_id",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectColumns",
 				"blobEmployee sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     partitionFileNames:['employee.csv'],",
@@ -64,7 +76,7 @@
 				"          Dept_Id = Dept_id",
 				"     ),",
 				"     partitionBy('hash', 1)) ~> adlsEmployee",
-				"blobEmployee sink(allowSchemaDrift: true,",
+				"selectColumns sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          Emp_Key as integer,",
@@ -85,11 +97,11 @@
 				"     skipDuplicateMapOutputs: true,",
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
-				"          Emp_Id = Emp_id,",
+				"          Emp_Id,",
 				"          Name,",
 				"          Gender,",
 				"          Salary,",
-				"          Dept_Id = Dept_id",
+				"          Dept_Id",
 				"     )) ~> sqldbEmployeeSCD2"
 			]
 		}
