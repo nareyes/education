@@ -1,7 +1,7 @@
 {
-	"name": "df_employee_select",
+	"name": "df_employee_filter",
 	"properties": {
-		"description": "Select transformation demo.",
+		"description": "Filter transformation demo.",
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [
@@ -27,7 +27,7 @@
 						"type": "DatasetReference"
 					},
 					"name": "sqldbEmployeeDF",
-					"description": "Export data to ds_sqldb_output_employee_df",
+					"description": "Export data to ds_sqldb_output_employee_scd2",
 					"rejectedDataLinkedService": {
 						"referenceName": "ls_azblob",
 						"type": "LinkedServiceReference"
