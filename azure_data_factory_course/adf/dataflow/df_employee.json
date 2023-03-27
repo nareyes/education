@@ -34,9 +34,11 @@
 				"     validateSchema: false,",
 				"     inferDriftedColumnTypes: true,",
 				"     ignoreNoFilesFound: true,",
-				"     moveFiles: ['','processed/']) ~> blobEmployee",
+				"     moveFiles: ['','processed/'],",
+				"     partitionBy('hash', 1)) ~> blobEmployee",
 				"blobEmployee sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
+				"     partitionFileNames:['employee.csv'],",
 				"     umask: 0022,",
 				"     preCommands: [],",
 				"     postCommands: [],",
@@ -48,7 +50,8 @@
 				"          Gender,",
 				"          Salary,",
 				"          Dept_Id = Dept_id",
-				"     )) ~> adlsEmployee"
+				"     ),",
+				"     partitionBy('hash', 1)) ~> adlsEmployee"
 			]
 		}
 	}
