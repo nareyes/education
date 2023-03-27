@@ -1,7 +1,7 @@
 {
-	"name": "pl_dataflow_employee_select",
+	"name": "pl_dataflow_employee_filter",
 	"properties": {
-		"description": "Employee data flow from blob to sqldb using select transformation.",
+		"description": "Employee data flow from blob to sqldb using filter transformation.",
 		"activities": [
 			{
 				"name": "dfEmployee",

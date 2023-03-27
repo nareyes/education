@@ -39,7 +39,8 @@
 					"name": "selectEmployee"
 				},
 				{
-					"name": "filterEmployee"
+					"name": "filterEmployee",
+					"description": "Filtering rows using expressions on columns 'Dept_Id' equals to 1."
 				}
 			],
 			"scriptLines": [
@@ -64,7 +65,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> selectEmployee",
-				"selectEmployee filter(ERROR_FUNCTION('')) ~> filterEmployee",
+				"selectEmployee filter(equals(Dept_Id, 1)) ~> filterEmployee",
 				"blobEmployee sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     partitionFileNames:['employee.csv'],",

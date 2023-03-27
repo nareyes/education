@@ -1,7 +1,7 @@
 {
 	"name": "pl_dataflow_employee",
 	"properties": {
-		"description": "Employee data flow from blob to adls/sqldb.",
+		"description": "Employee data flow from blob to adls.",
 		"activities": [
 			{
 				"name": "dfEmployee",
