@@ -1,0 +1,148 @@
+{
+	"name": "df_employee_exists",
+	"properties": {
+		"description": "Exists transformation demo.",
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_blob_input_employee",
+						"type": "DatasetReference"
+					},
+					"name": "blobEmployee"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_sqldb_input_department",
+						"type": "DatasetReference"
+					},
+					"name": "sqldbDepartment"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_sqldb_output_employee_other",
+						"type": "DatasetReference"
+					},
+					"name": "sqldbEmployeeOther",
+					"description": "Export data to ds_sqldb_output_employee_df",
+					"rejectedDataLinkedService": {
+						"referenceName": "ls_azblob",
+						"type": "LinkedServiceReference"
+					}
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_sqldb_output_employee_df",
+						"type": "DatasetReference"
+					},
+					"name": "sqldbEmployeeDF"
+				}
+			],
+			"transformations": [
+				{
+					"name": "selectEmployee"
+				},
+				{
+					"name": "existsDepartment",
+					"description": "Filtering rows which are matching on columns 'selectEmployee@Dept_Id, sqldbDepartment@Dept_Id'"
+				},
+				{
+					"name": "notExistsDepartment",
+					"description": "Filtering rows which are matching on columns 'selectEmployee@Dept_Id, sqldbDepartment@Dept_Id'"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Emp_id as integer,",
+				"          Name as string,",
+				"          Gender as string,",
+				"          Salary as integer,",
+				"          Dept_id as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     inferDriftedColumnTypes: true,",
+				"     ignoreNoFilesFound: true,",
+				"     partitionBy('hash', 1)) ~> blobEmployee",
+				"source(output(",
+				"          Dept_Id as integer,",
+				"          Dept_Name as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> sqldbDepartment",
+				"blobEmployee select(mapColumn(",
+				"          Emp_Id = Emp_id,",
+				"          Name,",
+				"          Gender,",
+				"          Salary,",
+				"          Dept_Id = Dept_id",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectEmployee",
+				"selectEmployee, sqldbDepartment exists(selectEmployee@Dept_Id == sqldbDepartment@Dept_Id,",
+				"     negate:false,",
+				"     broadcast: 'auto')~> existsDepartment",
+				"selectEmployee, sqldbDepartment exists(selectEmployee@Dept_Id == sqldbDepartment@Dept_Id,",
+				"     negate:true,",
+				"     broadcast: 'auto')~> notExistsDepartment",
+				"notExistsDepartment sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Emp_Key as integer,",
+				"          Emp_Id as integer,",
+				"          Name as string,",
+				"          Gender as string,",
+				"          Salary as integer,",
+				"          Dept_Id as integer,",
+				"          Updated as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          Emp_Id,",
+				"          Name,",
+				"          Gender,",
+				"          Salary,",
+				"          Dept_Id",
+				"     )) ~> sqldbEmployeeOther",
+				"existsDepartment sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Emp_Key as integer,",
+				"          Emp_Id as integer,",
+				"          Name as string,",
+				"          Gender as string,",
+				"          Salary as integer,",
+				"          Dept_Id as integer,",
+				"          Updated as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          Emp_Id,",
+				"          Name,",
+				"          Gender,",
+				"          Salary,",
+				"          Dept_Id",
+				"     )) ~> sqldbEmployeeDF"
+			]
+		}
+	}
+}
