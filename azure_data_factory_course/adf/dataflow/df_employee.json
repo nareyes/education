@@ -19,6 +19,18 @@
 						"type": "DatasetReference"
 					},
 					"name": "adlsEmployee"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_sqldb_output_employee_scd2",
+						"type": "DatasetReference"
+					},
+					"name": "sqldbEmployeeSCD2",
+					"description": "Export data to ds_sqldb_output_employee_scd2",
+					"rejectedDataLinkedService": {
+						"referenceName": "ls_azblob",
+						"type": "LinkedServiceReference"
+					}
 				}
 			],
 			"transformations": [],
@@ -51,7 +63,34 @@
 				"          Salary,",
 				"          Dept_Id = Dept_id",
 				"     ),",
-				"     partitionBy('hash', 1)) ~> adlsEmployee"
+				"     partitionBy('hash', 1)) ~> adlsEmployee",
+				"blobEmployee sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Emp_Key as integer,",
+				"          Emp_Id as integer,",
+				"          Name as string,",
+				"          Gender as string,",
+				"          Salary as integer,",
+				"          Dept_Id as integer,",
+				"          Is_Active as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     truncate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          Emp_Id = Emp_id,",
+				"          Name,",
+				"          Gender,",
+				"          Salary,",
+				"          Dept_Id = Dept_id",
+				"     )) ~> sqldbEmployeeSCD2"
 			]
 		}
 	}
