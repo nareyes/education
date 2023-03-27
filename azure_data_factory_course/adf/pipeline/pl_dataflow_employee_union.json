@@ -1,7 +1,7 @@
 {
-	"name": "pl_dataflow_employee_condsplit",
+	"name": "pl_dataflow_employee_union",
 	"properties": {
-		"description": "Employee data flow from blob to sqldb using conditional split transformation.",
+		"description": "Employee data flow from blob to sqldb using union transformation.",
 		"activities": [
 			{
 				"name": "dfEmployee",
@@ -26,7 +26,7 @@
 				],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "df_employee_condsplit",
+						"referenceName": "df_employee_union",
 						"type": "DataFlowReference"
 					},
 					"staging": {
