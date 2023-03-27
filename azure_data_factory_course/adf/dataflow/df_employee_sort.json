@@ -1,7 +1,7 @@
 {
-	"name": "df_employee_select_copy1",
+	"name": "df_employee_sort",
 	"properties": {
-		"description": "Select transformation demo.",
+		"description": "Sort transformation demo.",
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [
