@@ -39,8 +39,11 @@
 					"name": "selectEmployee"
 				},
 				{
-					"name": "filterEmployee",
+					"name": "filterEmployeeDept",
 					"description": "Filtering rows using expressions on columns 'Dept_Id' equals to 1."
+				},
+				{
+					"name": "filterEmployeeGender"
 				}
 			],
 			"scriptLines": [
@@ -65,7 +68,8 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> selectEmployee",
-				"selectEmployee filter(equals(Dept_Id, 1)) ~> filterEmployee",
+				"selectEmployee filter(equals(Dept_Id, 1)) ~> filterEmployeeDept",
+				"filterEmployeeDept filter(equals(Gender, 'F')) ~> filterEmployeeGender",
 				"blobEmployee sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     partitionFileNames:['employee.csv'],",
@@ -82,7 +86,7 @@
 				"          Dept_Id = Dept_id",
 				"     ),",
 				"     partitionBy('hash', 1)) ~> adlsEmployee",
-				"filterEmployee sink(allowSchemaDrift: true,",
+				"filterEmployeeGender sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          Emp_Key as integer,",
