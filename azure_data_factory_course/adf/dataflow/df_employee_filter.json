@@ -34,6 +34,9 @@
 				},
 				{
 					"name": "filterEmployeeGender"
+				},
+				{
+					"name": "selectColumns"
 				}
 			],
 			"scriptLines": [
@@ -49,8 +52,17 @@
 				"     inferDriftedColumnTypes: true,",
 				"     ignoreNoFilesFound: true,",
 				"     partitionBy('hash', 1)) ~> blobEmployee",
-				"blobEmployee filter(equals(Dept_id, 1)) ~> filterEmployeeDept",
+				"selectColumns filter(equals(Dept_Id, 1)) ~> filterEmployeeDept",
 				"filterEmployeeDept filter(equals(Gender, 'F')) ~> filterEmployeeGender",
+				"blobEmployee select(mapColumn(",
+				"          Emp_Id = Emp_id,",
+				"          Name,",
+				"          Gender,",
+				"          Salary,",
+				"          Dept_Id = Dept_id",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectColumns",
 				"filterEmployeeGender sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -71,11 +83,11 @@
 				"     skipDuplicateMapOutputs: true,",
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
-				"          Emp_Id = Emp_id,",
+				"          Emp_Id,",
 				"          Name,",
 				"          Gender,",
 				"          Salary,",
-				"          Dept_Id = Dept_id",
+				"          Dept_Id",
 				"     )) ~> sqldbEmployeeDF"
 			]
 		}
