@@ -16,13 +16,6 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "ds_adls_output_folder",
-						"type": "DatasetReference"
-					},
-					"name": "adlsEmployee"
-				},
-				{
-					"dataset": {
 						"referenceName": "ds_sqldb_output_employee_df",
 						"type": "DatasetReference"
 					},
@@ -61,22 +54,6 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> selectEmployee",
-				"blobEmployee sink(allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     partitionFileNames:['employee.csv'],",
-				"     umask: 0022,",
-				"     preCommands: [],",
-				"     postCommands: [],",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
-				"     mapColumn(",
-				"          Emp_Id = Emp_id,",
-				"          Name,",
-				"          Gender,",
-				"          Salary,",
-				"          Dept_Id = Dept_id",
-				"     ),",
-				"     partitionBy('hash', 1)) ~> adlsEmployee",
 				"selectEmployee sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
