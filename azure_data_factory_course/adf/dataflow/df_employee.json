@@ -22,22 +22,18 @@
 				},
 				{
 					"dataset": {
-						"referenceName": "ds_sqldb_output_employee_scd2",
+						"referenceName": "ds_sqldb_output_employee_df",
 						"type": "DatasetReference"
 					},
-					"name": "sqldbEmployeeSCD2",
-					"description": "Export data to ds_sqldb_output_employee_scd2",
+					"name": "sqldbEmployeeDF",
+					"description": "Export data to ds_sqldb_output_employee_df",
 					"rejectedDataLinkedService": {
 						"referenceName": "ls_azblob",
 						"type": "LinkedServiceReference"
 					}
 				}
 			],
-			"transformations": [
-				{
-					"name": "selectColumns"
-				}
-			],
+			"transformations": [],
 			"scriptLines": [
 				"source(output(",
 				"          Emp_id as integer,",
@@ -51,15 +47,6 @@
 				"     inferDriftedColumnTypes: true,",
 				"     ignoreNoFilesFound: true,",
 				"     partitionBy('hash', 1)) ~> blobEmployee",
-				"blobEmployee select(mapColumn(",
-				"          Emp_Id = Emp_id,",
-				"          Name,",
-				"          Gender,",
-				"          Salary,",
-				"          Dept_Id = Dept_id",
-				"     ),",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> selectColumns",
 				"blobEmployee sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     partitionFileNames:['employee.csv'],",
@@ -76,7 +63,7 @@
 				"          Dept_Id = Dept_id",
 				"     ),",
 				"     partitionBy('hash', 1)) ~> adlsEmployee",
-				"selectColumns sink(allowSchemaDrift: true,",
+				"blobEmployee sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          Emp_Key as integer,",
@@ -85,7 +72,7 @@
 				"          Gender as string,",
 				"          Salary as integer,",
 				"          Dept_Id as integer,",
-				"          Is_Active as string",
+				"          Updated as timestamp",
 				"     ),",
 				"     deletable:false,",
 				"     insertable:true,",
@@ -97,12 +84,12 @@
 				"     skipDuplicateMapOutputs: true,",
 				"     errorHandlingOption: 'stopOnFirstError',",
 				"     mapColumn(",
-				"          Emp_Id,",
+				"          Emp_Id = Emp_id,",
 				"          Name,",
 				"          Gender,",
 				"          Salary,",
-				"          Dept_Id",
-				"     )) ~> sqldbEmployeeSCD2"
+				"          Dept_Id = Dept_id",
+				"     )) ~> sqldbEmployeeDF"
 			]
 		}
 	}
