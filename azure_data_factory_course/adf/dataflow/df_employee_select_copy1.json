@@ -32,7 +32,7 @@
 					"name": "selectEmployee"
 				},
 				{
-					"name": "sortEmployeeName"
+					"name": "sortEmployeeDeptSalary"
 				}
 			],
 			"scriptLines": [
@@ -57,8 +57,9 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> selectEmployee",
-				"selectEmployee sort(asc(Name, true)) ~> sortEmployeeName",
-				"sortEmployeeName sink(allowSchemaDrift: true,",
+				"selectEmployee sort(asc(Dept_Id, true),",
+				"     desc(Salary, true)) ~> sortEmployeeDeptSalary",
+				"sortEmployeeDeptSalary sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          Emp_Key as integer,",
