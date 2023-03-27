@@ -36,7 +36,10 @@
 			],
 			"transformations": [
 				{
-					"name": "selectColumns"
+					"name": "selectEmployee"
+				},
+				{
+					"name": "filterEmployee"
 				}
 			],
 			"scriptLines": [
@@ -60,7 +63,8 @@
 				"          Dept_Id = Dept_id",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> selectColumns",
+				"     skipDuplicateMapOutputs: true) ~> selectEmployee",
+				"selectEmployee filter(ERROR_FUNCTION('')) ~> filterEmployee",
 				"blobEmployee sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     partitionFileNames:['employee.csv'],",
@@ -77,7 +81,7 @@
 				"          Dept_Id = Dept_id",
 				"     ),",
 				"     partitionBy('hash', 1)) ~> adlsEmployee",
-				"selectColumns sink(allowSchemaDrift: true,",
+				"filterEmployee sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
 				"          Emp_Key as integer,",
