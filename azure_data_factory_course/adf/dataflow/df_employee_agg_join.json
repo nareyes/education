@@ -112,14 +112,7 @@
 				"     format: 'table',",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError',",
-				"     mapColumn(",
-				"          Dept_Id,",
-				"          Dept_Name,",
-				"          Emp_Count,",
-				"          Max_Salary,",
-				"          Avg_Salary",
-				"     )) ~> sqldbEmployeeAggJoin"
+				"     errorHandlingOption: 'stopOnFirstError') ~> sqldbEmployeeAggJoin"
 			]
 		}
 	}
