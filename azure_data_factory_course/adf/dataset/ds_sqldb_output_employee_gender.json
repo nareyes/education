@@ -1,0 +1,38 @@
+{
+	"name": "ds_sqldb_output_employee_gender",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azsqldb",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Dept_Id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Total_F",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Total_M",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Updated",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "EmployeeGender"
+		}
+	}
+}

@@ -1,0 +1,47 @@
+{
+	"name": "pl_dataflow_employee_pivot",
+	"properties": {
+		"description": "Employee data flow from blob to sqldb using pivot transformation.",
+		"activities": [
+			{
+				"name": "dfEmployee",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [
+					{
+						"name": "input",
+						"value": "blob/df-input"
+					},
+					{
+						"name": "output",
+						"value": "sqldb"
+					}
+				],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "df_employee_pivot",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"folder": {
+			"name": "Data Flow"
+		},
+		"annotations": [
+			"Data Flow"
+		]
+	}
+}
