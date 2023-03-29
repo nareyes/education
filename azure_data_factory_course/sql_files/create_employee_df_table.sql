@@ -8,7 +8,59 @@ CREATE TABLE EmployeeDF (
     ,Updated    DATETIME DEFAULT GETDATE()
 );
 
-SELECT * FROM EmployeeDF;
+
+CREATE TABLE EmployeeDept (
+    Emp_Key     INT NOT NULL IDENTITY(1,1) PRIMARY KEY
+    ,Emp_Id     INT NOT NULL
+    ,Name       VARCHAR(MAX)
+    ,Gender     VARCHAR(MAX)
+    ,Salary     INT
+    ,Dept_Id    INT
+    ,Dept_Name  VARCHAR(MAX)
+    ,Updated    DATETIME DEFAULT GETDATE()
+);
+
+
+CREATE TABLE EmployeeRank (
+    Emp_Key     INT NOT NULL IDENTITY(1,1) PRIMARY KEY
+    ,Emp_Id     INT NOT NULL
+    ,Name       VARCHAR(MAX)
+    ,Gender     VARCHAR(MAX)
+    ,Salary     INT
+    ,Salary_Rnk BIGINT
+    ,Dept_Id    INT
+    ,Updated    DATETIME DEFAULT GETDATE()
+);
+
+
+CREATE TABLE EmployeeAgg (
+    Dept_Id     INT
+    ,Dept_Name  VARCHAR(MAX)
+    ,Emp_Count  INT 
+    ,Max_Salary BIGINT
+    ,Avg_Salary BIGINT
+    ,Updated    DATETIME DEFAULT GETDATE()
+);
+
+
+CREATE TABLE EmployeeGender (
+    Dept_Id     INT
+    ,Total_F    INT 
+    ,Total_M    INT
+    ,Updated    DATETIME DEFAULT GETDATE()
+);
+
+
+CREATE TABLE EmployeeDerived (
+    Emp_Key             INT NOT NULL IDENTITY(1,1) PRIMARY KEY
+    ,Emp_Id             INT NOT NULL
+    ,Gender_Name        VARCHAR(MAX)
+    ,Salary             INT
+    ,Salary_Weekly      INT
+    ,Dept_Id            INT
+    ,Department_Name    VARCHAR(MAX)
+    ,Updated            DATETIME DEFAULT GETDATE()
+);
 
 
 -- Create Conditional Split Tables
@@ -22,8 +74,6 @@ CREATE TABLE EmployeeIT (
     ,Updated    DATETIME DEFAULT GETDATE()
 );
 
-SELECT * FROM EmployeeIT;
-
 
 CREATE TABLE EmployeeHR (
     Emp_Key     INT NOT NULL IDENTITY(1,1) PRIMARY KEY
@@ -34,8 +84,6 @@ CREATE TABLE EmployeeHR (
     ,Dept_Id    INT
     ,Updated    DATETIME DEFAULT GETDATE()
 );
-
-SELECT * FROM EmployeeHR;
 
 
 CREATE TABLE EmployeeOther (
@@ -48,32 +96,15 @@ CREATE TABLE EmployeeOther (
     ,Updated    DATETIME DEFAULT GETDATE()
 );
 
-SELECT * FROM EmployeeOther;
-
 
 -- Validate DF Runs
 SELECT Updated, COUNT (*)
-FROM EmployeeDF
-GROUP BY Updated
-ORDER BY Updated DESC;
-
-SELECT Updated, COUNT (*)
-FROM EmployeeIT
-GROUP BY Updated
-ORDER BY Updated DESC;
-
-SELECT Updated, COUNT (*)
-FROM EmployeeHR
-GROUP BY Updated
-ORDER BY Updated DESC;
-
-SELECT Updated, COUNT (*)
-FROM EmployeeOther
+FROM <Table_Name>
 GROUP BY Updated
 ORDER BY Updated DESC;
 
 SELECT *
-FROM EmployeeDF
+FROM <Table_Name>
 WHERE Updated = (
     SELECT MAX (Updated)
     FROM EmployeeDF
