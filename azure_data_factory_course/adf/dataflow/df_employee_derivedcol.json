@@ -1,0 +1,132 @@
+{
+	"name": "df_employee_derivedcol",
+	"properties": {
+		"description": "Derived column transformation demo.",
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_blob_input_employee",
+						"type": "DatasetReference"
+					},
+					"name": "blobEmployee"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_sqldb_input_department",
+						"type": "DatasetReference"
+					},
+					"name": "sqldbDepartment"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_sqldb_output_employee_derived",
+						"type": "DatasetReference"
+					},
+					"name": "sqldbEmployeeDerived",
+					"rejectedDataLinkedService": {
+						"referenceName": "ls_azblob",
+						"type": "LinkedServiceReference"
+					}
+				}
+			],
+			"transformations": [
+				{
+					"name": "selectEmployee"
+				},
+				{
+					"name": "lookupDepartment"
+				},
+				{
+					"name": "selectFinal"
+				},
+				{
+					"name": "derivedColumns"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Emp_id as integer,",
+				"          Name as string,",
+				"          Gender as string,",
+				"          Salary as integer,",
+				"          Dept_id as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     inferDriftedColumnTypes: true,",
+				"     ignoreNoFilesFound: true,",
+				"     partitionBy('hash', 1)) ~> blobEmployee",
+				"source(output(",
+				"          Dept_Id as integer,",
+				"          Dept_Name as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> sqldbDepartment",
+				"blobEmployee select(mapColumn(",
+				"          Emp_Id = Emp_id,",
+				"          Name,",
+				"          Gender,",
+				"          Salary,",
+				"          Dept_Id = Dept_id",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectEmployee",
+				"selectEmployee, sqldbDepartment lookup(selectEmployee@Dept_Id == sqldbDepartment@Dept_Id,",
+				"     multiple: false,",
+				"     pickup: 'any',",
+				"     broadcast: 'auto')~> lookupDepartment",
+				"derivedColumns select(mapColumn(",
+				"          Emp_Id,",
+				"          Gender_Name,",
+				"          Name,",
+				"          Gender,",
+				"          Salary,",
+				"          Salary_Weekly,",
+				"          Dept_Id = selectEmployee@Dept_Id,",
+				"          Dept_Id = sqldbDepartment@Dept_Id,",
+				"          Dept_Name,",
+				"          Department_Name",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectFinal",
+				"lookupDepartment derive(Gender_Name = concat(Gender, '_', Name),",
+				"          Salary_Weekly = divide(Salary, 52),",
+				"          Department_Name = iif(isNull(Dept_Name), 'Unknown', Dept_Name)) ~> derivedColumns",
+				"selectFinal sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Emp_Key as integer,",
+				"          Emp_Id as integer,",
+				"          Gender_Name as string,",
+				"          Salary as integer,",
+				"          Salary_Weekly as integer,",
+				"          Dept_Id as integer,",
+				"          Department_Name as string,",
+				"          Updated as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          Emp_Id,",
+				"          Gender_Name,",
+				"          Salary,",
+				"          Salary_Weekly,",
+				"          Dept_Id,",
+				"          Department_Name",
+				"     )) ~> sqldbEmployeeDerived"
+			]
+		}
+	}
+}
