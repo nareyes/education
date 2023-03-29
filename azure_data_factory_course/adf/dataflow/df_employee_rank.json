@@ -19,7 +19,7 @@
 						"referenceName": "ds_sqldb_output_employee_rank",
 						"type": "DatasetReference"
 					},
-					"name": "sqldbEmployeeDF",
+					"name": "sqldbEmployeeRank",
 					"description": "Export data to ds_sqldb_output_employee_df",
 					"rejectedDataLinkedService": {
 						"referenceName": "ls_azblob",
@@ -92,7 +92,7 @@
 				"          Salary,",
 				"          Salary_Rnk,",
 				"          Dept_Id",
-				"     )) ~> sqldbEmployeeDF"
+				"     )) ~> sqldbEmployeeRank"
 			]
 		}
 	}
