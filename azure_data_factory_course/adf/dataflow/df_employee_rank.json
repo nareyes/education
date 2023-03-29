@@ -16,7 +16,7 @@
 			"sinks": [
 				{
 					"dataset": {
-						"referenceName": "ds_sqldb_output_employee_df",
+						"referenceName": "ds_sqldb_output_employee_rank",
 						"type": "DatasetReference"
 					},
 					"name": "sqldbEmployeeDF",
@@ -63,7 +63,7 @@
 				"     skipDuplicateMapOutputs: true) ~> selectEmployee",
 				"selectEmployee sort(desc(Salary, true)) ~> sortEmployeeDeptSalary",
 				"sortEmployeeDeptSalary rank(desc(Salary, true),",
-				"     output(Salary_Rank as long),",
+				"     output(Salary_Rnk as long),",
 				"     dense: true) ~> rankSalary",
 				"rankSalary sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
@@ -73,6 +73,7 @@
 				"          Name as string,",
 				"          Gender as string,",
 				"          Salary as integer,",
+				"          Salary_Rnk as integer,",
 				"          Dept_Id as integer,",
 				"          Updated as timestamp",
 				"     ),",
@@ -88,7 +89,8 @@
 				"          Emp_Id,",
 				"          Name,",
 				"          Gender,",
-				"          Salary = Salary_Rank,",
+				"          Salary,",
+				"          Salary_Rnk,",
 				"          Dept_Id",
 				"     )) ~> sqldbEmployeeDF"
 			]
