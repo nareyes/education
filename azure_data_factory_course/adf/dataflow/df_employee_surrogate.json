@@ -1,5 +1,5 @@
 {
-	"name": "df_employee_select_copy1",
+	"name": "df_employee_surrogate",
 	"properties": {
 		"description": "Surrogate key transformation demo.",
 		"type": "MappingDataFlow",
