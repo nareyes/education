@@ -1,7 +1,7 @@
 {
-	"name": "df_employee_aggregate",
+	"name": "df_employee_aggregate_join",
 	"properties": {
-		"description": "Aggregation transformation demo.",
+		"description": "Aggregate and join transformation demo.",
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [

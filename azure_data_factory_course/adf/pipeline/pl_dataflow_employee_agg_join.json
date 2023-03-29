@@ -1,7 +1,7 @@
 {
-	"name": "pl_dataflow_employee_aggregate",
+	"name": "pl_dataflow_employee_agg_join",
 	"properties": {
-		"description": "Employee data flow from blob to sqldb using aggregate transformation.",
+		"description": "Employee data flow from blob to sqldb using aggregate and join transformation.",
 		"activities": [
 			{
 				"name": "dfEmployee",
@@ -26,7 +26,7 @@
 				],
 				"typeProperties": {
 					"dataflow": {
-						"referenceName": "df_employee_aggregate",
+						"referenceName": "df_employee_aggregate_join",
 						"type": "DataFlowReference"
 					},
 					"compute": {
