@@ -1,7 +1,7 @@
 {
 	"name": "pl_dataflow_employee_surrogate",
 	"properties": {
-		"description": "Employee data flow from blob to sqldb using surrogate transformation.",
+		"description": "Employee data flow from blob to sqldb using surrogate key transformation.",
 		"activities": [
 			{
 				"name": "dfEmployee",
