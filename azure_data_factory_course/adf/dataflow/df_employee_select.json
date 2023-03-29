@@ -20,7 +20,6 @@
 						"type": "DatasetReference"
 					},
 					"name": "sqldbEmployeeDF",
-					"description": "Export data to ds_sqldb_output_employee_df",
 					"rejectedDataLinkedService": {
 						"referenceName": "ls_azblob",
 						"type": "LinkedServiceReference"
