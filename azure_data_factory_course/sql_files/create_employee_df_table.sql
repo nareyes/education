@@ -1,5 +1,5 @@
 CREATE TABLE EmployeeDF (
-    Emp_Key     INT NOT NULL IDENTITY(1,1) PRIMARY KEY
+    Emp_Key     INT NOT NULL IDENTITY(1, 1) PRIMARY KEY
     ,Emp_Id     INT NOT NULL
     ,Name       VARCHAR(MAX)
     ,Gender     VARCHAR(MAX)
@@ -10,7 +10,7 @@ CREATE TABLE EmployeeDF (
 
 
 CREATE TABLE EmployeeDept (
-    Emp_Key     INT NOT NULL IDENTITY(1,1) PRIMARY KEY
+    Emp_Key     INT NOT NULL IDENTITY(1, 1) PRIMARY KEY
     ,Emp_Id     INT NOT NULL
     ,Name       VARCHAR(MAX)
     ,Gender     VARCHAR(MAX)
@@ -22,7 +22,7 @@ CREATE TABLE EmployeeDept (
 
 
 CREATE TABLE EmployeeRank (
-    Emp_Key     INT NOT NULL IDENTITY(1,1) PRIMARY KEY
+    Emp_Key     INT NOT NULL IDENTITY(1, 1) PRIMARY KEY
     ,Emp_Id     INT NOT NULL
     ,Name       VARCHAR(MAX)
     ,Gender     VARCHAR(MAX)
@@ -52,7 +52,7 @@ CREATE TABLE EmployeeGender (
 
 
 CREATE TABLE EmployeeDerived (
-    Emp_Key             INT NOT NULL IDENTITY(1,1) PRIMARY KEY
+    Emp_Key             INT NOT NULL IDENTITY(1, 1) PRIMARY KEY
     ,Emp_Id             INT NOT NULL
     ,Gender_Name        VARCHAR(MAX)
     ,Salary             INT
@@ -65,7 +65,7 @@ CREATE TABLE EmployeeDerived (
 
 -- Create Conditional Split Tables
 CREATE TABLE EmployeeIT (
-    Emp_Key     INT NOT NULL IDENTITY(1,1) PRIMARY KEY
+    Emp_Key     INT NOT NULL IDENTITY(1, 1) PRIMARY KEY
     ,Emp_Id     INT NOT NULL
     ,Name       VARCHAR(MAX)
     ,Gender     VARCHAR(MAX)
@@ -76,7 +76,7 @@ CREATE TABLE EmployeeIT (
 
 
 CREATE TABLE EmployeeHR (
-    Emp_Key     INT NOT NULL IDENTITY(1,1) PRIMARY KEY
+    Emp_Key     INT NOT NULL IDENTITY(1, 1) PRIMARY KEY
     ,Emp_Id     INT NOT NULL
     ,Name       VARCHAR(MAX)
     ,Gender     VARCHAR(MAX)
@@ -87,7 +87,7 @@ CREATE TABLE EmployeeHR (
 
 
 CREATE TABLE EmployeeOther (
-    Emp_Key     INT NOT NULL IDENTITY(1,1) PRIMARY KEY
+    Emp_Key     INT NOT NULL IDENTITY(1, 1) PRIMARY KEY
     ,Emp_Id     INT NOT NULL
     ,Name       VARCHAR(MAX)
     ,Gender     VARCHAR(MAX)
@@ -99,12 +99,12 @@ CREATE TABLE EmployeeOther (
 
 -- Validate DF Runs
 SELECT Updated, COUNT (*)
-FROM <Table_Name>
+FROM Table_Name
 GROUP BY Updated
 ORDER BY Updated DESC;
 
 SELECT *
-FROM <Table_Name>
+FROM Table_Name
 WHERE Updated = (
     SELECT MAX (Updated)
     FROM EmployeeDF
