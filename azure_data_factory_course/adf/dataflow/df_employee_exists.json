@@ -27,7 +27,6 @@
 						"type": "DatasetReference"
 					},
 					"name": "sqldbEmployeeOther",
-					"description": "Export data to ds_sqldb_output_employee_df",
 					"rejectedDataLinkedService": {
 						"referenceName": "ls_azblob",
 						"type": "LinkedServiceReference"
@@ -46,12 +45,10 @@
 					"name": "selectEmployee"
 				},
 				{
-					"name": "existsDepartment",
-					"description": "Filtering rows which are matching on columns 'selectEmployee@Dept_Id, sqldbDepartment@Dept_Id'"
+					"name": "existsDepartment"
 				},
 				{
-					"name": "notExistsDepartment",
-					"description": "Filtering rows which are matching on columns 'selectEmployee@Dept_Id, sqldbDepartment@Dept_Id'"
+					"name": "notExistsDepartment"
 				}
 			],
 			"scriptLines": [
