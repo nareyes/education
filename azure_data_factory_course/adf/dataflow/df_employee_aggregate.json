@@ -1,0 +1,90 @@
+{
+	"name": "df_employee_aggregate",
+	"properties": {
+		"description": "Aggregation transformation demo.",
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_blob_input_employee",
+						"type": "DatasetReference"
+					},
+					"name": "blobEmployee"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_sqldb_output_employee_agg",
+						"type": "DatasetReference"
+					},
+					"name": "sqldbEmployeeDF",
+					"description": "Export data to ds_sqldb_output_employee_df",
+					"rejectedDataLinkedService": {
+						"referenceName": "ls_azblob",
+						"type": "LinkedServiceReference"
+					}
+				}
+			],
+			"transformations": [
+				{
+					"name": "selectEmployee"
+				},
+				{
+					"name": "aggregateEmployee"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Emp_id as integer,",
+				"          Name as string,",
+				"          Gender as string,",
+				"          Salary as integer,",
+				"          Dept_id as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     inferDriftedColumnTypes: true,",
+				"     ignoreNoFilesFound: true,",
+				"     partitionBy('hash', 1)) ~> blobEmployee",
+				"blobEmployee select(mapColumn(",
+				"          Emp_Id = Emp_id,",
+				"          Name,",
+				"          Gender,",
+				"          Salary,",
+				"          Dept_Id = Dept_id",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectEmployee",
+				"selectEmployee aggregate(groupBy(Dept_Id),",
+				"     Emp_Count = count(Emp_Id),",
+				"          Max_Salary = max(Salary),",
+				"          Avg_Salary = avg(Salary)) ~> aggregateEmployee",
+				"aggregateEmployee sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Dept_Id as integer,",
+				"          Emp_Count as integer,",
+				"          Max_Salary as long,",
+				"          Avg_Salary as integer,",
+				"          Updated as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          Dept_Id,",
+				"          Emp_Count,",
+				"          Max_Salary,",
+				"          Avg_Salary",
+				"     )) ~> sqldbEmployeeDF"
+			]
+		}
+	}
+}

@@ -1,0 +1,43 @@
+{
+	"name": "ds_sqldb_output_employee_agg",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azsqldb",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Dept_Id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Emp_Count",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Max_Salary",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "Avg_Salary",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Updated",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "EmployeeAgg"
+		}
+	}
+}
