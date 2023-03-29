@@ -20,7 +20,6 @@
 						"type": "DatasetReference"
 					},
 					"name": "sqldbEmployeeRank",
-					"description": "Export data to ds_sqldb_output_employee_df",
 					"rejectedDataLinkedService": {
 						"referenceName": "ls_azblob",
 						"type": "LinkedServiceReference"
@@ -35,8 +34,7 @@
 					"name": "sortEmployeeDeptSalary"
 				},
 				{
-					"name": "rankSalary",
-					"description": "Dense ranking rows on columns 'Salary'"
+					"name": "rankSalary"
 				}
 			],
 			"scriptLines": [
