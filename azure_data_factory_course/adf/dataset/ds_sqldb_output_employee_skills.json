@@ -1,0 +1,46 @@
+{
+	"name": "ds_sqldb_output_employee_skills",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azsqldb",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "Emp_Key",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Emp_Id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "First_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Last_Name",
+				"type": "varchar"
+			},
+			{
+				"name": "Skills",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "Updated",
+				"type": "datetime",
+				"precision": 23,
+				"scale": 3
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "EmployeeSkills"
+		}
+	}
+}

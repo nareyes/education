@@ -1,0 +1,43 @@
+{
+	"name": "ds_blob_input_employee_skills",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_azblob",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": "employee_skills.json",
+				"container": "df-input"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"emp_id": {
+					"type": "string"
+				},
+				"emp_name": {
+					"type": "object",
+					"properties": {
+						"first_name": {
+							"type": "string"
+						},
+						"last_name": {
+							"type": "string"
+						}
+					}
+				},
+				"skills": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				}
+			}
+		}
+	}
+}

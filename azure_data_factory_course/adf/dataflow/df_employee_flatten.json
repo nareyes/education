@@ -1,0 +1,77 @@
+{
+	"name": "df_employee_flatten",
+	"properties": {
+		"description": "Flatten transformation demo.",
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_blob_input_employee_skills",
+						"type": "DatasetReference"
+					},
+					"name": "blobEmployeeSkills"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_sqldb_output_employee_skills",
+						"type": "DatasetReference"
+					},
+					"name": "sqldbEmployeeSkills"
+				}
+			],
+			"transformations": [
+				{
+					"name": "flattenJSON"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          emp_id as string,",
+				"          emp_name as (first_name as string, last_name as string),",
+				"          skills as string[]",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'arrayOfDocuments',",
+				"     singleQuoted: true) ~> blobEmployeeSkills",
+				"blobEmployeeSkills foldDown(unroll(skills),",
+				"     mapColumn(",
+				"          Emp_Id = emp_id,",
+				"          First_Name = emp_name.first_name,",
+				"          Last_Name = emp_name.last_name,",
+				"          Skills = skills",
+				"     ),",
+				"     skipDuplicateMapInputs: false,",
+				"     skipDuplicateMapOutputs: false) ~> flattenJSON",
+				"flattenJSON sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Emp_Key as integer,",
+				"          Emp_Id as integer,",
+				"          First_Name as string,",
+				"          Last_Name as string,",
+				"          Skills as integer,",
+				"          Updated as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          Emp_Id,",
+				"          First_Name,",
+				"          Last_Name,",
+				"          Skills",
+				"     )) ~> sqldbEmployeeSkills"
+			]
+		}
+	}
+}
