@@ -63,6 +63,16 @@ CREATE TABLE EmployeeDerived (
 );
 
 
+CREATE TABLE EmployeeSkills (
+    Emp_Key     INT NOT NULL IDENTITY(1, 1) PRIMARY KEY
+    ,Emp_Id     INT NOT NULL
+    ,First_Name VARCHAR(MAX)
+    ,Last_Name  VARCHAR(MAX)
+    ,Skills     VARCHAR(MAX)
+    ,Updated    DATETIME DEFAULT GETDATE()
+);
+
+
 -- Create Conditional Split Tables
 CREATE TABLE EmployeeIT (
     Emp_Key     INT NOT NULL IDENTITY(1, 1) PRIMARY KEY
