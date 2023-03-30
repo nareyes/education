@@ -1,5 +1,5 @@
 {
-	"name": "df_employee_aggregate_join",
+	"name": "df_employee_agg",
 	"properties": {
 		"description": "Aggregate and join transformation demo.",
 		"type": "MappingDataFlow",
