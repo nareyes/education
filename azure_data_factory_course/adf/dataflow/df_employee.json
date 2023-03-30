@@ -1,6 +1,7 @@
 {
 	"name": "df_employee",
 	"properties": {
+		"description": "Data flow demo.",
 		"type": "MappingDataFlow",
 		"typeProperties": {
 			"sources": [
