@@ -107,6 +107,9 @@ CREATE TABLE EmployeeOther (
 );
 
 
+-- Inert for Alter Row Demo
+
+
 -- Validate DF Runs
 SELECT Updated, COUNT (*)
 FROM Table_Name
