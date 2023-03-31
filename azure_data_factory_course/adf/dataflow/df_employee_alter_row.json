@@ -1,0 +1,89 @@
+{
+	"name": "df_employee_alter_row",
+	"properties": {
+		"description": "Alter row transformation demo.",
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_blob_input_employee",
+						"type": "DatasetReference"
+					},
+					"name": "blobEmployee"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_sqldb_output_employee_df",
+						"type": "DatasetReference"
+					},
+					"name": "sqldbEmployeeDF",
+					"rejectedDataLinkedService": {
+						"referenceName": "ls_azblob",
+						"type": "LinkedServiceReference"
+					}
+				}
+			],
+			"transformations": [
+				{
+					"name": "deleteDepartmennt"
+				},
+				{
+					"name": "selectEmployee"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          Emp_id as integer,",
+				"          Name as string,",
+				"          Gender as string,",
+				"          Salary as integer,",
+				"          Dept_id as integer",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     inferDriftedColumnTypes: true,",
+				"     ignoreNoFilesFound: true,",
+				"     partitionBy('hash', 1)) ~> blobEmployee",
+				"selectEmployee alterRow(deleteIf(Dept_Id == 3)) ~> deleteDepartmennt",
+				"blobEmployee select(mapColumn(",
+				"          Emp_Id = Emp_id,",
+				"          Name,",
+				"          Gender,",
+				"          Salary,",
+				"          Dept_Id = Dept_id",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectEmployee",
+				"deleteDepartmennt sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Emp_Key as integer,",
+				"          Emp_Id as integer,",
+				"          Name as string,",
+				"          Gender as string,",
+				"          Salary as integer,",
+				"          Dept_Id as integer,",
+				"          Updated as timestamp",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError',",
+				"     mapColumn(",
+				"          Emp_Id,",
+				"          Name,",
+				"          Gender,",
+				"          Salary,",
+				"          Dept_Id",
+				"     )) ~> sqldbEmployeeDF"
+			]
+		}
+	}
+}
