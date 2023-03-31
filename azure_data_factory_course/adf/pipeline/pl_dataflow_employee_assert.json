@@ -1,5 +1,5 @@
 {
-	"name": "pl_dataflow_employee_select_copy1",
+	"name": "pl_dataflow_employee_assert",
 	"properties": {
 		"description": "Employee data flow from blob to sqldb using assert transformation.",
 		"activities": [
