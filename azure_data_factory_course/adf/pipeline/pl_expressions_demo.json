@@ -1,6 +1,7 @@
 {
 	"name": "pl_expressions_demo",
 	"properties": {
+		"description": "Copy Marks data using set variable activity as filter.",
 		"activities": [
 			{
 				"name": "setMinMarks",
