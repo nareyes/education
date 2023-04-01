@@ -1,0 +1,82 @@
+{
+	"name": "pl_expressions_demo",
+	"properties": {
+		"activities": [
+			{
+				"name": "setMinMarks",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "varMarks",
+					"value": {
+						"value": "@string(pipeline().parameters.minMarks)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "copyMarks",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT Name, Marks FROM Marks\nWHERE Marks >= @{pipeline().parameters.minMarks}",
+							"type": "Expression"
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_sqldb_input_marks",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_sqldb_output_marks_clean",
+						"type": "DatasetReference"
+					}
+				]
+			}
+		],
+		"parameters": {
+			"minMarks": {
+				"type": "int",
+				"defaultValue": 80
+			}
+		},
+		"variables": {
+			"varMarks": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}
