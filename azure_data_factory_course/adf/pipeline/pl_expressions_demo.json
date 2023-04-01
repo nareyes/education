@@ -78,6 +78,11 @@
 				"type": "String"
 			}
 		},
-		"annotations": []
+		"folder": {
+			"name": "Additional Activities"
+		},
+		"annotations": [
+			"Additional Activities"
+		]
 	}
 }
