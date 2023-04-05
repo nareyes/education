@@ -10,7 +10,7 @@
 					"type": "PipelineReference"
 				},
 				"parameters": {
-					"paramScheduleTime": "@trigger().scheduledTime"
+					"paramScheduledTime": "@trigger().scheduledTime"
 				}
 			}
 		],

@@ -13,7 +13,7 @@
 				}
 			},
 			{
-				"name": "setScheduleTime",
+				"name": "setScheduledTime",
 				"type": "SetVariable",
 				"dependsOn": [
 					{
@@ -25,21 +25,21 @@
 				],
 				"userProperties": [],
 				"typeProperties": {
-					"variableName": "varScheduleTime",
+					"variableName": "varScheduledTime",
 					"value": {
-						"value": "@string(pipeline().parameters.paramScheduleTime)",
+						"value": "@string(pipeline().parameters.paramScheduledTime)",
 						"type": "Expression"
 					}
 				}
 			}
 		],
 		"parameters": {
-			"paramScheduleTime": {
+			"paramScheduledTime": {
 				"type": "string"
 			}
 		},
 		"variables": {
-			"varScheduleTime": {
+			"varScheduledTime": {
 				"type": "String"
 			}
 		},
