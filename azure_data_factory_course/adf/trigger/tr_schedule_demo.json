@@ -19,7 +19,7 @@
 			"recurrence": {
 				"frequency": "Minute",
 				"interval": 1,
-				"startTime": "2023-04-05T06:00:00",
+				"startTime": "2023-04-04T06:00:00",
 				"timeZone": "Central Standard Time"
 			}
 		}
