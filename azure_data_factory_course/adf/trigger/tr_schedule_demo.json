@@ -17,21 +17,10 @@
 		"type": "ScheduleTrigger",
 		"typeProperties": {
 			"recurrence": {
-				"frequency": "Week",
+				"frequency": "Minute",
 				"interval": 1,
 				"startTime": "2023-04-05T06:00:00",
-				"timeZone": "Central Standard Time",
-				"schedule": {
-					"minutes": [
-						0
-					],
-					"hours": [
-						6
-					],
-					"weekDays": [
-						"Sunday"
-					]
-				}
+				"timeZone": "Central Standard Time"
 			}
 		}
 	}
