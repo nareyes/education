@@ -1,0 +1,53 @@
+{
+	"name": "pl_schedule_trigger_demo",
+	"properties": {
+		"description": "Demo schedule trigger.",
+		"activities": [
+			{
+				"name": "waitSeconds",
+				"type": "Wait",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 1
+				}
+			},
+			{
+				"name": "setScheduleTime",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "waitSeconds",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "varScheduleTime",
+					"value": {
+						"value": "@string(pipeline().parameters.paramScheduleTime)",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"paramScheduleTime": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"varScheduleTime": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Triggers"
+		},
+		"annotations": [
+			"Triggers"
+		]
+	}
+}

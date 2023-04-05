@@ -3,7 +3,17 @@
 	"properties": {
 		"annotations": [],
 		"runtimeState": "Started",
-		"pipelines": [],
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "pl_schedule_trigger_demo",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"paramScheduleTime": "@trigget().scheduledTime"
+				}
+			}
+		],
 		"type": "ScheduleTrigger",
 		"typeProperties": {
 			"recurrence": {
