@@ -79,3 +79,43 @@ SELECT
     ) AS lastval
 FROM Sales.OrderValues
 ORDER BY custid ASC, orderdate ASC, orderid ASC;
+
+
+--------------------------------
+-- AGGREGATE WINDOW FUNCTIONS --
+--------------------------------
+
+-- SUM
+SELECT
+    orderid
+    ,custid
+    ,val
+    ,SUM (val) OVER () AS totalvalue -- sum of val for entire table
+    ,SUM (val) OVER (PARTITION BY custid) AS custtotalvalue -- sum of val for each customer
+FROM Sales.OrderValues;
+
+
+-- SUM w/ Detail
+SELECT
+    orderid
+    ,custid
+    ,val
+    ,SUM (val) OVER () AS totalvalue -- sum of val for entire table
+    ,100.0 * val / SUM (val) OVER () AS pctall -- percent of total value
+    ,SUM (val) OVER (PARTITION BY custid) AS custtotalvalue -- sum of val for each customer
+    ,val * 100.0 / SUM (val) OVER (PARTITION BY custid) AS pctcust -- percent of customer value
+FROM Sales.OrderValues; 
+
+
+-- SUM w/ Running Total
+SELECT
+    empid
+    ,ordermonth
+    ,val
+    ,SUM (val) OVER (
+        PARTITION BY empid -- Grouped by empid
+        ORDER BY ordermonth
+        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW -- Filters a frame to all values from beginning of the partition to the current month
+    ) AS runval
+    ,SUM (val) OVER (PARTITION BY empid) AS emptotal
+FROM Sales.EmpOrders;
