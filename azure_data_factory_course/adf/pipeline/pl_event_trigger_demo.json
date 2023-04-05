@@ -2,6 +2,17 @@
 	"name": "pl_event_trigger_demo",
 	"properties": {
 		"description": "Demo event trigger.",
+		"activities": [
+			{
+				"name": "waitSeconds",
+				"type": "Wait",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"waitTimeInSeconds": 10
+				}
+			}
+		],
 		"folder": {
 			"name": "Triggers"
 		},
