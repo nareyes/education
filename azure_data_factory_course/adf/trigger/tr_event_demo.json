@@ -1,0 +1,18 @@
+{
+	"name": "tr_event_demo",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/drop/blobs/",
+			"blobPathEndsWith": ".csv",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/bcf56a43-4dae-4887-97fd-bc7d98b6d806/resourceGroups/rg-dp203-sandbox/providers/Microsoft.Storage/storageAccounts/storageazdp203",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}
