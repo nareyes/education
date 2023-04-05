@@ -4,7 +4,7 @@
 		"description": "Demo event trigger.",
 		"activities": [
 			{
-				"name": "copyEmployeeEvent",
+				"name": "copyEmpEvent",
 				"type": "Copy",
 				"dependsOn": [],
 				"policy": {
