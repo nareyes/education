@@ -1,0 +1,12 @@
+{
+	"name": "pl_event_trigger_demo",
+	"properties": {
+		"description": "Demo event trigger.",
+		"folder": {
+			"name": "Triggers"
+		},
+		"annotations": [
+			"Triggers"
+		]
+	}
+}
