@@ -119,3 +119,147 @@ SELECT
     ) AS runval
     ,SUM (val) OVER (PARTITION BY empid) AS emptotal
 FROM Sales.EmpOrders;
+
+
+--------------
+-- PIVOTING --
+--------------
+
+-- Create Demo Table
+USE tsql_fundamentals
+GO
+
+DROP TABLE IF EXISTS dbo.Orders
+GO
+
+CREATE TABLE dbo.Orders (
+     orderid     INT         NOT NULL
+    ,orderdate   DATE        NOT NULL
+    ,empid       INT         NOT NULL
+    ,custid      VARCHAR(5)  NOT NULL
+    ,qty         INT         NOT NULL
+    ,CONSTRAINT  PK_Orders   PRIMARY KEY(orderid)
+);
+
+INSERT INTO dbo.Orders(orderid, orderdate, empid, custid, qty)
+VALUES
+    (30001, '20140802', 3, 'A', 10)
+    ,(10001, '20141224', 2, 'A', 12)
+    ,(10005, '20141224', 1, 'B', 20)
+    ,(40001, '20150109', 2, 'A', 40)
+    ,(10006, '20150118', 1, 'C', 14)
+    ,(20001, '20150212', 2, 'B', 12)
+    ,(40005, '20160212', 3, 'A', 10)
+    ,(20002, '20160216', 1, 'C', 20)
+    ,(30003, '20160418', 2, 'B', 15)
+    ,(30004, '20140418', 3, 'C', 22)
+    ,(30007, '20160907', 3, 'D', 30);
+
+SELECT * FROM dbo.Orders;
+
+
+-- Pivot w/ CASE Statements (Create Columns for CustId)
+SELECT
+    empid
+    ,SUM (CASE WHEN custid = 'A' THEN qty END) AS A
+    ,SUM (CASE WHEN custid = 'B' THEN qty END) AS B
+    ,SUM (CASE WHEN custid = 'C' THEN qty END) AS C
+    ,SUM (CASE WHEN custid = 'D' THEN qty END) AS D
+FROM dbo.Orders
+GROUP BY empid
+
+
+-- PIVOT Operator
+/*
+Pivot Elements
+- Grouping
+- Spreading
+- Aggregating
+
+- Pivot Form (Always Use Derived Table in FROM Clause)
+SELECT ...
+FROM <derived_input_table>
+    PIVOT (
+        <agg_function>(<aggregation_element>)
+        FOR <spreading_element> IN (<list_of_target_columns>)
+    ) AS <result_table_alias>
+WHERE ...;
+ */
+
+ -- PIVOT Example
+SELECT empid, [A], [B], [C], [D]
+FROM (
+    SELECT empid, custid, qty
+    FROM dbo.Orders
+) AS tbl
+    PIVOT (
+        SUM (qty)
+        FOR custid IN ([A], [B], [C], [D])
+    ) AS pvt;
+
+
+----------------
+-- UNPIVOTING --
+----------------
+
+-- Create Demo Table
+USE tsql_fundamentals
+GO
+
+DROP TABLE IF EXISTS dbo.EmpCustOrders
+GO
+
+CREATE TABLE dbo.EmpCustOrders (
+    empid   INT        NOT NULL CONSTRAINT PK_EmpCustOrders PRIMARY KEY
+    ,A      VARCHAR(5) NULL
+    ,B      VARCHAR(5) NULL
+    ,C      VARCHAR(5) NULL
+    ,D      VARCHAR(5) NULL
+);
+
+INSERT INTO dbo.EmpCustOrders(empid, A, B, C, D)
+    SELECT empid, [A], [B], [C], [D]
+    FROM (
+        SELECT empid, custid, qty
+        FROM dbo.Orders
+    ) AS tbl
+        PIVOT (
+            SUM (qty)
+            FOR custid IN ([A], [B], [C], [D])
+        ) AS pvt;
+
+SELECT * FROM dbo.EmpCustOrders;
+
+-- Unpivot w/ APPLY Operator (Pg 231 for Detail)
+SELECT empid, custid, qty
+FROM dbo.EmpCustOrders
+    CROSS APPLY (VALUES 
+        ('A', A)
+        ,('B', B)
+        ,('C', C)
+        ,('D', D)
+    ) AS C(custid, qty)
+WHERE qty IS NOT NULL;
+
+
+-- UNNPIVOT Operator
+/*
+Unpivot Elements
+- Produce Copies
+- Extract Values
+- Eliminate Irrelevant Rows
+
+- Unpivot Form
+SELECT ...
+FROM <derived_input_table>
+    UNPIVOT (
+        FOR <values_column> FOR <names_column> IN(<source_columns>)
+    ) AS <result_table_alias>
+WHERE ...;
+ */
+
+SELECT empid, custid, qty
+FROM dbo.EmpCustOrders
+    UNPIVOT (
+        qty FOR custid IN ([A], [B], [C], [D])
+    ) AS unpvt;
