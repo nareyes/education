@@ -351,6 +351,8 @@ GROUP BY GROUPING SETS (
     ,()
 );
 
+SELECT * FROM dbo.Orders; -- For comparison 
+
 
 -- CUBE
 SELECT
