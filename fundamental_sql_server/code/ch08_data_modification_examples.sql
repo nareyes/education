@@ -170,3 +170,151 @@ SELECT NEXT VALUE FOR dbo.SeqOrderIDs;
 SELECT current_value
 FROM sys.sequences
 WHERE OBJECT_ID = OBJECT_ID(N'dbo.SeqOrderIDs');
+
+
+-------------------
+-- DELETING DATA --
+-------------------
+
+-- Create Demo Tables
+DROP TABLE IF EXISTS dbo.Orders, dbo.Customers
+GO
+
+CREATE TABLE dbo.Customers (
+    custid        INT          NOT NULL CONSTRAINT PK_Customers PRIMARY KEY(custid)
+    ,companyname  NVARCHAR(40) NOT NULL
+    ,contactname  NVARCHAR(30) NOT NULL
+    ,contacttitle NVARCHAR(30) NOT NULL
+    ,address      NVARCHAR(60) NOT NULL
+    ,city         NVARCHAR(15) NOT NULL
+    ,region       NVARCHAR(15) NULL
+    ,postalcode   NVARCHAR(10) NULL
+    ,country      NVARCHAR(15) NOT NULL
+    ,phone        NVARCHAR(24) NOT NULL
+    ,fax          NVARCHAR(24) NULL
+);
+
+CREATE TABLE dbo.Orders (
+    orderid         INT          NOT NULL CONSTRAINT PK_Orders PRIMARY KEY(orderid)
+    ,custid         INT          NULL     CONSTRAINT FK_Orders_Customers FOREIGN KEY(custid) REFERENCES dbo.Customers(custid)
+    ,empid          INT          NOT NULL
+    ,orderdate      DATE         NOT NULL
+    ,requireddate   DATE         NOT NULL
+    ,shippeddate    DATE         NULL
+    ,shipperid      INT          NOT NULL
+    ,freight        MONEY        NOT NULL CONSTRAINT DFT_Orders_freight DEFAULT(0)
+    ,shipname       NVARCHAR(40) NOT NULL
+    ,shipaddress    NVARCHAR(60) NOT NULL
+    ,shipcity       NVARCHAR(15) NOT NULL
+    ,shipregion     NVARCHAR(15) NULL
+    ,shippostalcode NVARCHAR(10) NULL
+    ,shipcountry    NVARCHAR(15) NOT NULL
+);
+GO
+
+INSERT INTO dbo.Customers SELECT * FROM Sales.Customers;
+INSERT INTO dbo.Orders SELECT * FROM Sales.Orders;
+
+
+-- DELETE Statement (w/ Optional Filter Predicate)
+/* 
+DELETE FROM <table_name>
+WHERE <filter_predicate>
+*/
+DELETE FROM dbo.Orders
+WHERE orderdate < '20150101' -- Expensive, Fully Logged
+
+
+-- TRUNCATE Statement (No Filter Predicate, Deletes All Rows)
+TRUNCATE TABLE dbo.Orders; -- Inexpensive, Minimally Logged
+
+
+-- DELETE Based on JOIN (Allows Filtered Attributes From Another Table)
+-- Non-Standard
+DELETE FROM O
+FROM dbo.Orders AS O
+    INNER JOIN dbo.Customers AS C
+        ON O.custid = C.custid
+        WHERE C.country = N'USA';
+
+-- DELETE w/ Subquery (Same Example As Above)
+-- Standard
+DELETE FROM dbo.Orders
+WHERE EXISTS (
+    SELECT * FROM dbo.Customers AS C
+    WHERE Orders.custid = C.custid
+        AND C.country = N'USA'
+);
+
+
+-------------------
+-- UPDATING DATA --
+-------------------
+DROP TABLE IF EXISTS dbo.OrderDetails, dbo.Orders
+GO
+
+CREATE TABLE dbo.Orders (
+    orderid         INT          NOT NULL CONSTRAINT PK_Orders PRIMARY KEY(orderid)
+    ,custid         INT          NULL
+    ,empid          INT          NOT NULL
+    ,orderdate      DATE         NOT NULL
+    ,requireddate   DATE         NOT NULL
+    ,shippeddate    DATE         NULL
+    ,shipperid      INT          NOT NULL
+    ,freight        MONEY        NOT NULL CONSTRAINT DFT_Orders_freight DEFAULT(0)
+    ,shipname       NVARCHAR(40) NOT NULL
+    ,shipaddress    NVARCHAR(60) NOT NULL
+    ,shipcity       NVARCHAR(15) NOT NULL
+    ,shipregion     NVARCHAR(15) NULL
+    ,shippostalcode NVARCHAR(10) NULL
+    ,shipcountry    NVARCHAR(15) NOT NULL
+);
+
+CREATE TABLE dbo.OrderDetails (
+    orderid   INT           NOT NULL
+    ,productid INT           NOT NULL
+    ,unitprice MONEY         NOT NULL CONSTRAINT DFT_OrderDetails_unitprice DEFAULT(0)
+    ,qty       SMALLINT      NOT NULL CONSTRAINT DFT_OrderDetails_qty DEFAULT(1)
+    ,discount  NUMERIC(4, 3) NOT NULL CONSTRAINT DFT_OrderDetails_discount DEFAULT(0)
+
+    ,CONSTRAINT PK_OrderDetails         PRIMARY KEY(orderid, productid)
+    ,CONSTRAINT FK_OrderDetails_Orders  FOREIGN KEY(orderid) REFERENCES dbo.Orders(orderid)
+    ,CONSTRAINT CHK_discount            CHECK (discount BETWEEN 0 AND 1)
+    ,CONSTRAINT CHK_qty                 CHECK (qty > 0)
+    ,CONSTRAINT CHK_unitprice           CHECK (unitprice >= 0)
+);
+GO
+
+INSERT INTO dbo.Orders SELECT * FROM Sales.Orders;
+INSERT INTO dbo.OrderDetails SELECT * FROM Sales.OrderDetails;
+
+
+-- UPDATE Statement
+/*
+UPDATE <table_name>
+    SET <condition>
+WHERE <filter_predicate>
+*/
+UPDATE dbo.OrderDetails
+    SET discount += 0.05
+WHERE productid = 51;
+
+
+-- UPDATE Based on JOIN (Allows Filtered Attributes From Another Table)
+-- Non-Standard
+UPDATE D
+    SET discount += 0.05
+FROM dbo.OrderDetails AS D
+    INNER JOIN dbo.Orders AS O
+        ON D.orderid = O.orderid
+        WHERE O.custid = 1;
+
+-- UPDATE w/ Subquery (Same Example As Above)
+-- Standard
+UPDATE dbo.OrderDetails
+    SET discount += 0.05
+WHERE EXISTS (
+    SELECT * FROM dbo.Orders AS O
+    WHERE O.orderid = OrderDetails.orderid
+        AND O.custid = 1
+);
