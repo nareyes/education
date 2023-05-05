@@ -5,7 +5,7 @@
 			"name": "admin"
 		},
 		"content": {
-			"query": "-- Query Session ID\nSELECT DB_NAME(database_id), 'kill '+cast(session_id as varchar(10)), *\n    FROM sys.dm_exec_sessions\n    WHERE DB_NAME(database_id) NOT IN ('master')\n    ORDER by 1;\n\n\n-- Kill Session ID\nKILL <session_id>;",
+			"query": "-- Query Session ID\nSELECT DB_NAME(database_id), 'kill '+ CAST(session_id AS VARCHAR(10)), *\n    FROM sys.dm_exec_sessions\n    WHERE DB_NAME(database_id) NOT IN ('master')\n    ORDER BY 1;\n\n\n-- Kill Session ID\nKILL <session_id>;",
 			"metadata": {
 				"language": "sql"
 			},
