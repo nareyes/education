@@ -8,7 +8,7 @@
 <br>
 
 ## Project Requirements
----
+
 ### Data Discovery
 - Schema applied to raw data
 - Discovery capability on raw data
@@ -37,7 +37,7 @@
 - Operational Reporting
 
 ## NYC Taxi File Overview
-![](/imgs/nyc_taxi_file_overview.png)
+![](https://github.com/nareyes/education/blob/main/azure_synapse_course/imgs/nyc_taxi_file_overview.png)
 
 ## Solution Architecture
-![](/imgs/solution_architecture.png)
+![](https://github.com/nareyes/education/blob/main/azure_synapse_course/imgs/solution_architecture.png)
