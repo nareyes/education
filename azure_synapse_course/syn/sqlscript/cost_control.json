@@ -1,0 +1,20 @@
+{
+	"name": "cost_control",
+	"properties": {
+		"folder": {
+			"name": "admin"
+		},
+		"content": {
+			"query": "-- Data Processed\nSELECT * FROM sys.dm_external_data_processed;\n\n-- Current Cost Control Settings\nSELECT * FROM sys.configurations\nWHERE Name LIKE 'Data Processed%';\n\n-- Set Cost Control Limits\nsp_set_data_processed_limit\n    @type = N'monthly',\n    @limit_tb = 2;\n\nsp_set_data_processed_limit\n    @type = N'weekly',\n    @limit_tb = 1;\n\nsp_set_data_processed_limit\n    @type = N'daily',\n    @limit_tb = 1;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
