@@ -6,4 +6,4 @@ SELECT DB_NAME(database_id), 'kill '+ CAST(session_id AS VARCHAR(10)), *
 
 
 -- Kill Session ID
-KILL <session_id>;
+KILL session_id;
