@@ -393,7 +393,7 @@ WHEN NOT MATCHED THEN
 SELECT * FROM dbo.Customers;
 
 
--- MERGE w/ DELETE Clause
+-- MERGE w/ WHEN NOT MATCHED BY SOURCE & DELETE Clause
 MERGE INTO dbo.Customers AS TGT 
 USING dbo.CustomersStage AS SRC
     ON TGT.custid = SRC.custid
@@ -513,6 +513,92 @@ UPDATE T
     SET col2 = rownum;
 
 SELECT * FROM dbo.T1;
+
+
+-------------------------------------------
+-- Modifications w/ TOP and OFFSET-FETCH --
+-------------------------------------------
+
+-- Create Demo Table
+-- Order Details and Orders
+DROP TABLE IF EXISTS dbo.OrderDetails, dbo.Orders;
+GO
+
+CREATE TABLE dbo.Orders (
+    orderid         INT          NOT NULL CONSTRAINT PK_Orders PRIMARY KEY(orderid)
+    ,custid         INT          NULL
+    ,empid          INT          NOT NULL
+    ,orderdate      DATE         NOT NULL
+    ,requireddate   DATE         NOT NULL
+    ,shippeddate    DATE         NULL
+    ,shipperid      INT          NOT NULL
+    ,freight        MONEY        NOT NULL CONSTRAINT DFT_Orders_freight DEFAULT(0)
+    ,shipname       NVARCHAR(40) NOT NULL
+    ,shipaddress    NVARCHAR(60) NOT NULL
+    ,shipcity       NVARCHAR(15) NOT NULL
+    ,shipregion     NVARCHAR(15) NULL
+    ,shippostalcode NVARCHAR(10) NULL
+    ,shipcountry    NVARCHAR(15) NOT NULL
+);
+
+INSERT INTO dbo.Orders SELECT * FROM Sales.Orders;
+
+
+-- DELETE Using TOP
+DELETE TOP(50) FROM dbo.Orders;
+
+
+-- UPDATE Using TOP
+UPDATE TOP(50) dbo.Orders
+    SET freight += 10.00;
+
+
+-- DELETE w/ CTE Using TOP
+WITH
+C AS (
+    SELECT TOP (50) *
+    FROM dbo.Orders
+    ORDER BY orderid
+)
+
+DELETE FROM C;
+
+
+-- UPDATE w/ CTE Using TOP
+WITH
+C AS (
+    SELECT TOP (50) *
+    FROM dbo.Orders
+    ORDER BY orderid DESC
+)
+
+UPDATE C
+    SET freight += 10.00;
+
+
+-- DELETE w/ CTE Using OFFSET
+WITH
+C AS (
+    SELECT *
+    FROM dbo.Orders
+    ORDER BY orderid
+    OFFSET 0 ROWS FETCH NEXT 50 ROWS ONLY
+)
+
+DELETE FROM C;
+
+
+-- UPDATE w/ CTE Using OFFSET
+WITH
+C AS (
+    SELECT *
+    FROM dbo.Orders
+    ORDER BY orderid DESC
+    OFFSET 0 ROWS FETCH NEXT 50 ROWS ONLY
+)
+
+UPDATE C
+  SET freight += 10.00;
 
 
 -------------------
