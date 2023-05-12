@@ -1,0 +1,20 @@
+{
+	"name": "debug_error",
+	"properties": {
+		"folder": {
+			"name": "query_csv"
+		},
+		"content": {
+			"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Generate Error\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        -- HEADER_ROW = TRUE\n        FIRSTROW = 2\n    ) \n    WITH(\n        LocationID      SMALLINT    \n        ,Borough        VARCHAR(15) \n        ,Zone           VARCHAR(5) -- Incorrect Data Size\n        ,ServiceZone    VARCHAR(15)\n    ) AS TaxiZone\n\n\n-- Update Parser Version (Returns Explicit Error)\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '1.0', -- Changed From 2.0\n        -- HEADER_ROW = TRUE\n        FIRSTROW = 2\n    ) \n    WITH(\n        LocationID      SMALLINT    \n        ,Borough        VARCHAR(15) \n        ,Zone           VARCHAR(5) -- Incorrect Data Size\n        ,ServiceZone    VARCHAR(15)\n    ) AS TaxiZone",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "NYC_Taxi_Serverless",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
