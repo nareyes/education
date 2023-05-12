@@ -146,6 +146,29 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/column_subset')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "query_csv"
+				},
+				"content": {
+					"query": "-- Select Subset of Columns (CSV w/ Headers)\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) \n    WITH(\n        ,Borough VARCHAR(15)  \n        ,Zone    VARCHAR(50) \n    ) AS TaxiZone\n\n\n-- Select Subset of Columns (CSV w/o Headers)\n-- Specify Column Ordinal Position in WITH Clause\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone_without_header.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0'\n    )\n    WITH(\n        Borough VARCHAR(15)  2\n        ,Zone   VARCHAR(50)  3\n    ) AS TaxiZone\n\n\n-- Renaming Columns\n-- Specify Column Ordinal Position in WITH Clause\n-- Synapse Ignores Header Column (Explicit: Use FIRSTROW Instead)\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        -- HEADER_ROW = TRUE\n        FIRSTROW = 2\n    ) \n    WITH(\n        LocationID      SMALLINT    \n        ,Borough        VARCHAR(15) \n        ,Zone           VARCHAR(50) \n        ,ServiceZone    VARCHAR(15) 4\n    ) AS TaxiZone\n\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        -- HEADER_ROW = TRUE\n        FIRSTROW = 2\n    ) \n    WITH(\n        location_id     SMALLINT    1\n        ,borough        VARCHAR(15) 2\n        ,zone           VARCHAR(50) 3   \n        ,service_zone   VARCHAR(15) 4\n    ) AS TaxiZone",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/cost_control')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -223,7 +246,7 @@
 					"name": "query_csv"
 				},
 				"content": {
-					"query": "-- Examine Database Collation\nSELECT\n    name\n    ,collation_name\nFROM sys.databases;\n\n\n-- Apply Collation to a Query\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) \n    WITH(\n        LocationID      SMALLINT\n        ,Borough        VARCHAR(15) COLLATE Latin1_General_100_CI_AI_SC_UTF8\n        ,Zone           VARCHAR(50) COLLATE Latin1_General_100_CI_AI_SC_UTF8\n        ,service_zone   VARCHAR(15) COLLATE Latin1_General_100_CI_AI_SC_UTF8\n    ) AS TaxiZone\n\n\n-- Apply Collation to a Database\n-- Not Applicable to Master Database\nUSE NYC_Taxi_Serverless;\nALTER DATABASE NYC_Taxi_Serverless COLLATE Latin1_General_100_CI_AI_SC_UTF8;\n\n\n-- Confirm Collation Change\nSELECT\n    name\n    ,collation_name\nFROM sys.databases;\n\n\n-- Above Query Will Now Run w/o Collation Warnings\n-- Must Be Using Appropriate Database\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) \n    WITH(\n        LocationID      SMALLINT\n        ,Borough        VARCHAR(15)\n        ,Zone           VARCHAR(50)\n        ,service_zone   VARCHAR(15)\n    ) AS TaxiZone",
+					"query": "-- Examine Database Collation\nSELECT\n    name\n    ,collation_name\nFROM sys.databases;\n\n\n-- Apply Collation to a Query\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) \n    WITH(\n        LocationID      SMALLINT\n        ,Borough        VARCHAR(15) COLLATE Latin1_General_100_CI_AI_SC_UTF8\n        ,Zone           VARCHAR(50) COLLATE Latin1_General_100_CI_AI_SC_UTF8\n        ,service_zone   VARCHAR(15) COLLATE Latin1_General_100_CI_AI_SC_UTF8\n    ) AS TaxiZone\n\n\n-- Apply Collation to a Database\n-- Not Applicable to Master Database\nUSE NYC_Taxi_Serverless;\nALTER DATABASE NYC_Taxi_Serverless COLLATE Latin1_General_100_CI_AI_SC_UTF8;\n\n\n-- Confirm Collation Change\nSELECT\n    name\n    ,collation_name\nFROM sys.databases;\n\n\n-- Query Will Now Run w/o Collation Warnings\n-- Must Be Using Appropriate Database\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) \n    WITH(\n        LocationID      SMALLINT\n        ,Borough        VARCHAR(15)\n        ,Zone           VARCHAR(50)\n        ,service_zone   VARCHAR(15)\n    ) AS TaxiZone",
 					"metadata": {
 						"language": "sql"
 					},
