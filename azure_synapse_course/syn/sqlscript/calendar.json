@@ -1,11 +1,11 @@
 {
-	"name": "SQL script 1",
+	"name": "calendar",
 	"properties": {
 		"folder": {
 			"name": "discovery"
 		},
 		"content": {
-			"query": "USE NYC_Taxi_Serverless\nGO\n\n\n",
+			"query": "USE NYC_Taxi_Serverless\nGO\n\n\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'calendar.csv',\n        DATA_SOURCE = 'NYC_Taxi_File_Drop',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        FIRSTROW = 2\n    ) \n    WITH(\n        DateKey         INT         1\n        ,Date           DATE        2\n        ,Year           SMALLINT    3\n        ,Month          TINYINT     4\n        ,Day            TINYINT     5\n        ,DayName        VARCHAR(10) 6\n        ,DayOfYear      SMALLINT    7\n        ,WeekOfMonth    TINYINT     8\n        ,WeekOfYear     TINYINT     9\n        ,MonthName      VARCHAR(10) 10\n        ,YearMonth      INT         11\n        ,YearWeek       INT         12\n    ) AS Calendar",
 			"metadata": {
 				"language": "sql"
 			},

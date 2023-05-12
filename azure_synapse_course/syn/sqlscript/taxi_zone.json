@@ -1,0 +1,20 @@
+{
+	"name": "taxi_zone",
+	"properties": {
+		"folder": {
+			"name": "discovery"
+		},
+		"content": {
+			"query": "USE NYC_Taxi_Serverless\nGO\n\n\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        -- HEADER_ROW = TRUE\n        FIRSTROW = 2\n    ) \n    WITH(\n        LocationID      SMALLINT    \n        ,Borough        VARCHAR(15) \n        ,Zone           VARCHAR(50) \n        ,ServiceZone    VARCHAR(15) 4\n    ) AS TaxiZone",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
