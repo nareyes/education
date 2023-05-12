@@ -11,9 +11,6 @@
 		"synlakehousedev-WorkspaceDefaultSqlServer_connectionString": {
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synlakehousedev.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
-		"syn-dev-WorkspaceDefaultStorage_properties_typeProperties_url": {
-			"value": "https://synlakehousedev.dfs.core.windows.net"
-		},
 		"synlakehousedev-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://synlakehousedev.dfs.core.windows.net"
 		}

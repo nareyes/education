@@ -17,10 +17,6 @@
 			"metadata": "Secure string for 'connectionString' of 'synlakehousedev-WorkspaceDefaultSqlServer'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synlakehousedev.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
-		"syn-dev-WorkspaceDefaultStorage_properties_typeProperties_url": {
-			"type": "string",
-			"defaultValue": "https://synlakehousedev.dfs.core.windows.net"
-		},
 		"synlakehousedev-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://synlakehousedev.dfs.core.windows.net"
@@ -44,25 +40,6 @@
 				"type": "AzureSqlDW",
 				"typeProperties": {
 					"connectionString": "[parameters('syn-dev-WorkspaceDefaultSqlServer_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/syn-dev-WorkspaceDefaultStorage')]",
-			"type": "Microsoft.Synapse/workspaces/linkedServices",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": [],
-				"type": "AzureBlobFS",
-				"typeProperties": {
-					"url": "[parameters('syn-dev-WorkspaceDefaultStorage_properties_typeProperties_url')]"
 				},
 				"connectVia": {
 					"referenceName": "AutoResolveIntegrationRuntime",
@@ -146,6 +123,29 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/calendar')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "discovery"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'calendar.csv',\n        DATA_SOURCE = 'NYC_Taxi_File_Drop',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        FIRSTROW = 2\n    ) \n    WITH(\n        DateKey         INT         1\n        ,Date           DATE        2\n        ,Year           SMALLINT    3\n        ,Month          TINYINT     4\n        ,Day            TINYINT     5\n        ,DayName        VARCHAR(10) 6\n        ,DayOfYear      SMALLINT    7\n        ,WeekOfMonth    TINYINT     8\n        ,WeekOfYear     TINYINT     9\n        ,MonthName      VARCHAR(10) 10\n        ,YearMonth      INT         11\n        ,YearWeek       INT         12\n    ) AS Calendar",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/column_subset')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -154,7 +154,7 @@
 					"name": "query_csv"
 				},
 				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Select Subset of Columns (CSV w/ Headers)\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) \n    WITH(\n        ,Borough VARCHAR(15)  \n        ,Zone    VARCHAR(50) \n    ) AS TaxiZone\n\n\n-- Select Subset of Columns (CSV w/o Headers)\n-- Specify Column Ordinal Position in WITH Clause\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone_without_header.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0'\n    )\n    WITH(\n        Borough VARCHAR(15)  2\n        ,Zone   VARCHAR(50)  3\n    ) AS TaxiZone\n\n\n-- Renaming Columns\n-- Specify Column Ordinal Position in WITH Clause\n-- Synapse Ignores Header Column (Explicit: Use FIRSTROW Instead)\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        -- HEADER_ROW = TRUE\n        FIRSTROW = 2\n    ) \n    WITH(\n        LocationID      SMALLINT    \n        ,Borough        VARCHAR(15) \n        ,Zone           VARCHAR(50) \n        ,ServiceZone    VARCHAR(15) 4\n    ) AS TaxiZone\n\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        -- HEADER_ROW = TRUE\n        FIRSTROW = 2\n    ) \n    WITH(\n        location_id     SMALLINT    1\n        ,borough        VARCHAR(15) 2\n        ,zone           VARCHAR(50) 3   \n        ,service_zone   VARCHAR(15) 4\n    ) AS TaxiZone",
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Select Subset of Columns (CSV w/ Headers)\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) \n    WITH(\n        Borough VARCHAR(15)  \n        ,Zone    VARCHAR(50) \n    ) AS TaxiZone\n\n\n-- Select Subset of Columns (CSV w/o Headers)\n-- Specify Column Ordinal Position in WITH Clause\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone_without_header.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0'\n    )\n    WITH(\n        Borough VARCHAR(15)  2\n        ,Zone   VARCHAR(50)  3\n    ) AS TaxiZone\n\n\n-- Renaming Columns\n-- Specify Column Ordinal Position in WITH Clause\n-- Synapse Ignores Header Column (Explicit: Use FIRSTROW Instead)\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        -- HEADER_ROW = TRUE\n        FIRSTROW = 2\n    ) \n    WITH(\n        LocationID      SMALLINT    \n        ,Borough        VARCHAR(15) \n        ,Zone           VARCHAR(50) \n        ,ServiceZone    VARCHAR(15) 4\n    ) AS TaxiZone\n\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        -- HEADER_ROW = TRUE\n        FIRSTROW = 2\n    ) \n    WITH(\n        location_id     SMALLINT    1\n        ,borough        VARCHAR(15) 2\n        ,zone           VARCHAR(50) 3   \n        ,service_zone   VARCHAR(15) 4\n    ) AS TaxiZone",
 					"metadata": {
 						"language": "sql"
 					},
@@ -223,7 +223,7 @@
 					"name": "query_csv"
 				},
 				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Create External Data Source\n-- Navigate: Data > Database > External Resources\n-- Using HTTPS or ABFSS Protocol\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop\nWITH(\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/file-drop/'\n)\n\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_HTTPS\nWITH(\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/file-drop/'\n)\n\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_ABFSS\nWITH(\n    LOCATION = 'abfss://file-drop@synlakehousedev.dfs.core.windows.net/'\n)\n\n\n-- Query Using External Data Source\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'taxi_zone.csv',\n        DATA_SOURCE = 'NYC_Taxi_File_Drop_HTTPS',\n        -- DATA_SOURCE = 'NYC_Taxi_File_Drop_ABFSS',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        -- HEADER_ROW = TRUE\n        FIRSTROW = 2\n    ) \n    WITH(\n        LocationID      SMALLINT    \n        ,Borough        VARCHAR(15) \n        ,Zone           VARCHAR(50) \n        ,ServiceZone    VARCHAR(15) 4\n    ) AS TaxiZone\n\n\n/*\nBenefits: Cleans queries and makes it easier for developers to query data lake.\nAbility to create reusable sources that point to different zones in the lakehouse.\n*/\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_Raw\nWITH(\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'\n)\n\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_Processed\nWITH(\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'\n)\n\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_Curated\nWITH(\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'\n)\n\n\n-- Examine Data Sources\nSELECT \n    name \n    ,location\nFROM sys.external_data_sources;\n\n\n-- Drop Data Source\nDROP EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_HTTPS\nGO\n\n\n-- Drop Data Source (IF EXISTS)\nIF EXISTS(\n    SELECT name FROM sys.external_data_sources WHERE name = 'NYC_Taxi_File_Drop_ABFSS'\n)\nBEGIN\n    DROP EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_ABFSS\nEND",
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Create External Data Source\n-- Navigate: Data > Database > External Resources\n-- Using HTTPS or ABFSS Protocol\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop\nWITH(\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/file-drop/'\n)\n\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_HTTPS\nWITH(\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/file-drop/'\n)\n\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_ABFSS\nWITH(\n    LOCATION = 'abfss://file-drop@synlakehousedev.dfs.core.windows.net/'\n)\n\n\n/*\nBenefits: Cleans queries and makes it easier for developers to query data lake.\nAbility to create reusable sources that point to different zones in the lakehouse.\n*/\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_Raw\nWITH(\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'\n)\n\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_Processed\nWITH(\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'\n)\n\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_Curated\nWITH(\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'\n)\n\n\n-- Examine Data Sources\nSELECT \n    name \n    ,location\nFROM sys.external_data_sources;\n\n\n-- Drop Data Source\nDROP EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_HTTPS\nGO\n\n\n-- Drop Data Source (IF EXISTS)\nIF EXISTS(\n    SELECT name FROM sys.external_data_sources WHERE name = 'NYC_Taxi_File_Drop_ABFSS'\n)\nBEGIN\n    DROP EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_ABFSS\nEND\n\n\n-- Query Using External Data Source\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'taxi_zone.csv',\n        DATA_SOURCE = 'NYC_Taxi_File_Drop',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        -- HEADER_ROW = TRUE\n        FIRSTROW = 2\n    ) \n    WITH(\n        LocationID      SMALLINT    \n        ,Borough        VARCHAR(15) \n        ,Zone           VARCHAR(50) \n        ,ServiceZone    VARCHAR(15) 4\n    ) AS TaxiZone",
 					"metadata": {
 						"language": "sql"
 					},
@@ -284,6 +284,29 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/query_calendar_csv')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "query_csv"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Query Calendar CSV File\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'calendar.csv',\n        DATA_SOURCE = 'NYC_Taxi_File_Drop',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS Calendar\n\n\n-- Query Calendar Data Types\nEXEC sp_describe_first_result_set N'\n    SELECT\n        TOP 100 *\n    FROM\n        OPENROWSET(\n            BULK ''calendar.csv'',\n            DATA_SOURCE = ''NYC_Taxi_File_Drop'',\n            FORMAT = ''CSV'',\n            PARSER_VERSION = ''2.0'',\n            HEADER_ROW = TRUE\n        ) AS Calendar\n'\n\n\n-- Query Calendar CSV File w/ Optimizaed Data Types and Size\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'calendar.csv',\n        DATA_SOURCE = 'NYC_Taxi_File_Drop',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        FIRSTROW = 2\n    ) \n    WITH(\n        DateKey         INT         1\n        ,Date           DATE        2\n        ,Year           SMALLINT    3\n        ,Month          TINYINT     4\n        ,Day            TINYINT     5\n        ,DayName        VARCHAR(10) 6\n        ,DayOfYear      SMALLINT    7\n        ,WeekOfMonth    TINYINT     8\n        ,WeekOfYear     TINYINT     9\n        ,MonthName      VARCHAR(10) 10\n        ,YearMonth      INT         11\n        ,YearWeek       INT         12\n    ) AS Calendar",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/specify_collation')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -316,6 +339,29 @@
 				},
 				"content": {
 					"query": "-- Examine Data Types\n-- Escape Single Quotes in Query\nEXEC sp_describe_first_result_set N'\n    SELECT\n        TOP 100 *\n    FROM\n        OPENROWSET(\n            BULK ''https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv'',\n            FORMAT = ''CSV'',\n            PARSER_VERSION = ''2.0'',\n            HEADER_ROW = TRUE\n        ) AS TaxiZone\n'\n\n\n-- Determine Actual Max Length per Column\nSELECT\n    MAX(LEN(LocationID)) AS Len_LocationID\n    ,MAX(LEN(Borough)) AS Len_Borough\n    ,MAX(LEN(Zone)) AS Len_Zone\n    ,MAX(LEN(service_zone)) AS Len_Service_Zone\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TaxiZone\n\n\n/*\n- Adjusting data types and sizes has cost and permofrmance implications.\n- Synapse is generous with its data type and size assignment.\n- It is a best practice to adjust sizes when running queries in Serverless to minimize cost.\n*/\n\n\n-- Use WITH to Provide Explicit Data Types\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) \n    WITH(\n        LocationID      SMALLINT\n        ,Borough        VARCHAR(15)\n        ,Zone           VARCHAR(50)\n        ,service_zone   VARCHAR(15)\n    ) AS TaxiZone\n\n\n-- Confirm Explicit Data Types\nEXEC sp_describe_first_result_set N'\n    SELECT\n        TOP 100 *\n    FROM\n        OPENROWSET(\n            BULK ''https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv'',\n            FORMAT = ''CSV'',\n            PARSER_VERSION = ''2.0'',\n            HEADER_ROW = TRUE\n        )\n        WITH(\n            LocationID      SMALLINT\n            ,Borough        VARCHAR(15)\n            ,Zone           VARCHAR(50)\n            ,service_zone   VARCHAR(15)\n        ) AS TaxiZone\n'",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/taxi_zone')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "discovery"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        -- HEADER_ROW = TRUE\n        FIRSTROW = 2\n    ) \n    WITH(\n        LocationID      SMALLINT    \n        ,Borough        VARCHAR(15) \n        ,Zone           VARCHAR(50) \n        ,ServiceZone    VARCHAR(15) 4\n    ) AS TaxiZone",
 					"metadata": {
 						"language": "sql"
 					},
