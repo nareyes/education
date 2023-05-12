@@ -1,0 +1,20 @@
+{
+	"name": "specify_data_types",
+	"properties": {
+		"folder": {
+			"name": "query_csv"
+		},
+		"content": {
+			"query": "-- Examine Data Types\n-- Escape Single Quotes in Query\nEXEC sp_describe_first_result_set N'\n    SELECT\n        TOP 100 *\n    FROM\n        OPENROWSET(\n            BULK ''https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv'',\n            FORMAT = ''CSV'',\n            PARSER_VERSION = ''2.0'',\n            HEADER_ROW = TRUE\n        ) AS TaxiZone\n'\n\n\n-- Determine Actual Max Length per Column\nSELECT\n    MAX(LEN(LocationID)) AS Len_LocationID\n    ,MAX(LEN(Borough)) AS Len_Borough\n    ,MAX(LEN(Zone)) AS Len_Zone\n    ,MAX(LEN(service_zone)) AS Len_Service_Zone\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TaxiZone\n\n\n/*\n- Adjusting data types and sizes has cost and permofrmance implications.\n- Synapse is generous with its data type and size assignment.\n- It is a best practice to adjust sizes when running queries in Serverless to minimize cost.\n*/\n\n\n-- Use WITH to Provide Explicit Data Types\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) \n    WITH(\n        LocationID      SMALLINT\n        ,Borough        VARCHAR(15)\n        ,Zone           VARCHAR(50)\n        ,service_zone   VARCHAR(15)\n    ) AS TaxiZone\n\n\n-- Confirm Explicit Data Types\nEXEC sp_describe_first_result_set N'\n    SELECT\n        TOP 100 *\n    FROM\n        OPENROWSET(\n            BULK ''https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv'',\n            FORMAT = ''CSV'',\n            PARSER_VERSION = ''2.0'',\n            HEADER_ROW = TRUE\n        )\n        WITH(\n            LocationID      SMALLINT\n            ,Borough        VARCHAR(15)\n            ,Zone           VARCHAR(50)\n            ,service_zone   VARCHAR(15)\n        ) AS TaxiZone\n'",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

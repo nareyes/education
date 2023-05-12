@@ -1,0 +1,20 @@
+{
+	"name": "openrowset_function",
+	"properties": {
+		"folder": {
+			"name": "query_csv"
+		},
+		"content": {
+			"query": "-- OPENROWSET\n-- Use HTTPS or ABFSS Protocol\n\n-- HTTPS\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE,\n        FIELDTERMINATOR = ',', -- Default = ,\n        ROWTERMINATOR = '\\n' -- Default = \\n\n    ) AS TaxiZone\n\n\n-- ABFSS\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'abfss://file-drop@synlakehousedev.dfs.core.windows.net/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE,\n        FIELDTERMINATOR = ',',\n        ROWTERMINATOR = '\\n'\n    ) AS TaxiZone",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
