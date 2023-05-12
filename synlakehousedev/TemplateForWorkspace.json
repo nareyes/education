@@ -307,6 +307,52 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/query_trip_type_tsv')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "query_csv"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Query Trip Type TSV File\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_type.tsv',\n        DATA_SOURCE = 'NYC_Taxi_File_Drop',\n        FORMAT = 'CSV',\n        FIELDTERMINATOR = '\\t',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n) AS TripType\n\n\n-- Query Trip Type Data Types\nEXEC sp_describe_first_result_set N'\n    SELECT\n        TOP 100 *\n    FROM\n        OPENROWSET(\n            BULK ''trip_type.tsv'',\n            DATA_SOURCE = ''NYC_Taxi_File_Drop'',\n            FORMAT = ''CSV'',\n            FIELDTERMINATOR = ''\\t'',\n            PARSER_VERSION = ''2.0'',\n            HEADER_ROW = TRUE\n    ) AS TripType\n'\n\n\n-- Query Trip Type TSV File w/ Optimizaed Data Types and Size\nSELECT\n    *\nFROM\n    OPENROWSET(\n        BULK 'trip_type.tsv',\n        DATA_SOURCE = 'NYC_Taxi_File_Drop',\n        FORMAT = 'CSV',\n        FIELDTERMINATOR = '\\t',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    )\n    WITH(\n        TripType                SMALLINT    1\n        ,TripTypeDescription    VARCHAR(25) 2\n    ) AS TripType",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/quoted_escaped_columns')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "query_csv"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Query CSV File w/ Additional Comma\n-- \", Inc\" Ignored\nSELECT\n    TOP 100 *\nFROM OPENROWSET(\n    BULK 'vendor_unquoted.csv',\n    DATA_SOURCE = 'NYC_Taxi_File_Drop',\n    FORMAT = 'CSV',\n    PARSER_VERSION = '2.0',\n    HEADER_ROW = TRUE\n) AS Vendor\n\n\n-- Escape Character\nSELECT\n    TOP 100 *\nFROM OPENROWSET(\n    BULK 'vendor_escaped.csv',\n    DATA_SOURCE = 'NYC_Taxi_File_Drop',\n    FORMAT = 'CSV',\n    PARSER_VERSION = '2.0',\n    HEADER_ROW = TRUE,\n    ESCAPECHAR = '\\'\n) AS Vendor\n\n\n-- Quote Character\nSELECT\n    TOP 100 *\nFROM OPENROWSET(\n    BULK 'vendor.csv',\n    DATA_SOURCE = 'NYC_Taxi_File_Drop',\n    FORMAT = 'CSV',\n    PARSER_VERSION = '2.0',\n    HEADER_ROW = TRUE,\n    FIELDQUOTE = '\"' -- Optional. Default is \"\"\n) AS Vendor",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/specify_collation')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
