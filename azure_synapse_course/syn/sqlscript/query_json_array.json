@@ -1,0 +1,20 @@
+{
+	"name": "query_json_array",
+	"properties": {
+		"folder": {
+			"name": "query_json"
+		},
+		"content": {
+			"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Query JSON Array w/ JSON_VALUES\nSELECT\n    JSON_VALUE (jsonDoc, '$.payment_type') AS PaymentType\n    ,JSON_VALUE (jsonDoc, '$.payment_type_desc[0].value') AS PaymentTypeDescription -- Use Index Position of Array\nFROM\n    OPENROWSET(\n        BULK 'payment_type_array.json',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV', -- Even for JSON\n        PARSER_VERSION = '1.0',\n        FIELDTERMINATOR = '0x0b',\n        FIELDQUOTE = '0x0b',\n        ROWTERMINATOR = '0x0a'\n    ) \n    WITH(\n        jsonDoc NVARCHAR(MAX)\n    ) AS PaymentType\n\n\n-- Query JSON Array w/ OPENJSON\nSELECT\n    PaymentType\n    ,PaymentTypeDescription\nFROM\n    OPENROWSET(\n        BULK 'payment_type_array.json',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV', -- Even for JSON\n        PARSER_VERSION = '1.0',\n        FIELDTERMINATOR = '0x0b',\n        FIELDQUOTE = '0x0b',\n        ROWTERMINATOR = '0x0a'\n    ) \n    WITH(\n        jsonDoc NVARCHAR(MAX)\n    ) AS PaymentType\n\nCROSS APPLY OPENJSON(jsonDoc) -- Return Key Value Pairs\n    WITH(\n        PaymentType         SMALLINT        '$.payment_type'\n        ,payment_type_desc  NVARCHAR(MAX)   AS JSON\n    )\n\nCROSS APPLY OPENJSON(payment_type_desc)\n    WITH(\n        PaymentSubType          SMALLINT    '$.sub_type'\n        ,PaymentTypeDescription VARCHAR(20) '$.value'\n    )",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "NYC_Taxi_Serverless",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
