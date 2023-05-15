@@ -7,9 +7,9 @@ SELECT
 FROM
     OPENROWSET(
         BULK 'calendar.csv',
-        DATA_SOURCE = 'NYC_Taxi_File_Drop',
+        DATA_SOURCE = 'NYC_Taxi_Raw',
         FORMAT = 'CSV',
-        PARSER_VERSION = '2.0',
+        PARSER_VERSION = '2.0',
         FIRSTROW = 2
     ) 
     WITH(

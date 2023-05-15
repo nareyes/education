@@ -67,9 +67,9 @@ SELECT
 FROM
     OPENROWSET(
         BULK 'taxi_zone.csv',
-        DATA_SOURCE = 'NYC_Taxi_File_Drop',
+        DATA_SOURCE = 'NYC_Taxi_Raw',
         FORMAT = 'CSV',
-        PARSER_VERSION = '2.0',
+        PARSER_VERSION = '2.0',
         -- HEADER_ROW = TRUE
         FIRSTROW = 2
     ) 

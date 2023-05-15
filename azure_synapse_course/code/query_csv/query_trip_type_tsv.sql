@@ -7,7 +7,7 @@ SELECT
 FROM
     OPENROWSET(
         BULK 'trip_type.tsv',
-        DATA_SOURCE = 'NYC_Taxi_File_Drop',
+        DATA_SOURCE = 'NYC_Taxi_Raw',
         FORMAT = 'CSV',
         FIELDTERMINATOR = '\t',
         PARSER_VERSION = '2.0',
@@ -22,7 +22,7 @@ EXEC sp_describe_first_result_set N'
     FROM
         OPENROWSET(
             BULK ''trip_type.tsv'',
-            DATA_SOURCE = ''NYC_Taxi_File_Drop'',
+            DATA_SOURCE = ''NYC_Taxi_Raw'',
             FORMAT = ''CSV'',
             FIELDTERMINATOR = ''\t'',
             PARSER_VERSION = ''2.0'',
@@ -37,7 +37,7 @@ SELECT
 FROM
     OPENROWSET(
         BULK 'trip_type.tsv',
-        DATA_SOURCE = 'NYC_Taxi_File_Drop',
+        DATA_SOURCE = 'NYC_Taxi_Raw',
         FORMAT = 'CSV',
         FIELDTERMINATOR = '\t',
         PARSER_VERSION = '2.0',

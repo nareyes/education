@@ -7,9 +7,9 @@ SELECT
 FROM
     OPENROWSET(
         BULK 'calendar.csv',
-        DATA_SOURCE = 'NYC_Taxi_File_Drop',
+        DATA_SOURCE = 'NYC_Taxi_Raw',
         FORMAT = 'CSV',
-        PARSER_VERSION = '2.0',
+        PARSER_VERSION = '2.0',
         HEADER_ROW = TRUE
     ) AS Calendar
 
@@ -21,7 +21,7 @@ EXEC sp_describe_first_result_set N'
     FROM
         OPENROWSET(
             BULK ''calendar.csv'',
-            DATA_SOURCE = ''NYC_Taxi_File_Drop'',
+            DATA_SOURCE = ''NYC_Taxi_Raw'',
             FORMAT = ''CSV'',
             PARSER_VERSION = ''2.0'',
             HEADER_ROW = TRUE
@@ -35,7 +35,7 @@ SELECT
 FROM
     OPENROWSET(
         BULK 'calendar.csv',
-        DATA_SOURCE = 'NYC_Taxi_File_Drop',
+        DATA_SOURCE = 'NYC_Taxi_Raw',
         FORMAT = 'CSV',
         PARSER_VERSION = '2.0',
         FIRSTROW = 2
