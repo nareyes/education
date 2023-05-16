@@ -1,0 +1,20 @@
+{
+	"name": "query_delta",
+	"properties": {
+		"folder": {
+			"name": "query_columnar"
+		},
+		"content": {
+			"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Query Delta Sub-Folder\n-- Will Fail, Delta Does Not Support\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_delta/year=2020/',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'DELTA'\n    ) AS TripData\n\n\n-- Query Delta Folder\n-- Includes Partition Metadata Columns (Used for Filtering)\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_delta/',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'DELTA'\n    ) AS TripData\n\n\n-- Query Data Types\nEXEC sp_describe_first_result_set N'\n    SELECT\n        TOP 100 *\n    FROM\n        OPENROWSET(\n            BULK ''trip_data_green_delta/'',\n            DATA_SOURCE = ''NYC_Taxi_Raw'',\n            FORMAT = ''DELTA''\n        ) AS TripData\n'\n\n\n-- Query Delta Folders w/ Explicit Data Types\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_delta/',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'DELTA'\n    ) \n    WITH(\n        VendorID                INT\n        ,lpep_pickup_datetime   DATETIME2(7)\n        ,lpep_dropoff_datetime  DATETIME2(7)\n        ,passenger_count        INT\n        ,trip_distance          FLOAT\n        ,total_amount           FLOAT\n        ,trip_type              INT\n        ,year                   VARCHAR(4)\n        ,month                  VARCHAR(2)\n    ) AS TripData\n\n\n-- Target Specified Partitions w/ Metadata Columns\nSELECT\n    passenger_count\n    ,COUNT(1) AS trip_count\n    ,AVG(total_amount) AS avg_trip_cost\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_delta/',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'DELTA'\n    ) \n    WITH(\n        passenger_count        INT\n        ,trip_distance          FLOAT\n        ,total_amount           FLOAT\n        ,year                   VARCHAR(4)\n        ,month                  VARCHAR(2)\n    ) AS TripData\nWHERE 1=1\n    AND year = '2020'\n    AND month = '01'\nGROUP BY passenger_count\nORDER BY passenger_count ASC;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "NYC_Taxi_Serverless",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
