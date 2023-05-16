@@ -1,5 +1,5 @@
 {
-	"name": "query_folders",
+	"name": "query_folders_csv",
 	"properties": {
 		"folder": {
 			"name": "query_folders"

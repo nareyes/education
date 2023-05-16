@@ -1,0 +1,20 @@
+{
+	"name": "query_parquet",
+	"properties": {
+		"folder": {
+			"name": "query_columnar"
+		},
+		"content": {
+			"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Query Single File\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\n\n\n-- Query Data Types\n-- Parquet Infers Data Types from Metadata (More Accurate)\nEXEC sp_describe_first_result_set N'\n    SELECT\n        TOP 100 *\n    FROM\n        OPENROWSET(\n            BULK ''trip_data_green_parquet/year=2020/month=01/*.parquet'',\n            DATA_SOURCE = ''NYC_Taxi_Raw'',\n            FORMAT = ''PARQUET''\n        ) AS TripData\n'\n\n\n-- Query w/ Explicit Data Types\n-- Most Inferred Data Types are Correct\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) \n    WITH(\n        VendorID                INT\n        ,lpep_pickup_datetime   DATETIME2(7)\n        ,lpep_dropoff_datetime  DATETIME2(7)\n        ,store_and_fwd_flag     CHAR(1)\n        ,RatecodeID             INT\n        ,PULocationID           INT\n        ,DOLocationID           INT\n        ,passenger_count        INT\n        ,trip_distance          FLOAT\n        ,fare_amount            FLOAT\n        ,extra                  FLOAT\n        ,mta_tax                FLOAT\n        ,tip_amount             FLOAT\n        ,tolls_amount           FLOAT\n        ,ehail_fee              INT\n        ,improvement_surcharge  FLOAT\n        ,total_amount           FLOAT\n        ,payment_type           INT\n        ,trip_type              INT\n        ,congestion_surcharge   FLOAT\n    ) AS TripData\n\n\n-- Query w/ Explicit Data Types and Columns (More Cost Efficient)\n-- Most Inferred Data Types are Correct\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) \n    WITH(\n        VendorID                INT\n        ,lpep_pickup_datetime   DATETIME2(7)\n        ,lpep_dropoff_datetime  DATETIME2(7)\n        ,trip_distance          FLOAT\n        ,fare_amount            FLOAT\n        ,tip_amount             FLOAT\n        ,tolls_amount           FLOAT\n        ,total_amount           FLOAT\n        ,trip_type              INT\n    ) AS TripData",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "NYC_Taxi_Serverless",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
