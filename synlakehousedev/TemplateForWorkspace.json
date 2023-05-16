@@ -376,6 +376,75 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/query_file_metadata')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "query_folders"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- FILENAME Function\nSELECT\n    TripData.filename() AS file_name\n    ,COUNT(1) AS record_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv', -- ** All Folders and Sub-Folders\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\nGROUP BY TripData.filename()\nORDER BY file_name ASC;\n\n\n-- FILENAME Function w/ WHERE Clause\nSELECT\n    TripData.filename() AS file_name\n    ,COUNT(1) AS record_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv', -- ** All Folders and Sub-Folders\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\nWHERE TripData.filename() IN ('green_tripdata_2020-01.csv', 'green_tripdata_2021-01.csv') -- Alternate to Specifying in BULK\nGROUP BY TripData.filename()\nORDER BY file_name ASC;\n\n\n-- FILEPATH Function\nSELECT\n    TripData.filepath() AS file_path\n    -- Using Ordinal Wildcard Position\n    ,TripData.filepath(1) AS year\n    ,TripData.filepath(2) AS month\n    ,TripData.filepath(3) AS file_name\n    ,COUNT(1) AS record_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv', -- ** All Folders and Sub-Folders\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\nGROUP BY TripData.filepath(), TripData.filepath(1), TripData.filepath(2), TripData.filepath(3)\nORDER BY file_path ASC;\n\n\n-- FILEPATH Function w/ WHERE Clause\nSELECT\n    TripData.filepath() AS file_path\n    -- Using Ordinal Wildcard Position\n    ,TripData.filepath(1) AS year\n    ,TripData.filepath(2) AS month\n    ,TripData.filepath(3) AS file_name\n    ,COUNT(1) AS record_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv', -- ** Best Practice be Explicit\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\nWHERE 1=1\n    AND TripData.filepath(1) = '2020'\n    AND TripData.filepath(2) IN ('06', '07', '08')\nGROUP BY TripData.filepath(), TripData.filepath(1), TripData.filepath(2), TripData.filepath(3)\nORDER BY file_path ASC;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/query_folders_csv')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "query_folders"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Select All Files From Folder w/ Single File\nSELECT\n    TOP 100\n    TripData.filename() AS file_name\n    ,TripData.*\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=2020/month=01/', -- *, *.csv\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\n\n\n-- Select All Files From Folder w/ Sub-Folders\nSELECT\n    TOP 100\n    TripData.filename() AS file_name\n    ,TripData.*\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=2020/**', -- ** All Underlying Sub-Folders\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\n\n\nSELECT\n    TOP 100\n    TripData.filename() AS file_name\n    ,TripData.*\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv', -- ** All Folders and Sub-Folders\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\n\n\n-- Select All Files From Folder and Specified Sub-Folders\nSELECT\n    TOP 100\n    TripData.filename() AS file_name\n    ,TripData.*\nFROM\n    OPENROWSET(\n        BULK    (\n            'trip_data_green_csv/year=2020/month=01/*.csv',\n            'trip_data_green_csv/year=2020/month=03/*.csv'\n        ),\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/query_folders_parquet')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "query_folders"
+				},
+				"content": {
+					"query": "",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/query_json_array')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -408,6 +477,29 @@
 				},
 				"content": {
 					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Query Multi-Line JSON Values w/ OPENJSON\n-- OPENJSON = More Efficient, More Functionality\nSELECT\n    RateCodeID\n    ,RateCodeDescription\nFROM\n    OPENROWSET(\n        BULK 'rate_code_multi_line.json',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV', -- Even for JSON\n        PARSER_VERSION = '1.0',\n        FIELDTERMINATOR = '0x0b',\n        FIELDQUOTE = '0x0b',\n        ROWTERMINATOR = '0x0b' -- Vertical Tab\n    ) \n    WITH(\n        jsonDoc NVARCHAR(MAX)\n    ) AS RateCode\n\nCROSS APPLY OPENJSON(jsonDoc) -- Return Key Value Pairs\n    WITH(\n        RateCodeID              TINYINT     '$.rate_code_id'\n        ,RateCodeDescription    VARCHAR(20) '$.rate_code'\n    )",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/query_parquet')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "query_columnar"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Query Single File\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\n\n\n-- Query Data Types\n-- Parquet Infers Data Types from Metadata (More Accurate)\nEXEC sp_describe_first_result_set N'\n    SELECT\n        TOP 100 *\n    FROM\n        OPENROWSET(\n            BULK ''trip_data_green_parquet/year=2020/month=01/*.parquet'',\n            DATA_SOURCE = ''NYC_Taxi_Raw'',\n            FORMAT = ''PARQUET''\n        ) AS TripData\n'\n\n\n-- Query w/ Explicit Data Types\n-- Most Inferred Data Types are Correct\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) \n    WITH(\n        VendorID                INT\n        ,lpep_pickup_datetime   DATETIME2(7)\n        ,lpep_dropoff_datetime  DATETIME2(7)\n        ,store_and_fwd_flag     CHAR(1)\n        ,RatecodeID             INT\n        ,PULocationID           INT\n        ,DOLocationID           INT\n        ,passenger_count        INT\n        ,trip_distance          FLOAT\n        ,fare_amount            FLOAT\n        ,extra                  FLOAT\n        ,mta_tax                FLOAT\n        ,tip_amount             FLOAT\n        ,tolls_amount           FLOAT\n        ,ehail_fee              INT\n        ,improvement_surcharge  FLOAT\n        ,total_amount           FLOAT\n        ,payment_type           INT\n        ,trip_type              INT\n        ,congestion_surcharge   FLOAT\n    ) AS TripData\n\n\n-- Query w/ Explicit Data Types and Columns (More Cost Efficient)\n-- Most Inferred Data Types are Correct\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) \n    WITH(\n        VendorID                INT\n        ,lpep_pickup_datetime   DATETIME2(7)\n        ,lpep_dropoff_datetime  DATETIME2(7)\n        ,trip_distance          FLOAT\n        ,fare_amount            FLOAT\n        ,tip_amount             FLOAT\n        ,tolls_amount           FLOAT\n        ,total_amount           FLOAT\n        ,trip_type              INT\n    ) AS TripData",
 					"metadata": {
 						"language": "sql"
 					},
@@ -593,52 +685,6 @@
 			},
 			"dependsOn": [],
 			"location": "centralus"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/query_folders')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"folder": {
-					"name": "query_folders"
-				},
-				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Select All Files From Folder w/ Single File\nSELECT\n    TOP 100\n    TripData.filename() AS file_name\n    ,TripData.*\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=2020/month=01/', -- *, *.csv\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\n\n\n-- Select All Files From Folder w/ Sub-Folders\nSELECT\n    TOP 100\n    TripData.filename() AS file_name\n    ,TripData.*\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=2020/**', -- ** All Underlying Sub-Folders\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\n\n\nSELECT\n    TOP 100\n    TripData.filename() AS file_name\n    ,TripData.*\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv', -- ** All Folders and Sub-Folders\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\n\n\n-- Select All Files From Folder and Specified Sub-Folders\nSELECT\n    TOP 100\n    TripData.filename() AS file_name\n    ,TripData.*\nFROM\n    OPENROWSET(\n        BULK    (\n            'trip_data_green_csv/year=2020/month=01/*.csv',\n            'trip_data_green_csv/year=2020/month=03/*.csv'\n        ),\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "NYC_Taxi_Serverless",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/query_file_metadata')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"folder": {
-					"name": "query_folders"
-				},
-				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- FILENAME Function\nSELECT\n    TripData.filename() AS file_name\n    ,COUNT(1) AS record_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv', -- ** All Folders and Sub-Folders\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\nGROUP BY TripData.filename()\nORDER BY file_name ASC;\n\n\n-- FILENAME Function w/ WHERE Clause\nSELECT\n    TripData.filename() AS file_name\n    ,COUNT(1) AS record_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv', -- ** All Folders and Sub-Folders\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\nWHERE TripData.filename() IN ('green_tripdata_2020-01.csv', 'green_tripdata_2021-01.csv') -- Alternate to Specifying in BULK\nGROUP BY TripData.filename()\nORDER BY file_name ASC;\n\n\n-- FILEPATH Function\nSELECT\n    TripData.filepath() AS file_path\n    -- Using Ordinal Wildcard Position\n    ,TripData.filepath(1) AS year\n    ,TripData.filepath(2) AS month\n    ,TripData.filepath(3) AS file_name\n    ,COUNT(1) AS record_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv', -- ** All Folders and Sub-Folders\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\nGROUP BY TripData.filepath(), TripData.filepath(1), TripData.filepath(2), TripData.filepath(3)\nORDER BY file_path ASC;\n\n\n-- FILEPATH Function w/ WHERE Clause\nSELECT\n    TripData.filepath() AS file_path\n    -- Using Ordinal Wildcard Position\n    ,TripData.filepath(1) AS year\n    ,TripData.filepath(2) AS month\n    ,TripData.filepath(3) AS file_name\n    ,COUNT(1) AS record_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv', -- ** Best Practice be Explicit\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\nWHERE 1=1\n    AND TripData.filepath(1) = '2020'\n    AND TripData.filepath(2) IN ('06', '07', '08')\nGROUP BY TripData.filepath(), TripData.filepath(1), TripData.filepath(2), TripData.filepath(3)\nORDER BY file_path ASC;",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "NYC_Taxi_Serverless",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
 		}
 	]
 }
