@@ -5,12 +5,12 @@
 			"name": "query_folders"
 		},
 		"content": {
-			"query": "",
+			"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Query Folder w/ Wildcard\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\n\n\n-- Query Folder w/ Sub-Folders\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/**',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\n\n\n-- Query Folder w/ FILENAME Function\nSELECT\n    TOP 100\n    TripData.filename() AS file_name\n    ,TripData.*\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/**',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\n\n\n-- Query Folder w/ FILEPATH Function\nSELECT\n    TripData.filepath(1) AS year\n    ,TripData.filepath(2) AS month\n    ,TripData.filepath(3) AS file_name\n    ,COUNT(1) AS record_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=*/month=*/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\nWHERE 1=1\n    AND TripData.filepath(1) = '2020'\n    AND TripData.filepath(2) IN ('01', '04', '06')\nGROUP BY TripData.filepath(1), TripData.filepath(2), TripData.filepath(3)\nORDER BY TripData.filepath(1), TripData.filepath(2), TripData.filepath(3);",
 			"metadata": {
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "master",
+				"databaseName": "NYC_Taxi_Serverless",
 				"poolName": "Built-in"
 			},
 			"resultLimit": 5000
