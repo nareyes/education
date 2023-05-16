@@ -1,0 +1,20 @@
+{
+	"name": "query_folders",
+	"properties": {
+		"folder": {
+			"name": "query_folders"
+		},
+		"content": {
+			"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Select All Files From Folder w/ Single File\nSELECT\n    TOP 100\n    TripData.filename() AS file_name\n    ,TripData.*\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=2020/month=01/', -- *, *.csv\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\n\n\n-- Select All Files From Folder w/ Sub-Folders\nSELECT\n    TOP 100\n    TripData.filename() AS file_name\n    ,TripData.*\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=2020/**', -- ** All Underlying Sub-Folders\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\n\n\nSELECT\n    TOP 100\n    TripData.filename() AS file_name\n    ,TripData.*\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv', -- ** All Folders and Sub-Folders\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\n\n\n-- Select All Files From Folder and Specified Sub-Folders\nSELECT\n    TOP 100\n    TripData.filename() AS file_name\n    ,TripData.*\nFROM\n    OPENROWSET(\n        BULK    (\n            'trip_data_green_csv/year=2020/month=01/*.csv',\n            'trip_data_green_csv/year=2020/month=03/*.csv'\n        ),\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "NYC_Taxi_Serverless",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

@@ -1,0 +1,20 @@
+{
+	"name": "query_file_metadata",
+	"properties": {
+		"folder": {
+			"name": "admin"
+		},
+		"content": {
+			"query": "USE NYC_Taxi_Serverless\nGO\n\n-- FILENAME Function\nSELECT\n    TripData.filename() AS file_name\n    ,COUNT(1) AS record_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv', -- ** All Folders and Sub-Folders\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\nGROUP BY TripData.filename()\nORDER BY file_name ASC;\n\n\n-- FILENAME Function w/ WHERE Clause\nSELECT\n    TripData.filename() AS file_name\n    ,COUNT(1) AS record_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv', -- ** All Folders and Sub-Folders\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\nWHERE TripData.filename() IN ('green_tripdata_2020-01.csv', 'green_tripdata_2021-01.csv') -- Alternate to Specifying in BULK\nGROUP BY TripData.filename()\nORDER BY file_name ASC;\n\n\n-- FILEPATH Function\nSELECT\n    TripData.filepath() AS file_path\n    -- Using Ordinal Wildcard Position\n    ,TripData.filepath(1) AS year\n    ,TripData.filepath(2) AS month\n    ,TripData.filepath(3) AS file_name\n    ,COUNT(1) AS record_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv', -- ** All Folders and Sub-Folders\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\nGROUP BY TripData.filepath(), TripData.filepath(1), TripData.filepath(2), TripData.filepath(3)\nORDER BY file_path ASC;\n\n\n-- FILEPATH Function w/ WHERE Clause\nSELECT\n    TripData.filepath() AS file_path\n    -- Using Ordinal Wildcard Position\n    ,TripData.filepath(1) AS year\n    ,TripData.filepath(2) AS month\n    ,TripData.filepath(3) AS file_name\n    ,COUNT(1) AS record_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_csv/year=*/month=*/*.csv', -- ** Best Practice be Explicit\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TripData\nWHERE 1=1\n    AND TripData.filepath(1) = '2020'\n    AND TripData.filepath(2) IN ('06', '07', '08')\nGROUP BY TripData.filepath(), TripData.filepath(1), TripData.filepath(2), TripData.filepath(3)\nORDER BY file_path ASC;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "NYC_Taxi_Serverless",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
