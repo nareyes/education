@@ -215,6 +215,52 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/identify_duplicates')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "data_discovery"
+				},
+				"content": {
+					"query": "",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/joining files')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "data_discovery"
+				},
+				"content": {
+					"query": "",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/json_value_function')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -293,6 +339,29 @@
 				},
 				"content": {
 					"query": "-- OPENROWSET\n-- Use HTTPS or ABFSS Protocol\n\n-- HTTPS\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE,\n        FIELDTERMINATOR = ',', -- Default = ,\n        ROWTERMINATOR = '\\n' -- Default = \\n\n    ) AS TaxiZone\n\n\n-- ABFSS\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'abfss://file-drop@synlakehousedev.dfs.core.windows.net/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE,\n        FIELDTERMINATOR = ',',\n        ROWTERMINATOR = '\\n'\n    ) AS TaxiZone",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/quality_checks')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "data_discovery"
+				},
+				"content": {
+					"query": "",
 					"metadata": {
 						"language": "sql"
 					},
@@ -592,6 +661,29 @@
 				},
 				"content": {
 					"query": "-- Examine Data Types\n-- Escape Single Quotes in Query\nEXEC sp_describe_first_result_set N'\n    SELECT\n        TOP 100 *\n    FROM\n        OPENROWSET(\n            BULK ''https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv'',\n            FORMAT = ''CSV'',\n            PARSER_VERSION = ''2.0'',\n            HEADER_ROW = TRUE\n        ) AS TaxiZone\n'\n\n\n-- Determine Actual Max Length per Column\nSELECT\n    MAX(LEN(LocationID)) AS Len_LocationID\n    ,MAX(LEN(Borough)) AS Len_Borough\n    ,MAX(LEN(Zone)) AS Len_Zone\n    ,MAX(LEN(service_zone)) AS Len_Service_Zone\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) AS TaxiZone\n\n\n/*\n- Adjusting data types and sizes has cost and permofrmance implications.\n- Synapse is generous with its data type and size assignment.\n- It is a best practice to adjust sizes when running queries in Serverless to minimize cost.\n*/\n\n\n-- Use WITH to Provide Explicit Data Types\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) \n    WITH(\n        LocationID      SMALLINT\n        ,Borough        VARCHAR(15)\n        ,Zone           VARCHAR(50)\n        ,service_zone   VARCHAR(15)\n    ) AS TaxiZone\n\n\n-- Confirm Explicit Data Types\nEXEC sp_describe_first_result_set N'\n    SELECT\n        TOP 100 *\n    FROM\n        OPENROWSET(\n            BULK ''https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv'',\n            FORMAT = ''CSV'',\n            PARSER_VERSION = ''2.0'',\n            HEADER_ROW = TRUE\n        )\n        WITH(\n            LocationID      SMALLINT\n            ,Borough        VARCHAR(15)\n            ,Zone           VARCHAR(50)\n            ,service_zone   VARCHAR(15)\n        ) AS TaxiZone\n'",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/transform_data')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "data_discovery"
+				},
+				"content": {
+					"query": "",
 					"metadata": {
 						"language": "sql"
 					},
