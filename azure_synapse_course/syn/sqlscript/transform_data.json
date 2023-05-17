@@ -5,7 +5,7 @@
 			"name": "data_discovery"
 		},
 		"content": {
-			"query": "USE NYC_Taxi_Serverless\nGO\n\n\n",
+			"query": "USE NYC_Taxi_Serverless\nGO\n\n\n-- Explore\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData",
 			"metadata": {
 				"language": "sql"
 			},
