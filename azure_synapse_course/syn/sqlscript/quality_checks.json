@@ -5,7 +5,7 @@
 			"name": "data_discovery"
 		},
 		"content": {
-			"query": "",
+			"query": "USE NYC_Taxi_Serverless\nGO",
 			"metadata": {
 				"language": "sql"
 			},
