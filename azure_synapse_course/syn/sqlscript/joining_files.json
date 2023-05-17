@@ -1,16 +1,16 @@
 {
-	"name": "joining files",
+	"name": "joining_files",
 	"properties": {
 		"folder": {
 			"name": "data_discovery"
 		},
 		"content": {
-			"query": "USE NYC_Taxi_Serverless\nGO",
+			"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Explore Files to Join\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\n\n\n\n\n-- Identify NULL PULocationID (No Records)\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\nWHERE PULocationID IS NULL;\n\n\n-- Join Files\nSELECT\n    TaxiZone.Borough\n    ,COUNT(1) AS TripCount\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=*/month=*/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\n\nINNER JOIN\n    OPENROWSET(\n        BULK 'taxi_zone.csv',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    )\n    WITH(\n        LocationID      SMALLINT    1\n        ,Borough        VARCHAR(15) 2\n        ,Zone           VARCHAR(50) 3   \n        ,ServiceZone    VARCHAR(15) 4\n    ) AS TaxiZone\n\n    ON TripData.PULocationID = TaxiZone.LocationID\n\nGROUP BY TaxiZone.Borough\nORDER BY TaxiZone.Borough;",
 			"metadata": {
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "master",
+				"databaseName": "NYC_Taxi_Serverless",
 				"poolName": "Built-in"
 			},
 			"resultLimit": 5000
