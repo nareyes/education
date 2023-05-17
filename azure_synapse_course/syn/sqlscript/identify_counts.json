@@ -1,5 +1,5 @@
 {
-	"name": "identify_duplicates",
+	"name": "identify_counts",
 	"properties": {
 		"folder": {
 			"name": "data_discovery"
