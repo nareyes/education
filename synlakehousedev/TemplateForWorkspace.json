@@ -223,12 +223,12 @@
 					"name": "data_discovery"
 				},
 				"content": {
-					"query": "",
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n\n-- Explore Top\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE,\n        FIRSTROW = 2\n    ) \n    WITH(\n        location_id     SMALLINT    1\n        ,borough        VARCHAR(15) 2\n        ,zone           VARCHAR(50) 3   \n        ,service_zone   VARCHAR(15) 4\n    ) AS TaxiZone\n\n\n-- Check for Duplicate LocationIDs\nSELECT\n    location_id\n    ,COUNT(1) AS location_id_count \nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE,\n        FIRSTROW = 2\n    ) \n    WITH(\n        location_id     SMALLINT    1\n        ,borough        VARCHAR(15) 2\n        ,zone           VARCHAR(50) 3   \n        ,service_zone   VARCHAR(15) 4\n    ) AS TaxiZone\nGROUP BY location_id\nHAVING COUNT (1) > 1\nORDER BY location_id ASC;\n\n\n-- Check Record Count Per Borough\nSELECT\n    borough\n    ,COUNT(1) AS borough_count \nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE,\n        FIRSTROW = 2\n    ) \n    WITH(\n        location_id     SMALLINT    1\n        ,borough        VARCHAR(15) 2\n        ,zone           VARCHAR(50) 3   \n        ,service_zone   VARCHAR(15) 4\n    ) AS TaxiZone\nGROUP BY borough\nORDER BY borough ASC;",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"databaseName": "master",
+						"databaseName": "NYC_Taxi_Serverless",
 						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
@@ -246,7 +246,7 @@
 					"name": "data_discovery"
 				},
 				"content": {
-					"query": "",
+					"query": "USE NYC_Taxi_Serverless\nGO",
 					"metadata": {
 						"language": "sql"
 					},
@@ -361,7 +361,7 @@
 					"name": "data_discovery"
 				},
 				"content": {
-					"query": "",
+					"query": "USE NYC_Taxi_Serverless\nGO",
 					"metadata": {
 						"language": "sql"
 					},
@@ -683,7 +683,7 @@
 					"name": "data_discovery"
 				},
 				"content": {
-					"query": "",
+					"query": "USE NYC_Taxi_Serverless\nGO",
 					"metadata": {
 						"language": "sql"
 					},
