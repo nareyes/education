@@ -5,12 +5,12 @@
 			"name": "data_discovery"
 		},
 		"content": {
-			"query": "USE NYC_Taxi_Serverless\nGO\n\n\n-- Explore\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData",
+			"query": "USE NYC_Taxi_Serverless\nGO\n\n\n-- Explore\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\n\n\n-- Explore DATEDIFF\n-- Determine Count of Trips per Hour Duration\nSELECT\n    DATEDIFF (MINUTE, lpep_pickup_datetime, lpep_dropoff_datetime) / 60 AS min_range_hour\n    ,(DATEDIFF (MINUTE, lpep_pickup_datetime, lpep_dropoff_datetime) / 60) + 1 AS max_range_hour\n    ,COUNT(1) AS trip_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=*/month=*/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\nGROUP BY\n    DATEDIFF (MINUTE, lpep_pickup_datetime, lpep_dropoff_datetime) / 60\n    ,(DATEDIFF (MINUTE, lpep_pickup_datetime, lpep_dropoff_datetime) / 60) + 1\nORDER BY min_range_hour ASC;\n\n\n/* In this case, we would want to delete the records where drop off is < pick up.\nThis is not possible and there are only 2 such records in the data.\n*/",
 			"metadata": {
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "master",
+				"databaseName": "NYC_Taxi_Serverless",
 				"poolName": "Built-in"
 			},
 			"resultLimit": 5000
