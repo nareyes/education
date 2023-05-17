@@ -146,6 +146,29 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/common_table_exp')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "data_discovery"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n\n-- Identify Percentage of Cash & Credit Card Trips by Borough\nWITH\n\nCTE_PaymentType AS (\n    SELECT\n        CAST (JSON_VALUE (jsonDoc, '$.PaymentType') AS SMALLINT) AS PaymentType\n        ,CAST (JSON_VALUE (jsonDoc, '$.PaymentTypeDescription') AS VARCHAR(15)) AS PaymentTypeDescription\n    FROM\n        OPENROWSET(\n            BULK 'PaymentType.json',\n            DATA_SOURCE = 'NYC_Taxi_Raw',\n            FORMAT = 'CSV', -- Even for JSON\n            PARSER_VERSION = '1.0',\n            FIELDTERMINATOR = '0x0b',\n            FIELDQUOTE = '0x0b',\n            ROWTERMINATOR = '0x0a'\n        ) \n        WITH(\n            jsonDoc NVARCHAR(MAX)\n        ) AS PaymentType\n),\n\nCTE_TaxiZone AS (\n    SELECT\n        *\n    FROM\n        OPENROWSET(\n            BULK 'taxi_zone.csv',\n            DATA_SOURCE = 'NYC_Taxi_Raw',\n            FORMAT = 'CSV',\n            PARSER_VERSION = '2.0',\n            HEADER_ROW = TRUE\n        ) \n        WITH(\n            LocationID      SMALLINT    1\n            ,Borough        VARCHAR(15) 2\n            ,Zone           VARCHAR(50) 3   \n            ,ServiceZone    VARCHAR(15) 4\n        ) AS TaxiZone\n),\n\nCTE_TripData AS (\n    SELECT\n        *\n    FROM\n        OPENROWSET(\n            BULK 'trip_data_green_parquet/year=2020/month=01/*.parquet',\n            DATA_SOURCE = 'NYC_Taxi_Raw',\n            FORMAT = 'PARQUET'\n        ) AS TripData\n)\n\nSELECT \n       CTE_TaxiZone.Borough, \n       COUNT(1) AS TotalTrips,\n       SUM(CASE WHEN CTE_PaymentType.PaymentTypeDescription = 'Cash' THEN 1 ELSE 0 END) AS CashTrips,\n       SUM(CASE WHEN CTE_PaymentType.PaymentTypeDescription = 'Credit card' THEN 1 ELSE 0 END) AS CardTrips,\n       CAST((SUM(CASE WHEN CTE_PaymentType.PaymentTypeDescription = 'Cash' THEN 1 ELSE 0 END)/ CAST(COUNT(1) AS DECIMAL)) * 100 AS DECIMAL(5, 2)) AS CashTripsPercentage,\n       CAST((SUM(CASE WHEN CTE_PaymentType.PaymentTypeDescription = 'Credit card' THEN 1 ELSE 0 END)/ CAST(COUNT(1) AS DECIMAL)) * 100 AS DECIMAL(5, 2)) AS CardTripsPercentage\nFROM CTE_TripData \n    LEFT JOIN CTE_PaymentType ON (CTE_TripData.PaymentType = CTE_PaymentType.PaymentType)\n    LEFT JOIN CTE_TaxiZone    ON (CTE_TripData.PULocationId = CTE_TaxiZone.LocationID)\nWHERE CTE_PaymentType.PaymentTypeDescription IN ('Cash', 'Credit card')\nGROUP BY CTE_TaxiZone.Borough\nORDER BY CTE_TaxiZone.Borough;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/cost_control')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -215,7 +238,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/identify_duplicates')]",
+			"name": "[concat(parameters('workspaceName'), '/identify_counts')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -223,7 +246,7 @@
 					"name": "data_discovery"
 				},
 				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\n\n-- Explore Top\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE,\n        FIRSTROW = 2\n    ) \n    WITH(\n        location_id     SMALLINT    1\n        ,borough        VARCHAR(15) 2\n        ,zone           VARCHAR(50) 3   \n        ,service_zone   VARCHAR(15) 4\n    ) AS TaxiZone\n\n\n-- Check for Duplicate LocationIDs\nSELECT\n    location_id\n    ,COUNT(1) AS location_id_count \nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE,\n        FIRSTROW = 2\n    ) \n    WITH(\n        location_id     SMALLINT    1\n        ,borough        VARCHAR(15) 2\n        ,zone           VARCHAR(50) 3   \n        ,service_zone   VARCHAR(15) 4\n    ) AS TaxiZone\nGROUP BY location_id\nHAVING COUNT (1) > 1\nORDER BY location_id ASC;\n\n\n-- Check Record Count Per Borough\nSELECT\n    borough\n    ,COUNT(1) AS borough_count \nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE,\n        FIRSTROW = 2\n    ) \n    WITH(\n        location_id     SMALLINT    1\n        ,borough        VARCHAR(15) 2\n        ,zone           VARCHAR(50) 3   \n        ,service_zone   VARCHAR(15) 4\n    ) AS TaxiZone\nGROUP BY borough\nORDER BY borough ASC;",
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n\n-- Explore\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE,\n        FIRSTROW = 2\n    ) \n    WITH(\n        location_id     SMALLINT    1\n        ,borough        VARCHAR(15) 2\n        ,zone           VARCHAR(50) 3   \n        ,service_zone   VARCHAR(15) 4\n    ) AS TaxiZone\n\n\n-- Check for Duplicate LocationIDs\nSELECT\n    location_id\n    ,COUNT(1) AS location_id_count \nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE,\n        FIRSTROW = 2\n    ) \n    WITH(\n        location_id     SMALLINT    1\n        ,borough        VARCHAR(15) 2\n        ,zone           VARCHAR(50) 3   \n        ,service_zone   VARCHAR(15) 4\n    ) AS TaxiZone\nGROUP BY location_id\nHAVING COUNT (1) > 1\nORDER BY location_id ASC;\n\n\n-- Check Record Count Per Borough\nSELECT\n    borough\n    ,COUNT(1) AS borough_count \nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE,\n        FIRSTROW = 2\n    ) \n    WITH(\n        location_id     SMALLINT    1\n        ,borough        VARCHAR(15) 2\n        ,zone           VARCHAR(50) 3   \n        ,service_zone   VARCHAR(15) 4\n    ) AS TaxiZone\nGROUP BY borough\nORDER BY borough ASC;",
 					"metadata": {
 						"language": "sql"
 					},
@@ -238,7 +261,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/joining files')]",
+			"name": "[concat(parameters('workspaceName'), '/joining_files')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -246,12 +269,12 @@
 					"name": "data_discovery"
 				},
 				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO",
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Explore Files to Join\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\n\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    ) \n    WITH(\n        location_id     SMALLINT    1\n        ,borough        VARCHAR(15) 2\n        ,zone           VARCHAR(50) 3   \n        ,service_zone   VARCHAR(15) 4\n    ) AS TaxiZone\n\n\n-- Identify NULL PULocationID (No Records)\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\nWHERE PULocationID IS NULL;\n\n\n-- Join Files\nSELECT\n    TaxiZone.Borough\n    ,COUNT(1) AS TripCount\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=*/month=*/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\n\nINNER JOIN\n    OPENROWSET(\n        BULK 'taxi_zone.csv',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        HEADER_ROW = TRUE\n    )\n    WITH(\n        LocationID      SMALLINT    1\n        ,Borough        VARCHAR(15) 2\n        ,Zone           VARCHAR(50) 3   \n        ,ServiceZone    VARCHAR(15) 4\n    ) AS TaxiZone\n\n    ON TripData.PULocationID = TaxiZone.LocationID\n\nGROUP BY TaxiZone.Borough\nORDER BY TaxiZone.Borough;",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"databaseName": "master",
+						"databaseName": "NYC_Taxi_Serverless",
 						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
@@ -361,12 +384,12 @@
 					"name": "data_discovery"
 				},
 				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO",
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Explore\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\n\n\n-- Check TotalAmount Statistics\nSELECT\n    MIN (total_amount)      AS min_total_amount -- Unexpected MIN Value\n    ,MAX (total_amount)     AS max_total_amount\n    ,AVG (total_amount)     AS avg_total_amount\n    ,COUNT(1)               AS record_count\n    ,COUNT(total_amount)    AS record_count_not_null\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=*/month=*/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\n\n\n-- Check Negative TotalAmount Values\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\nWHERE total_amount < 0;\n\n\n-- Check PaymentType Counts for Negative TotalAmount Values\nSELECT\n    payment_type -- Outliers: 3 & 4\n    ,COUNT(1) AS payment_type_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=*/month=*/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\nWHERE total_amount < 0\nGROUP BY payment_type\nORDER BY payment_type ASC;\n\n\n-- Check Payment Type Descriptions (Interested in 3 and 4)\n-- Payment Type Descriptions: 3 = No Charge, 4 = Dispute\nSELECT\n    JSON_VALUE (jsonDoc, '$.payment_type') AS PaymentType\n    ,JSON_VALUE (jsonDoc, '$.payment_type_desc') AS PaymentTypeDescription\nFROM\n    OPENROWSET(\n        BULK 'payment_type.json',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV', -- Even for JSON\n        PARSER_VERSION = '1.0',\n        FIELDTERMINATOR = '0x0b',\n        FIELDQUOTE = '0x0b',\n        ROWTERMINATOR = '0x0a'\n    ) \n    WITH(\n        jsonDoc NVARCHAR(MAX)\n    ) AS PaymentType\n\n\n-- Check Percentage of Payment Type\nSELECT\n    payment_type\n    ,COUNT(1) AS payment_type_count\n    ,COUNT(1) * 100.0 / total_count AS payment_type_percentage\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=*/month=*/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\nCROSS JOIN(\n        SELECT COUNT(1) AS total_count\n        FROM OPENROWSET(\n            BULK 'trip_data_green_parquet/year=*/month=*/*.parquet',\n            DATA_SOURCE = 'NYC_Taxi_Raw',\n            FORMAT = 'PARQUET'\n        ) AS TripData\n    ) AS TotalCount\nGROUP BY payment_type, total_count\nORDER BY payment_type ASC;",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"databaseName": "master",
+						"databaseName": "NYC_Taxi_Serverless",
 						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
@@ -683,12 +706,12 @@
 					"name": "data_discovery"
 				},
 				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO",
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n\n-- Explore\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=2020/month=01/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\n\n\n-- Explore DATEDIFF\n-- Determine Count of Trips per Hour Duration\nSELECT\n    DATEDIFF (MINUTE, lpep_pickup_datetime, lpep_dropoff_datetime) / 60 AS min_range_hour\n    ,(DATEDIFF (MINUTE, lpep_pickup_datetime, lpep_dropoff_datetime) / 60) + 1 AS max_range_hour\n    ,COUNT(1) AS trip_count\nFROM\n    OPENROWSET(\n        BULK 'trip_data_green_parquet/year=*/month=*/*.parquet',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'PARQUET'\n    ) AS TripData\nGROUP BY\n    DATEDIFF (MINUTE, lpep_pickup_datetime, lpep_dropoff_datetime) / 60\n    ,(DATEDIFF (MINUTE, lpep_pickup_datetime, lpep_dropoff_datetime) / 60) + 1\nORDER BY min_range_hour ASC;\n\n\n/* In this case, we would want to delete the records where drop off is < pick up.\nThis is not possible and there are only 2 such records in the data.\n*/",
 					"metadata": {
 						"language": "sql"
 					},
 					"currentConnection": {
-						"databaseName": "master",
+						"databaseName": "NYC_Taxi_Serverless",
 						"poolName": "Built-in"
 					},
 					"resultLimit": 5000
