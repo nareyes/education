@@ -1,5 +1,5 @@
 {
-	"name": "external_file_formats",
+	"name": "create_external_file_formats",
 	"properties": {
 		"folder": {
 			"name": "logical_dw"
