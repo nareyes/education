@@ -1,0 +1,20 @@
+{
+	"name": "create_database_schema",
+	"properties": {
+		"folder": {
+			"name": "logical_dw"
+		},
+		"content": {
+			"query": "Use MASTER\nGO\n\n-- Create & Alter Database\nCREATE DATABASE NYC_Taxi_Serverless\nGO\n\nALTER DATABASE NYC_Taxi_Serverless\nCOLLATE Latin1_General_100_BIN2_UTF8\nGO\n\n\nUSE NYC_Taxi_Serverless\nGO\n\n-- Create Schemas\nCREATE SCHEMA Raw\nGO\n\nCREATE SCHEMA Processed\nGO\n\nCREATE SCHEMA Curated\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
