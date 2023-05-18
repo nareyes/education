@@ -5,12 +5,12 @@
 			"name": "logical_dw"
 		},
 		"content": {
-			"query": "USE NYC_Taxi_Serverless\nGO\n\n",
+			"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Taxi Zone\nCREATE EXTERNAL TABLE Raw.TaxiZone (\n    location_id     SMALLINT\n    ,borough        VARCHAR(15)\n    ,zone           VARCHAR(50)\n    ,service_zone   VARCHAR(15)\n)\n\n    WITH (\n        LOCATION = 'taxi_zone.csv'\n        ,DATA_SOURCE = NYC_Taxi_Raw\n        ,FILE_FORMAT = CSV_File_Format\n    );",
 			"metadata": {
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "master",
+				"databaseName": "NYC_Taxi_Serverless",
 				"poolName": "Built-in"
 			},
 			"resultLimit": 5000

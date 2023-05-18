@@ -10,7 +10,7 @@
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "master",
+				"databaseName": "NYC_Taxi_Serverless",
 				"poolName": "Built-in"
 			},
 			"resultLimit": 5000
