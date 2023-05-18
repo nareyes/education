@@ -36,20 +36,37 @@ WITH (
 Benefits: Cleans queries and makes it easier for developers to query data lake.
 Ability to create reusable sources that point to different zones in the lakehouse.
 */
-CREATE EXTERNAL DATA SOURCE NYC_Taxi_Raw
-WITH (
-    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'
+IF NOT EXISTS (
+    SELECT name FROM sys.external_data_sources 
+    WHERE name = 'NYC_Taxi_Raw'
 )
 
-CREATE EXTERNAL DATA SOURCE NYC_Taxi_Processed
-WITH (
-    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'
+    CREATE EXTERNAL DATA SOURCE NYC_Taxi_Raw
+    WITH (
+        LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'
+    );
+
+
+IF NOT EXISTS (
+    SELECT name FROM sys.external_data_sources 
+    WHERE name = 'NYC_Taxi_Processed'
 )
 
-CREATE EXTERNAL DATA SOURCE NYC_Taxi_Curated
-WITH (
-    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'
+    CREATE EXTERNAL DATA SOURCE NYC_Taxi_Processed
+    WITH (
+        LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'
+    );
+
+
+IF NOT EXISTS (
+    SELECT name FROM sys.external_data_sources 
+    WHERE name = 'NYC_Taxi_Curated'
 )
+
+    CREATE EXTERNAL DATA SOURCE NYC_Taxi_Curated
+    WITH (
+        LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'
+    );
 
 
 -- Examine Data Sources

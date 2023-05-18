@@ -192,15 +192,15 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/debug_error')]",
+			"name": "[concat(parameters('workspaceName'), '/create_database_schema')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"folder": {
-					"name": "query_csv"
+					"name": "logical_dw"
 				},
 				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Generate Error\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        -- HEADER_ROW = TRUE\n        FIRSTROW = 2\n    ) \n    WITH(\n        LocationID      SMALLINT    \n        ,Borough        VARCHAR(15) \n        ,Zone           VARCHAR(5) -- Incorrect Data Size\n        ,ServiceZone    VARCHAR(15)\n    ) AS TaxiZone\n\n\n-- Update Parser Version (Returns Explicit Error)\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '1.0', -- Changed From 2.0\n        -- HEADER_ROW = TRUE\n        FIRSTROW = 2\n    ) \n    WITH(\n        LocationID      SMALLINT    \n        ,Borough        VARCHAR(15) \n        ,Zone           VARCHAR(5) -- Incorrect Data Size\n        ,ServiceZone    VARCHAR(15)\n    ) AS TaxiZone",
+					"query": "Use MASTER\nGO\n\n-- Create & Alter Database\nCREATE DATABASE NYC_Taxi_Serverless\nGO\n\nALTER DATABASE NYC_Taxi_Serverless\nCOLLATE Latin1_General_100_BIN2_UTF8\nGO\n\n\nUSE NYC_Taxi_Serverless\nGO\n\n-- Create Schemas\nCREATE SCHEMA Raw\nGO\n\nCREATE SCHEMA Processed\nGO\n\nCREATE SCHEMA Curated\nGO",
 					"metadata": {
 						"language": "sql"
 					},
@@ -215,7 +215,76 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/external_data_source')]",
+			"name": "[concat(parameters('workspaceName'), '/create_external_data_sources')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "logical_dw"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n/* Template\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop\nWITH(\n    LOCATION = <file_path>,\n    CREDENTIAL = <credential_name>,\n    TYPE = {HADOOP}\n)\n\nCredential and Type Are Optional Arguments\nType = Hadoop Only Supported w/ Dedicated SQL Pools\n*/\n\n-- Create External Data Source\n-- Navigate: Data > Database > External Resources\n-- Using HTTPS or ABFSS Protocol (Container Properties for URL)\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop\nWITH (\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/file-drop/'\n)\n\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_HTTPS\nWITH (\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/file-drop/'\n)\n\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_ABFSS\nWITH (\n    LOCATION = 'abfss://file-drop@synlakehousedev.dfs.core.windows.net/'\n)\n\n\n/*\nBenefits: Cleans queries and makes it easier for developers to query data lake.\nAbility to create reusable sources that point to different zones in the lakehouse.\n*/\nIF NOT EXISTS (\n    SELECT name FROM sys.external_data_sources \n    WHERE name = 'NYC_Taxi_Raw'\n)\n\n    CREATE EXTERNAL DATA SOURCE NYC_Taxi_Raw\n    WITH (\n        LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'\n    );\n\n\nIF NOT EXISTS (\n    SELECT name FROM sys.external_data_sources \n    WHERE name = 'NYC_Taxi_Processed'\n)\n\n    CREATE EXTERNAL DATA SOURCE NYC_Taxi_Processed\n    WITH (\n        LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'\n    );\n\n\nIF NOT EXISTS (\n    SELECT name FROM sys.external_data_sources \n    WHERE name = 'NYC_Taxi_Curated'\n)\n\n    CREATE EXTERNAL DATA SOURCE NYC_Taxi_Curated\n    WITH (\n        LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'\n    );\n\n\n-- Examine Data Sources\nSELECT \n    name \n    ,location\nFROM sys.external_data_sources;\n\n\n-- Drop Data Source\nDROP EXTERNAL DATA SOURCE NYC_Taxi_File_Drop\nGO\n\n\nDROP EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_HTTPS\nGO\n\n\n-- Drop Data Source (IF EXISTS)\nIF EXISTS (\n    SELECT name FROM sys.external_data_sources \n    WHERE name = 'NYC_Taxi_File_Drop_ABFSS'\n)\nBEGIN\n    DROP EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_ABFSS\nEND",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/create_external_file_formats')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "logical_dw"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- CSV\nIF NOT EXISTS (\n    SELECT * FROM sys.external_file_formats\n    WHERE Name = 'CSV_File_Format'\n)\n\n    CREATE EXTERNAL FILE FORMAT CSV_File_Format\n    WITH (\n        FORMAT_TYPE = DELIMITEDTEXT,\n        FORMAT_OPTIONS (\n            FIELD_TERMINATOR = ','\n            ,STRING_DELIMITER = '\"'\n            ,FIRST_ROW = 2\n            ,USE_TYPE_DEFAULT = FALSE -- True Replaces NULLs w/ Default Values\n            ,ENCODING = 'UTF8'\n            ,PARSER_VERSION = '2.0'\n        )\n    );\n\n\n-- PARQUET\n\n\n\n-- DELTA",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/create_external_tables_raw')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "logical_dw"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Taxi Zone\nIF OBJECT_ID ('Raw.TaxiZone') IS NOT NULL\n    DROP EXTERNAL TABLE Raw.TaxiZone\n    GO\n\nCREATE EXTERNAL TABLE Raw.TaxiZone (\n    LocationID      SMALLINT\n    ,Borough        VARCHAR(15)\n    ,Zone           VARCHAR(50)\n    ,ServiceZone    VARCHAR(15)\n)\n\n    WITH (\n        LOCATION = 'taxi_zone.csv'\n        ,DATA_SOURCE = NYC_Taxi_Raw\n        ,FILE_FORMAT = CSV_File_Format\n        ,REJECT_VALUE = 10\n        ,REJECTED_ROW_LOCATION = 'rejections/tax_zone'\n    );\n\nSELECT * FROM Raw.TaxiZone;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/debug_error')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -223,7 +292,7 @@
 					"name": "query_csv"
 				},
 				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Create External Data Source\n-- Navigate: Data > Database > External Resources\n-- Using HTTPS or ABFSS Protocol\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop\nWITH(\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/file-drop/'\n)\n\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_HTTPS\nWITH(\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/file-drop/'\n)\n\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_ABFSS\nWITH(\n    LOCATION = 'abfss://file-drop@synlakehousedev.dfs.core.windows.net/'\n)\n\n\n/*\nBenefits: Cleans queries and makes it easier for developers to query data lake.\nAbility to create reusable sources that point to different zones in the lakehouse.\n*/\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_Raw\nWITH(\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'\n)\n\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_Processed\nWITH(\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'\n)\n\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_Curated\nWITH(\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'\n)\n\n\n-- Examine Data Sources\nSELECT \n    name \n    ,location\nFROM sys.external_data_sources;\n\n\n-- Drop Data Source\nDROP EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_HTTPS\nGO\n\n\n-- Drop Data Source (IF EXISTS)\nIF EXISTS(\n    SELECT name FROM sys.external_data_sources WHERE name = 'NYC_Taxi_File_Drop_ABFSS'\n)\nBEGIN\n    DROP EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_ABFSS\nEND\n\n\n-- Query Using External Data Source\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'taxi_zone.csv',\n        DATA_SOURCE = 'NYC_Taxi_Raw',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        -- HEADER_ROW = TRUE\n        FIRSTROW = 2\n    ) \n    WITH(\n        LocationID      SMALLINT    \n        ,Borough        VARCHAR(15) \n        ,Zone           VARCHAR(50) \n        ,ServiceZone    VARCHAR(15) 4\n    ) AS TaxiZone",
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Generate Error\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '2.0',\n        -- HEADER_ROW = TRUE\n        FIRSTROW = 2\n    ) \n    WITH(\n        LocationID      SMALLINT    \n        ,Borough        VARCHAR(15) \n        ,Zone           VARCHAR(5) -- Incorrect Data Size\n        ,ServiceZone    VARCHAR(15)\n    ) AS TaxiZone\n\n\n-- Update Parser Version (Returns Explicit Error)\nSELECT\n    TOP 100 *\nFROM\n    OPENROWSET(\n        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',\n        FORMAT = 'CSV',\n        PARSER_VERSION = '1.0', -- Changed From 2.0\n        -- HEADER_ROW = TRUE\n        FIRSTROW = 2\n    ) \n    WITH(\n        LocationID      SMALLINT    \n        ,Borough        VARCHAR(15) \n        ,Zone           VARCHAR(5) -- Incorrect Data Size\n        ,ServiceZone    VARCHAR(15)\n    ) AS TaxiZone",
 					"metadata": {
 						"language": "sql"
 					},
