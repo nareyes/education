@@ -5,7 +5,7 @@
 			"name": "logical_dw"
 		},
 		"content": {
-			"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Taxi Zone\nCREATE EXTERNAL TABLE Raw.TaxiZone (\n    location_id     SMALLINT\n    ,borough        VARCHAR(15)\n    ,zone           VARCHAR(50)\n    ,service_zone   VARCHAR(15)\n)\n\n    WITH (\n        LOCATION = 'taxi_zone.csv'\n        ,DATA_SOURCE = NYC_Taxi_Raw\n        ,FILE_FORMAT = CSV_File_Format\n    );",
+			"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Taxi Zone\nIF OBJECT_ID ('Raw.TaxiZone') IS NOT NULL\n    DROP EXTERNAL TABLE Raw.TaxiZone\n    GO\n\nCREATE EXTERNAL TABLE Raw.TaxiZone (\n    LocationID      SMALLINT\n    ,Borough        VARCHAR(15)\n    ,Zone           VARCHAR(50)\n    ,ServiceZone    VARCHAR(15)\n)\n\n    WITH (\n        LOCATION = 'taxi_zone.csv'\n        ,DATA_SOURCE = NYC_Taxi_Raw\n        ,FILE_FORMAT = CSV_File_Format\n        ,REJECT_VALUE = 10\n        ,REJECTED_ROW_LOCATION = 'rejections/tax_zone'\n    );\n\nSELECT * FROM Raw.TaxiZone;",
 			"metadata": {
 				"language": "sql"
 			},

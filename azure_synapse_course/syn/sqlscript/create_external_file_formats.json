@@ -5,12 +5,12 @@
 			"name": "logical_dw"
 		},
 		"content": {
-			"query": "USE NYC_Taxi_Serverless\nGO\n\n-- CSV\nCREATE EXTERNAL FILE FORMAT CSV_File_Format\nWITH (\n    FORMAT_TYPE = DELIMITEDTEXT,\n    FORMAT_OPTIONS (\n        FIELD_TERMINATOR = ','\n        ,STRING_DELIMITER = '\"'\n        ,FIRST_ROW = 2\n        ,USE_TYPE_DEFAULT = FALSE -- True Replaces NULLs w/ Default Values\n        ,ENCODING = 'UTF8'\n        ,PARSER_VERSION = '2.0'\n    )\n)\n\n\n-- PARQUET\n\n\n\n-- DELTA",
+			"query": "USE NYC_Taxi_Serverless\nGO\n\n-- CSV\nIF NOT EXISTS (\n    SELECT * FROM sys.external_file_formats\n    WHERE Name = 'CSV_File_Format'\n)\n\n    CREATE EXTERNAL FILE FORMAT CSV_File_Format\n    WITH (\n        FORMAT_TYPE = DELIMITEDTEXT,\n        FORMAT_OPTIONS (\n            FIELD_TERMINATOR = ','\n            ,STRING_DELIMITER = '\"'\n            ,FIRST_ROW = 2\n            ,USE_TYPE_DEFAULT = FALSE -- True Replaces NULLs w/ Default Values\n            ,ENCODING = 'UTF8'\n            ,PARSER_VERSION = '2.0'\n        )\n    );\n\n\n-- PARQUET\n\n\n\n-- DELTA",
 			"metadata": {
 				"language": "sql"
 			},
 			"currentConnection": {
-				"databaseName": "master",
+				"databaseName": "NYC_Taxi_Serverless",
 				"poolName": "Built-in"
 			},
 			"resultLimit": 5000
