@@ -1,5 +1,5 @@
 {
-	"name": "external_data_source",
+	"name": "external_data_sources",
 	"properties": {
 		"folder": {
 			"name": "logical_dw"
