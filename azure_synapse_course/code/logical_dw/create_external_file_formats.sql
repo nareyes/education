@@ -21,6 +21,26 @@ IF NOT EXISTS (
     );
 
 
+-- TSV
+IF NOT EXISTS (
+    SELECT * FROM sys.external_file_formats
+    WHERE Name = 'TSV_File_Format'
+)
+
+    CREATE EXTERNAL FILE FORMAT TSV_File_Format
+    WITH (
+        FORMAT_TYPE = DELIMITEDTEXT,
+        FORMAT_OPTIONS (
+            FIELD_TERMINATOR = '\t'
+            ,STRING_DELIMITER = '"'
+            ,FIRST_ROW = 2
+            ,USE_TYPE_DEFAULT = FALSE -- True Replaces NULLs w/ Default Values
+            ,ENCODING = 'UTF8'
+            ,PARSER_VERSION = '2.0'
+        )
+    );
+
+
 -- PARQUET
 
 

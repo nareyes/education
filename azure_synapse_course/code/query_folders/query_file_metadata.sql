@@ -75,3 +75,33 @@ WHERE 1=1
     AND TripData.filepath(2) IN ('06', '07', '08')
 GROUP BY TripData.filepath(), TripData.filepath(1), TripData.filepath(2), TripData.filepath(3)
 ORDER BY file_path ASC;
+
+
+-- Examine Data Types
+-- Escape Single Quotes in Query
+EXEC sp_describe_first_result_set N'
+    SELECT
+        TOP 100 *
+    FROM
+        OPENROWSET(
+            BULK ''https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv'',
+            FORMAT = ''CSV'',
+            PARSER_VERSION = ''2.0'',
+            HEADER_ROW = TRUE
+        ) AS TaxiZone
+'
+
+
+-- Determine Actual Max Length per Column
+SELECT
+    MAX(LEN(LocationID)) AS Len_LocationID
+    ,MAX(LEN(Borough)) AS Len_Borough
+    ,MAX(LEN(Zone)) AS Len_Zone
+    ,MAX(LEN(service_zone)) AS Len_Service_Zone
+FROM
+    OPENROWSET(
+        BULK 'https://synlakehousedev.dfs.core.windows.net/file-drop/taxi_zone.csv',
+        FORMAT = 'CSV',
+        PARSER_VERSION = '2.0',
+        HEADER_ROW = TRUE
+    ) AS TaxiZone
