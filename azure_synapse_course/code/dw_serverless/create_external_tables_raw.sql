@@ -97,7 +97,7 @@ CREATE EXTERNAL TABLE Raw.Vendor (
 SELECT * FROM Raw.Vendor;
 
 
--- Trip Data
+-- Trip Data CSV
 IF OBJECT_ID ('Raw.TripCSV') IS NOT NULL
     DROP EXTERNAL TABLE Raw.TripCSV
     GO
@@ -130,7 +130,86 @@ CREATE EXTERNAL TABLE Raw.TripCSV (
         ,DATA_SOURCE = NYC_Taxi_Raw
         ,FILE_FORMAT = CSV_File_Format
         ,REJECT_VALUE = 10
-        ,REJECTED_ROW_LOCATION = 'rejections/trip_type'
+        ,REJECTED_ROW_LOCATION = 'rejections/trip_csv'
     );
 
 SELECT TOP 100 * FROM Raw.TripCSV;
+
+
+-- Trip Data Parquet (Column Names Need to Match Source)
+IF OBJECT_ID ('Raw.TripParquet') IS NOT NULL
+    DROP EXTERNAL TABLE Raw.TripParquet
+    GO
+
+CREATE EXTERNAL TABLE Raw.TripParquet (
+    VendorID	            TINYINT
+    ,lpep_pickup_datetime	DATETIME2(0) 2
+    ,lpep_dropoff_datetime	DATETIME2(0)
+    ,store_and_fwd_flag	    VARCHAR(10)
+    ,RatecodeID	            SMALLINT
+    ,PULocationID	        SMALLINT
+    ,DOLocationID	        SMALLINT
+    ,passenger_count	    TINYINT
+    ,trip_distance	        FLOAT
+    ,fare_amount	        FLOAT
+    ,extra	                FLOAT
+    ,mta_tax	            FLOAT
+    ,tip_amount	            FLOAT
+    ,tolls_amount	        FLOAT
+    ,ehail_fee	            VARCHAR(50)
+    ,improvement_surcharge  FLOAT
+    ,total_amount	        FLOAT
+    ,payment_type	        BIGINT
+    ,trip_type              BIGINT
+    ,congestion_surcharge   FLOAT
+)
+
+    WITH (
+        LOCATION = 'trip_data_green_parquet/**'
+        ,DATA_SOURCE = NYC_Taxi_Raw
+        ,FILE_FORMAT = Parquet_File_Format
+        ,REJECT_VALUE = 10
+        ,REJECTED_ROW_LOCATION = 'rejections/trip_parquet'
+    );
+
+SELECT TOP 100 * FROM Raw.TripParquet;
+
+
+-- Trip Data Delta (Column Names Need to Match Source)
+IF OBJECT_ID ('Raw.TripDelta') IS NOT NULL
+    DROP EXTERNAL TABLE Raw.TripDelta
+    GO
+
+CREATE EXTERNAL TABLE Raw.TripDelta (
+    VendorID	            TINYINT
+    ,lpep_pickup_datetime	DATETIME2(0)
+    ,lpep_dropoff_datetime	DATETIME2(0)
+    ,store_and_fwd_flag	    VARCHAR(10)
+    ,RatecodeID	            SMALLINT
+    ,PULocationID	        SMALLINT
+    ,DOLocationID	        SMALLINT
+    ,passenger_count	    TINYINT
+    ,trip_distance	        FLOAT
+    ,fare_amount	        FLOAT
+    ,extra	                FLOAT
+    ,mta_tax	            FLOAT
+    ,tip_amount	            FLOAT
+    ,tolls_amount	        FLOAT
+    ,ehail_fee	            VARCHAR(50)
+    ,improvement_surcharge  FLOAT
+    ,total_amount	        FLOAT
+    ,payment_type	        BIGINT
+    ,trip_type              BIGINT
+    ,congestion_surcharge   FLOAT
+)
+
+    WITH (
+        LOCATION = 'trip_data_green_delta'
+        ,DATA_SOURCE = NYC_Taxi_Raw
+        ,FILE_FORMAT = Delta_File_Format
+        -- Reject Value Not Supported
+        -- ,REJECT_VALUE = 10
+        -- ,REJECTED_ROW_LOCATION = 'rejections/trip_delta'
+    );
+
+SELECT TOP 100 * FROM Raw.TripDelta;
