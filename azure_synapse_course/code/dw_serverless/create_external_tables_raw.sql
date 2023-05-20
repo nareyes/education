@@ -98,6 +98,7 @@ SELECT * FROM Raw.Vendor;
 
 
 -- Trip Data CSV
+-- External Tables Do Not Support Partition Pruning
 IF OBJECT_ID ('Raw.TripCSV') IS NOT NULL
     DROP EXTERNAL TABLE Raw.TripCSV
     GO
@@ -137,13 +138,14 @@ SELECT TOP 100 * FROM Raw.TripCSV;
 
 
 -- Trip Data Parquet (Column Names Need to Match Source)
+-- External Tables Do Not Support Partition Pruning
 IF OBJECT_ID ('Raw.TripParquet') IS NOT NULL
     DROP EXTERNAL TABLE Raw.TripParquet
     GO
 
 CREATE EXTERNAL TABLE Raw.TripParquet (
     VendorID	            TINYINT
-    ,lpep_pickup_datetime	DATETIME2(0) 2
+    ,lpep_pickup_datetime	DATETIME2(0)
     ,lpep_dropoff_datetime	DATETIME2(0)
     ,store_and_fwd_flag	    VARCHAR(10)
     ,RatecodeID	            SMALLINT
@@ -176,6 +178,7 @@ SELECT TOP 100 * FROM Raw.TripParquet;
 
 
 -- Trip Data Delta (Column Names Need to Match Source)
+-- External Tables Do Not Support Partition Pruning
 IF OBJECT_ID ('Raw.TripDelta') IS NOT NULL
     DROP EXTERNAL TABLE Raw.TripDelta
     GO
