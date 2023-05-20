@@ -7,7 +7,13 @@
 -- Create a system-versioned temporal table called Departments with an associated history table called DepartmentsHistory in the database TSQLV4. 
 -- The table should have the following columns: deptid INT, deptname VARCHAR(25), and mgrid INT, all disallowing NULLs. 
 -- Also include columns called validfrom and validto that define the validity period of the row. Define those with precision zero (1 second), and make them hidden.
-DROP TABLE IF EXISTS dbo.Departments, dbo.DepartmentsHistory
+IF OBJECT_ID(N'dbo.Departments', N'U') IS NOT NULL
+BEGIN
+    IF OBJECTPROPERTY(OBJECT_ID(N'dbo.Departments', N'U'), N'TableTemporalType') = 2
+        ALTER TABLE dbo.Departments
+            SET ( SYSTEM_VERSIONING = OFF );
+    DROP TABLE IF EXISTS dbo.DepartmentsHistory, dbo.Departments;
+END
 GO
 
 CREATE TABLE dbo.Departments (
@@ -18,11 +24,15 @@ CREATE TABLE dbo.Departments (
     ,validto     DATETIME2(0) GENERATED ALWAYS AS ROW END   HIDDEN NOT NULL
     ,PERIOD FOR SYSTEM_TIME (validfrom, validto)
 )
-WITH (
-    SYSTEM_VERSIONING = ON (
-        HISTORY_TABLE = dbo.DepartmentsHistory
-    )
+
+    WITH (
+        SYSTEM_VERSIONING = ON (
+            HISTORY_TABLE = dbo.DepartmentsHistory
+        )
 );
+
+SELECT *, validfrom, validto FROM dbo.Departments;
+SELECT * FROM dbo.DepartmentsHistory;
 
 /*
 Requirements for creating system-versioned temporal tables;
@@ -46,6 +56,8 @@ INSERT INTO dbo.Departments (deptid, deptname, mgrid)
         (2, 'IT', 5),
         (3, 'Sales', 11),
         (4, 'Marketing', 13);
+
+SELECT *, validfrom, validto FROM dbo.Departments;
 
 -- EXERCISE 2.2
 -- In one transaction, update the name of department 3 to Sales and Marketing and delete department 4. Call the point in time when the transaction starts P2.
@@ -71,13 +83,13 @@ UPDATE dbo.Departments
 WHERE mgrid = 3;
 
 -- Inspect Temporal Table Changes
-SELECT * FROM dbo.Departments;
+SELECT *, validfrom, validto FROM dbo.Departments;
 SELECT * FROM dbo.DepartmentsHistory;
 
 
 -- EXERCISE 3.1
 -- Query the current state of the table Departments.
-SELECT * FROM dbo.Departments;
+SELECT *, validfrom, validto FROM dbo.Departments;
 
 -- EXERCISE 3.2
 -- Query the state of the table Departments at a point in time after P2 and before P3.
@@ -87,19 +99,28 @@ FOR SYSTEM_TIME AS OF '2023-04-28 10:59:30';
 -- EXERCISE 3.3
 -- Query the state of the table Departments in the period between P2 and P3.
 -- Be explicit about the column names in the SELECT list, and include the validfrom and validto columns.
-
 SELECT
     deptid
     ,deptname
     ,mgrid
     ,validfrom
-    validto
+    ,validto
 FROM dbo.Departments
 FOR SYSTEM_TIME BETWEEN '2023-04-28 10:59:25' AND '2023-04-28 11:00:10'; -- P1 and P2
 
 
 -- EXERCISE 4
 -- Drop the table Departments and its associated history table.
+IF OBJECT_ID(N'dbo.Departments', N'U') IS NOT NULL
+BEGIN
+    IF OBJECTPROPERTY(OBJECT_ID(N'dbo.Departments', N'U'), N'TableTemporalType') = 2
+        ALTER TABLE dbo.Departments
+            SET ( SYSTEM_VERSIONING = OFF );
+    DROP TABLE IF EXISTS dbo.DepartmentsHistory, dbo.Departments;
+END
+GO
+
+-- Alternate
 ALTER TABLE dbo.Departments
     SET (
         SYSTEM_VERSIONING = OFF
