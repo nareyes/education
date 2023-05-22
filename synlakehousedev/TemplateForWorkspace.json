@@ -200,7 +200,7 @@
 					"name": "dw_serverless/create_external_tables_processed"
 				},
 				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Data Written to ADLS Cannot be Deleted Here\n-- Delete via Pipelines and Call Script as a Best Practice\n\n-- Calendar\nIF OBJECT_ID ('Processed.Calendar') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.Calendar\n    GO\n\nCREATE EXTERNAL TABLE Processed.Calendar\n\n    WITH (\n        LOCATION = 'calendar'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    -- SELECT *\n    -- FROM Raw.Calendar;\n\n    -- Alternate: Use OPENROWSET if Raw Table Does Not Exists\n    -- Preferred Method, Simple Column Renaming\n    SELECT\n        *\n    FROM\n        OPENROWSET(\n            BULK 'calendar.csv',\n            DATA_SOURCE = 'NYC_Taxi_Raw',\n            FORMAT = 'CSV',\n            PARSER_VERSION = '2.0',\n            FIRSTROW = 2\n        ) \n        WITH(\n            DateKey         INT         1\n            ,Date           DATE        2\n            ,Year           SMALLINT    3\n            ,Month          TINYINT     4\n            ,Day            TINYINT     5\n            ,DayName        VARCHAR(10) 6\n            ,DayOfYear      SMALLINT    7\n            ,WeekOfMonth    TINYINT     8\n            ,WeekOfYear     TINYINT     9\n            ,MonthName      VARCHAR(10) 10\n            ,YearMonth      INT         11\n            ,YearWeek       INT         12\n        ) AS Calendar\n\n\n-- Query Processed Table\nSELECT TOP 10 * FROM Processed.Calendar;",
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Data Written to ADLS Cannot be Deleted Here\n-- Delete via Pipelines and Call Script as a Best Practice\n\n-- Calendar\nIF OBJECT_ID ('Processed.Calendar') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.Calendar\n    GO\n\nCREATE EXTERNAL TABLE Processed.Calendar\n\n    WITH (\n        LOCATION = 'calendar'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    -- SELECT *\n    -- FROM Raw.Calendar;\n\n    -- Alternate: Use OPENROWSET if Raw Table Does Not Exists\n    -- Preferred Method, Simple Column Renaming\n    SELECT\n        *\n    FROM\n        OPENROWSET (\n            BULK 'calendar.csv',\n            DATA_SOURCE = 'NYC_Taxi_Raw',\n            FORMAT = 'CSV',\n            PARSER_VERSION = '2.0',\n            FIRSTROW = 2\n        )\n\n        WITH (\n            DateKey         INT         1\n            ,Date           DATE        2\n            ,Year           SMALLINT    3\n            ,Month          TINYINT     4\n            ,Day            TINYINT     5\n            ,DayName        VARCHAR(10) 6\n            ,DayOfYear      SMALLINT    7\n            ,WeekOfMonth    TINYINT     8\n            ,WeekOfYear     TINYINT     9\n            ,MonthName      VARCHAR(10) 10\n            ,YearMonth      INT         11\n            ,YearWeek       INT         12\n        ) AS Calendar\n\n\n-- Query Processed Table\n-- SELECT TOP 10 * FROM Processed.Calendar;",
 					"metadata": {
 						"language": "sql"
 					},
@@ -315,7 +315,53 @@
 					"name": "dw_serverless/create_external_tables_processed"
 				},
 				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Data Written to ADLS Cannot be Deleted Here\n-- Delete via Pipelines and Call Script as a Best Practice\n\n-- Taxi Zone\nIF OBJECT_ID ('Processed.TaxiZone') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.TaxiZone\n    GO\n\nCREATE EXTERNAL TABLE Processed.TaxiZone\n\n    WITH (\n        LOCATION = 'taxi_zone'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    -- SELECT *\n    -- FROM Raw.TaxiZone;\n\n    -- Alternate: Use OPENROWSET if Raw Table Does Not Exists\n    -- Preferred Method, Simple Column Renaming\n    SELECT\n        *\n    FROM\n        OPENROWSET(\n            BULK 'taxi_zone.csv'\n            ,DATA_SOURCE = 'NYC_Taxi_Raw'\n            ,FORMAT = 'CSV'\n            ,PARSER_VERSION = '2.0'\n            ,HEADER_ROW = TRUE\n        ) \n        WITH(\n            LocationID      SMALLINT    1\n            ,Borough        VARCHAR(15) 2\n            ,Zone           VARCHAR(50) 3\n            ,ServiceZone    VARCHAR(15) 4\n        ) AS TaxiZone\n\n\n-- Query Processed Table\nSELECT TOP 10 * FROM Processed.TaxiZone;",
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Data Written to ADLS Cannot be Deleted Here\n-- Delete via Pipelines and Call Script as a Best Practice\n\n-- Taxi Zone\nIF OBJECT_ID ('Processed.TaxiZone') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.TaxiZone\n    GO\n\nCREATE EXTERNAL TABLE Processed.TaxiZone\n\n    WITH (\n        LOCATION = 'taxi_zone'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    -- SELECT *\n    -- FROM Raw.TaxiZone;\n\n    -- Alternate: Use OPENROWSET if Raw Table Does Not Exists\n    -- Preferred Method, Simple Column Renaming\n    SELECT\n        *\n    FROM\n        OPENROWSET (\n            BULK 'taxi_zone.csv'\n            ,DATA_SOURCE = 'NYC_Taxi_Raw'\n            ,FORMAT = 'CSV'\n            ,PARSER_VERSION = '2.0'\n            ,HEADER_ROW = TRUE\n        )\n\n        WITH (\n            LocationID      SMALLINT    1\n            ,Borough        VARCHAR(15) 2\n            ,Zone           VARCHAR(50) 3\n            ,ServiceZone    VARCHAR(15) 4\n        ) AS TaxiZone\n\n\n-- Query Processed Table\n-- SELECT TOP 10 * FROM Processed.TaxiZone;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/create_trip_type_processed')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "dw_serverless/create_external_tables_processed"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Data Written to ADLS Cannot be Deleted Here\n-- Delete via Pipelines and Call Script as a Best Practice\n\n-- Taxi Zone\nIF OBJECT_ID ('Processed.TripType') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.TripType\n    GO\n\nCREATE EXTERNAL TABLE Processed.TripType\n\n    WITH (\n        LOCATION = 'trip_type'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    -- SELECT *\n    -- FROM Raw.TripType;\n\n    -- Alternate: Use OPENROWSET if Raw Table Does Not Exists\n    -- Preferred Method, Simple Column Renaming\n    SELECT\n        *\n    FROM\n        OPENROWSET (\n            BULK 'trip_type.tsv',\n            DATA_SOURCE = 'NYC_Taxi_Raw',\n            FORMAT = 'CSV',\n            FIELDTERMINATOR = '\\t',\n            PARSER_VERSION = '2.0',\n            HEADER_ROW = TRUE\n        )\n\n        WITH (\n            TripType                SMALLINT    1\n            ,TripTypeDescription    VARCHAR(25) 2\n        ) AS TripType\n\n\n-- Query Processed Table\n-- SELECT TOP 10 * FROM Processed.TripType;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/create_vendor_processed')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "dw_serverless/create_external_tables_processed"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Data Written to ADLS Cannot be Deleted Here\n-- Delete via Pipelines and Call Script as a Best Practice\n\n-- Taxi Zone\nIF OBJECT_ID ('Processed.Vendor') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.Vendor\n    GO\n\nCREATE EXTERNAL TABLE Processed.Vendor\n\n    WITH (\n        LOCATION = 'vendor'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    -- SELECT *\n    -- FROM Raw.Vendor;\n\n    -- Alternate: Use OPENROWSET if Raw Table Does Not Exists\n    -- Preferred Method, Simple Column Renaming\n    SELECT\n        *\n    FROM\n        OPENROWSET(\n            BULK 'vendor.csv'\n            ,DATA_SOURCE = 'NYC_Taxi_Raw'\n            ,FORMAT = 'CSV'\n            ,PARSER_VERSION = '2.0'\n            ,HEADER_ROW = TRUE\n        )\n\n        WITH (\n            VendorID    SMALLINT    1\n            ,VendorName VARCHAR(50) 2\n        ) AS Vendor\n\n\n-- Query Processed Table\n-- SELECT TOP 10 * FROM Processed.Vendor;",
 					"metadata": {
 						"language": "sql"
 					},
