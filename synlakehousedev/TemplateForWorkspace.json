@@ -223,7 +223,7 @@
 					"name": "dw_serverless"
 				},
 				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\n/* Template\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop\nWITH(\n    LOCATION = <file_path>,\n    CREDENTIAL = <credential_name>,\n    TYPE = {HADOOP}\n)\n\nCredential and Type Are Optional Arguments\nType = Hadoop Only Supported w/ Dedicated SQL Pools\n*/\n\n-- Create External Data Source\n-- Navigate: Data > Database > External Resources\n-- Using HTTPS or ABFSS Protocol (Container Properties for URL)\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop\nWITH (\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/file-drop/'\n)\n\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_HTTPS\nWITH (\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/file-drop/'\n)\n\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_ABFSS\nWITH (\n    LOCATION = 'abfss://file-drop@synlakehousedev.dfs.core.windows.net/'\n)\n\n\n/*\nBenefits: Cleans queries and makes it easier for developers to query data lake.\nAbility to create reusable sources that point to different zones in the lakehouse.\n*/\nIF NOT EXISTS (\n    SELECT name FROM sys.external_data_sources \n    WHERE name = 'NYC_Taxi_Raw'\n)\n\n    CREATE EXTERNAL DATA SOURCE NYC_Taxi_Raw\n    WITH (\n        LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'\n    );\n\n\nIF NOT EXISTS (\n    SELECT name FROM sys.external_data_sources \n    WHERE name = 'NYC_Taxi_Processed'\n)\n\n    CREATE EXTERNAL DATA SOURCE NYC_Taxi_Processed\n    WITH (\n        LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'\n    );\n\n\nIF NOT EXISTS (\n    SELECT name FROM sys.external_data_sources \n    WHERE name = 'NYC_Taxi_Curated'\n)\n\n    CREATE EXTERNAL DATA SOURCE NYC_Taxi_Curated\n    WITH (\n        LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'\n    );\n\n\n-- Examine Data Sources\nSELECT \n    name \n    ,location\nFROM sys.external_data_sources;\n\n\n-- Drop Data Source\nDROP EXTERNAL DATA SOURCE NYC_Taxi_File_Drop\nGO\n\n\nDROP EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_HTTPS\nGO\n\n\n-- Drop Data Source (IF EXISTS)\nIF EXISTS (\n    SELECT name FROM sys.external_data_sources \n    WHERE name = 'NYC_Taxi_File_Drop_ABFSS'\n)\nBEGIN\n    DROP EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_ABFSS\nEND",
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n/* Template\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop\nWITH(\n    LOCATION = <file_path>,\n    CREDENTIAL = <credential_name>,\n    TYPE = {HADOOP}\n)\n\nCredential and Type Are Optional Arguments\nType = Hadoop Only Supported w/ Dedicated SQL Pools\n*/\n\n-- Create External Data Source\n-- Navigate: Data > Database > External Resources\n-- Using HTTPS or ABFSS Protocol (Container Properties for URL)\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop\nWITH (\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/file-drop/'\n)\n\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_HTTPS\nWITH (\n    LOCATION = 'https://synlakehousedev.dfs.core.windows.net/file-drop/'\n)\n\nCREATE EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_ABFSS\nWITH (\n    LOCATION = 'abfss://file-drop@synlakehousedev.dfs.core.windows.net/'\n)\n\n\n/*\nBenefits: Cleans queries and makes it easier for developers to query data lake.\nAbility to create reusable sources that point to different zones in the lakehouse.\n*/\nIF NOT EXISTS (\n    SELECT name FROM sys.external_data_sources \n    WHERE name = 'NYC_Taxi_Raw'\n)\n\n    CREATE EXTERNAL DATA SOURCE NYC_Taxi_Raw\n    WITH (\n        LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'\n    );\n\n\nIF NOT EXISTS (\n    SELECT name FROM sys.external_data_sources \n    WHERE name = 'NYC_Taxi_Processed'\n)\n\n    CREATE EXTERNAL DATA SOURCE NYC_Taxi_Processed\n    WITH (\n        LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/processed'\n    );\n\n\nIF NOT EXISTS (\n    SELECT name FROM sys.external_data_sources \n    WHERE name = 'NYC_Taxi_Curated'\n)\n\n    CREATE EXTERNAL DATA SOURCE NYC_Taxi_Curated\n    WITH (\n        LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/curated'\n    );\n\n\n-- Examine Data Sources\nSELECT \n    name \n    ,location\nFROM sys.external_data_sources;\n\n\n-- Drop Data Source\nDROP EXTERNAL DATA SOURCE NYC_Taxi_File_Drop\nGO\n\n\nDROP EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_HTTPS\nGO\n\n\n-- Drop Data Source (IF EXISTS)\nIF EXISTS (\n    SELECT name FROM sys.external_data_sources \n    WHERE name = 'NYC_Taxi_Curated'\n)\nBEGIN\n    DROP EXTERNAL DATA SOURCE NYC_Taxi_Curated\nEND",
 					"metadata": {
 						"language": "sql"
 					},
@@ -823,6 +823,29 @@
 			},
 			"dependsOn": [],
 			"location": "centralus"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/create_taxi_zone_processed')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "dw_serverless/create_external_tables_processed"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Data Written to ADLS Cannot be Deleted Here\n-- Delete via Pipelines and Call Script as a Best Practice\n\n-- Taxi Zone\nIF OBJECT_ID ('Processed.TaxiZone') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.TaxiZone\n    GO\n\nCREATE EXTERNAL TABLE Processed.TaxiZone\n\n    WITH (\n        LOCATION = 'taxi_zone'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\nSELECT *\nFROM Raw.TaxiZone;\n\n    -- Alternate: Use OPENROWSET if Raw Table Does Not Exists\n    -- SELECT\n    --     *\n    -- FROM\n    --     OPENROWSET(\n    --         BULK 'taxi_zone.csv'creat\n    --         ,DATA_SOURCE = 'NYC_Taxi_Raw'\n    --         ,FORMAT = 'CSV'\n    --         ,PARSER_VERSION = '2.0'\n    --         ,HEADER_ROW = TRUE\n    --     ) \n    --     WITH(\n    --         LocationID      SMALLINT\n    --         ,Borough        VARCHAR(15)\n    --         ,Zone           VARCHAR(50)\n    --         ,service_zone   VARCHAR(15)\n    --     ) AS TaxiZone",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
 		}
 	]
 }
