@@ -1,0 +1,20 @@
+{
+	"name": "create_rate_code_json_processed",
+	"properties": {
+		"folder": {
+			"name": "dw_serverless/create_external_tables_processed"
+		},
+		"content": {
+			"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Data Written to ADLS Cannot be Deleted Here\n-- Delete via Pipelines and Call Script as a Best Practice\n\n-- Taxi Zone\nIF OBJECT_ID ('Processed.RateCode') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.RateCode\n    GO\n\nCREATE EXTERNAL TABLE Processed.RateCode\n\n    WITH (\n        LOCATION = 'rate_code'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    -- SELECT *\n    -- FROM Raw.View_RateCode;\n\n    -- Alternate: Use OPENROWSET if Raw Table Does Not Exists\n    -- Preferred Method, Simple Column Renaming\n    SELECT\n        RateCodeID\n        ,RateCodeDescription\n    FROM\n        OPENROWSET (\n            BULK 'rate_code.json',\n            DATA_SOURCE = 'NYC_Taxi_Raw',\n            FORMAT = 'CSV', -- Even for JSON\n            PARSER_VERSION = '1.0',\n            FIELDTERMINATOR = '0x0b',\n            FIELDQUOTE = '0x0b',\n            ROWTERMINATOR = '0x0b' -- Vertical Tab\n        ) \n\n            WITH (\n                jsonDoc NVARCHAR(MAX)\n            ) AS RateCode\n\n    CROSS APPLY OPENJSON(jsonDoc) -- Return Key Value Pairs\n        WITH (\n            RateCodeID              TINYINT     '$.rate_code_id'\n            ,RateCodeDescription    VARCHAR(20) '$.rate_code'\n        )\n\n\n-- Query Processed Table\n-- SELECT TOP 10 * FROM Processed.RateCode;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "NYC_Taxi_Serverless",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
