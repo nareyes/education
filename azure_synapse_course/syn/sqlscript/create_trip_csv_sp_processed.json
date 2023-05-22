@@ -1,0 +1,21 @@
+{
+	"name": "create_trip_csv_sp_processed",
+	"properties": {
+		"description": "Proper Partitions",
+		"folder": {
+			"name": "dw_serverless/create_external_tables_processed"
+		},
+		"content": {
+			"query": "USE NYC_Taxi_Serverless\nGO\n\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "NYC_Taxi_Serverless",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
