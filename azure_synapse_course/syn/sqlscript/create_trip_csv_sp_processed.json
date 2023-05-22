@@ -3,7 +3,7 @@
 	"properties": {
 		"description": "Proper Partitions",
 		"folder": {
-			"name": "dw_serverless/create_external_tables_processed"
+			"name": "dw_serverless/create_objects_tables_processed"
 		},
 		"content": {
 			"query": "USE NYC_Taxi_Serverless\nGO\n\n",

@@ -2,7 +2,7 @@
 	"name": "create_payment_type_json_processed",
 	"properties": {
 		"folder": {
-			"name": "dw_serverless/create_external_tables_processed"
+			"name": "dw_serverless/create_objects_tables_processed"
 		},
 		"content": {
 			"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Data Written to ADLS Cannot be Deleted Here\n-- Delete via Pipelines and Call Script as a Best Practice\n\n-- Taxi Zone\nIF OBJECT_ID ('Processed.PaymentType') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.PaymentType\n    GO\n\nCREATE EXTERNAL TABLE Processed.PaymentType\n\n    WITH (\n        LOCATION = 'payment_type'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    -- SELECT *\n    -- FROM Raw.View_RateCode;\n\n    -- Alternate: Use OPENROWSET if Raw Table Does Not Exists\n    -- Preferred Method, Simple Column Renaming\n    SELECT\n        PaymentType\n        ,PaymentTypeDescription\n    FROM\n        OPENROWSET (\n            BULK 'payment_type.json'\n            ,DATA_SOURCE = 'NYC_Taxi_Raw'\n            ,FORMAT = 'CSV' -- Even for JSON\n            ,PARSER_VERSION = '1.0'\n            ,FIELDTERMINATOR = '0x0b'\n            ,FIELDQUOTE = '0x0b'\n            ,ROWTERMINATOR = '0x0a'\n        ) \n\n            WITH (\n                jsonDoc NVARCHAR(MAX)\n            ) AS PaymentType\n\n    CROSS APPLY OPENJSON(jsonDoc) -- Return Key Value Pairs\n        WITH (\n            PaymentType             SMALLINT    '$.payment_type'\n            ,PaymentTypeDescription VARCHAR(15) '$.payment_type_desc'\n        )\n\n\n-- Query Processed Table\n-- SELECT TOP 10 * FROM Processed.PaymentType;",
