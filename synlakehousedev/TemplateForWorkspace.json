@@ -192,7 +192,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/create_calendar_processed')]",
+			"name": "[concat(parameters('workspaceName'), '/create_calendar_csv_processed')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -307,7 +307,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/create_taxi_zone_processed')]",
+			"name": "[concat(parameters('workspaceName'), '/create_taxi_zone_csv_processed')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -330,7 +330,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/create_trip_type_processed')]",
+			"name": "[concat(parameters('workspaceName'), '/create_trip_type_csv_processed')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -353,7 +353,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/create_vendor_processed')]",
+			"name": "[concat(parameters('workspaceName'), '/create_vendor_csv_processed')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
