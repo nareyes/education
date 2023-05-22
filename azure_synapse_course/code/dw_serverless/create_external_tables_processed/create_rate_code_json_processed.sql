@@ -29,13 +29,13 @@ AS
         ,RateCodeDescription
     FROM
         OPENROWSET (
-            BULK 'rate_code.json',
-            DATA_SOURCE = 'NYC_Taxi_Raw',
-            FORMAT = 'CSV', -- Even for JSON
-            PARSER_VERSION = '1.0',
-            FIELDTERMINATOR = '0x0b',
-            FIELDQUOTE = '0x0b',
-            ROWTERMINATOR = '0x0b' -- Vertical Tab
+            BULK 'rate_code.json'
+            ,DATA_SOURCE = 'NYC_Taxi_Raw'
+            ,FORMAT = 'CSV' -- Even for JSON
+            ,PARSER_VERSION = '1.0'
+            ,FIELDTERMINATOR = '0x0b'
+            ,FIELDQUOTE = '0x0b'
+            ,ROWTERMINATOR = '0x0b' -- Vertical Tab
         ) 
 
             WITH (
