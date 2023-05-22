@@ -54,7 +54,7 @@ IF NOT EXISTS (
 
     CREATE EXTERNAL DATA SOURCE NYC_Taxi_Processed
     WITH (
-        LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'
+        LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/processed'
     );
 
 
@@ -65,7 +65,7 @@ IF NOT EXISTS (
 
     CREATE EXTERNAL DATA SOURCE NYC_Taxi_Curated
     WITH (
-        LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/raw'
+        LOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/curated'
     );
 
 
@@ -88,8 +88,8 @@ GO
 -- Drop Data Source (IF EXISTS)
 IF EXISTS (
     SELECT name FROM sys.external_data_sources 
-    WHERE name = 'NYC_Taxi_File_Drop_ABFSS'
+    WHERE name = 'NYC_Taxi_Curated'
 )
 BEGIN
-    DROP EXTERNAL DATA SOURCE NYC_Taxi_File_Drop_ABFSS
+    DROP EXTERNAL DATA SOURCE NYC_Taxi_Curated
 END
