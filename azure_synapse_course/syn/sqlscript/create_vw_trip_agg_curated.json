@@ -1,0 +1,20 @@
+{
+	"name": "create_vw_trip_agg_curated",
+	"properties": {
+		"folder": {
+			"name": "dw_serverless/transform_external_objects_curated"
+		},
+		"content": {
+			"query": "USE NYC_Taxi_Serverless\nGO\n\nDROP VIEW IF EXISTS Curated.View_TripAggregated\nGO\n\nCREATE VIEW Curated.View_TripAggregated\nAS\n    SELECT\n        *\n    FROM\n        OPENROWSET (\n            BULK 'trip_aggregated/**'\n            ,DATA_SOURCE = 'NYC_Taxi_Curated'\n            ,FORMAT = 'PARQUET'\n        )\n\n            WITH (\n                PartitionYear   VARCHAR(4)\n                ,PartitionMonth VARCHAR(2)\n                ,Borough        VARCHAR(20)\n                ,TripDate       DATE\n                ,TripDay        VARCHAR(10)\n                ,IsWeekend      TINYINT\n                ,CardTripCount  INT\n                ,CashTripCount  INT         \n            ) AS TripAggregated\nGO\n\n\n-- Query w/ Partition Pruning\nSELECT *\nFROM Curated.View_TripAggregated\nWHERE PartitionYear = '2020' AND PartitionMonth = '01';",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "NYC_Taxi_Serverless",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

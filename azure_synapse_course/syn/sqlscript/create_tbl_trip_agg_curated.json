@@ -1,0 +1,20 @@
+{
+	"name": "create_tbl_trip_agg_curated",
+	"properties": {
+		"folder": {
+			"name": "dw_serverless/transform_external_objects_curated"
+		},
+		"content": {
+			"query": "USE NYC_Taxi_Serverless\nGO\n\n\n-- Pre-Aggregated Taxi Data\nSELECT\n    T.PartitionYear\n    ,T.PartitionMonth\n    ,Z.Borough\n    ,CAST (T.PickupDateTime AS DATE) AS TripDate\n    ,C.DayName AS TripDay\n    ,CASE WHEN C.DayName IN ('Saturday', 'Sunday') THEN 1 ELSE 0 END AS IsWeekend\n    ,SUM (CASE WHEN P.PaymentType = 1 THEN 1 ELSE 0 END) AS CardTripCount -- Payment Type: Card\n    ,SUM (CASE WHEN P.PaymentType = 2 THEN 1 ELSE 0 END) AS CashTripCount -- Payment Type: Cash\nFROM Processed.View_TripPartitioned AS T\n    INNER JOIN Processed.TaxiZone AS Z\n        ON T.PULocationID = Z.LocationID\n    INNER JOIN Processed.Calendar AS C\n        ON CAST (T.PickupDateTime AS DATE) = C.Date\n    INNER JOIN Processed.PaymentType AS P\n        ON T.PaymentType = P.PaymentType\nWHERE 1=1\n    AND T.PartitionYear = '2020' \n    AND T.PartitionMonth = '01'\nGROUP BY\n    T.PartitionYear\n    ,T.PartitionMonth\n    ,Z.Borough\n    ,CAST (T.PickupDateTime AS DATE)\n    ,C.DayName;\n\n\n-- Copy Data to Serverless and ADLS (Delete Serverless)\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '01';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '02';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '03';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '04';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '05';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '06';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '07';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '08';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '09';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '10';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '11';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '12';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '01';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '02';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '03';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '04';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '05';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '06';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '07';",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "NYC_Taxi_Serverless",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
