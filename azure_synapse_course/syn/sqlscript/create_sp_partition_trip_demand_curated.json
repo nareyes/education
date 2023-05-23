@@ -1,0 +1,20 @@
+{
+	"name": "create_sp_partition_trip_demand_curated",
+	"properties": {
+		"folder": {
+			"name": "dw_serverless/transform_external_objects_curated"
+		},
+		"content": {
+			"query": "USE NYC_Taxi_Serverless\nGO\n\nCREATE OR ALTER PROCEDURE Curated.InsertTripDemand\n\n@PartitionYear  VARCHAR(4),\n@PartitionMonth VARCHAR(2)\n\nAS\n\nBEGIN\n\n    DECLARE @CreateStatement    NVARCHAR(MAX),\n            @DropStatement      NVARCHAR(MAX);\n    \n\n    SET @CreateStatement =\n        'CREATE EXTERNAL TABLE Curated.TripDemand_' + @PartitionYear + '_' + @PartitionMonth +\n\n            ' WITH (\n                LOCATION = ''trip_demand/year=' + @PartitionYear + '/month=' + @PartitionMonth + '''\n                ,DATA_SOURCE = NYC_Taxi_Curated\n                ,FILE_FORMAT = Parquet_File_Format\n            )\n\n        AS\n\n            SELECT\n                T.PartitionYear\n                ,T.PartitionMonth\n                ,Z.Borough\n                ,CAST (T.PickupDateTime AS DATE) AS TripDate\n                ,C.DayName AS TripDay\n                ,CASE WHEN C.DayName IN (''Saturday'', ''Sunday'') THEN 1 ELSE 0 END AS IsWeekend\n                ,SUM (CASE WHEN TT.TripType = 1 THEN 1 ELSE 0 END) AS StreetHailCount -- Trip Type: Street Hail\n                ,SUM (CASE WHEN TT.TripType = 2 THEN 1 ELSE 0 END) AS DispatchCount -- Trip Type: Dispatch\n                ,SUM (T.TripDistance) AS TripDistance\n                ,SUM (DATEDIFF (MINUTE, T.PickupDateTime, T.DropoffDateTime)) AS TripDuration\n                ,SUM (T.FareAmount) AS FareAmount\n            FROM Processed.View_TripPartitioned AS T\n                INNER JOIN Processed.TaxiZone AS Z\n                    ON T.PULocationID = Z.LocationID\n                INNER JOIN Processed.Calendar AS C\n                    ON CAST (T.PickupDateTime AS DATE) = C.Date\n                INNER JOIN Processed.PaymentType AS P\n                    ON T.PaymentType = P.PaymentType\n                INNER JOIN Processed.TripType AS TT\n                    ON T.TripType = TT.TripType \n            WHERE 1=1\n                AND T.PartitionYear = ''' + @PartitionYear + ''' \n                AND T.PartitionMonth = ''' + @PartitionMonth + '''\n            GROUP BY\n                T.PartitionYear\n                ,T.PartitionMonth\n                ,Z.Borough\n                ,CAST (T.PickupDateTime AS DATE)\n                ,C.DayName';\n\n\n    PRINT(@CreateStatement)\n    EXEC sp_executesql @CreateStatement;\n\n\n    SET @DropStatement =\n        'DROP EXTERNAL TABLE Curated.TripDemand_' + @PartitionYear + '_' + @PartitionMonth;\n    \n    PRINT(@DropStatement)\n    EXEC sp_executesql @DropStatement;\n\nEND;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "NYC_Taxi_Serverless",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
