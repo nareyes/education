@@ -1,5 +1,5 @@
 {
-	"name": "create_rate_code_json_processed",
+	"name": "create_tbl_rate_code_json_processed",
 	"properties": {
 		"folder": {
 			"name": "dw_serverless/create_objects_tables_processed"

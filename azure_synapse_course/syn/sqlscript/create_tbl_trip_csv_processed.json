@@ -1,5 +1,5 @@
 {
-	"name": "create_trip_csv_processed",
+	"name": "create_tbl_trip_csv_processed",
 	"properties": {
 		"description": "Partitioned Data",
 		"folder": {

@@ -1,5 +1,5 @@
 {
-	"name": "create_trip_partitioned_view_processed",
+	"name": "create_vw_trip_partitioned_processed",
 	"properties": {
 		"folder": {
 			"name": "dw_serverless/create_objects_tables_processed"
