@@ -255,6 +255,29 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/create_sp_partition_trip_agg_curated')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "dw_serverless/transform_external_objects_curated"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\nCREATE OR ALTER PROCEDURE Curated.InsertTripAggregated\n\n@PartitionYear  VARCHAR(4),\n@PartitionMonth VARCHAR(2)\n\nAS\n\nBEGIN\n\n    DECLARE @CreateStatement    NVARCHAR(MAX),\n            @DropStatement      NVARCHAR(MAX);\n    \n\n    SET @CreateStatement =\n        'CREATE EXTERNAL TABLE Curated.TripAggregated_' + @PartitionYear + '_' + @PartitionMonth +\n\n            ' WITH (\n                LOCATION = ''trip_aggregated/year=' + @PartitionYear + '/month=' + @PartitionMonth + '''\n                ,DATA_SOURCE = NYC_Taxi_Curated\n                ,FILE_FORMAT = Parquet_File_Format\n            )\n\n        AS\n\n            SELECT\n                T.PartitionYear\n                ,T.PartitionMonth\n                ,Z.Borough\n                ,CAST (T.PickupDateTime AS DATE) AS TripDate\n                ,C.DayName AS TripDay\n                ,CASE WHEN C.DayName IN (''Saturday'', ''Sunday'') THEN 1 ELSE 0 END AS IsWeekend\n                ,SUM (CASE WHEN P.PaymentType = 1 THEN 1 ELSE 0 END) AS CardTripCount -- Payment Type: Card\n                ,SUM (CASE WHEN P.PaymentType = 2 THEN 1 ELSE 0 END) AS CashTripCount -- Payment Type: Cash\n            FROM Processed.View_TripPartitioned AS T\n                INNER JOIN Processed.TaxiZone AS Z\n                    ON T.PULocationID = Z.LocationID\n                INNER JOIN Processed.Calendar AS C\n                    ON CAST (T.PickupDateTime AS DATE) = C.Date\n                INNER JOIN Processed.PaymentType AS P\n                    ON T.PaymentType = P.PaymentType\n            WHERE 1=1\n                AND T.PartitionYear = ''' + @PartitionYear + ''' \n                AND T.PartitionMonth = ''' + @PartitionMonth + '''\n            GROUP BY\n                T.PartitionYear\n                ,T.PartitionMonth\n                ,Z.Borough\n                ,CAST (T.PickupDateTime AS DATE)\n                ,C.DayName';\n\n\n    PRINT(@CreateStatement)\n    EXEC sp_executesql @CreateStatement;\n\n\n    SET @DropStatement =\n        'DROP EXTERNAL TABLE Curated.TripAggregated_' + @PartitionYear + '_' + @PartitionMonth;\n    \n    PRINT(@DropStatement)\n    EXEC sp_executesql @DropStatement;\n\nEND;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/create_sp_partition_trip_processed')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -370,6 +393,29 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/create_tbl_trip_agg_curated')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "dw_serverless/transform_external_objects_curated"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n\n-- Pre-Aggregated Taxi Data\nSELECT\n    T.PartitionYear\n    ,T.PartitionMonth\n    ,Z.Borough\n    ,CAST (T.PickupDateTime AS DATE) AS TripDate\n    ,C.DayName AS TripDay\n    ,CASE WHEN C.DayName IN ('Saturday', 'Sunday') THEN 1 ELSE 0 END AS IsWeekend\n    ,SUM (CASE WHEN P.PaymentType = 1 THEN 1 ELSE 0 END) AS CardTripCount -- Payment Type: Card\n    ,SUM (CASE WHEN P.PaymentType = 2 THEN 1 ELSE 0 END) AS CashTripCount -- Payment Type: Cash\nFROM Processed.View_TripPartitioned AS T\n    INNER JOIN Processed.TaxiZone AS Z\n        ON T.PULocationID = Z.LocationID\n    INNER JOIN Processed.Calendar AS C\n        ON CAST (T.PickupDateTime AS DATE) = C.Date\n    INNER JOIN Processed.PaymentType AS P\n        ON T.PaymentType = P.PaymentType\nWHERE 1=1\n    AND T.PartitionYear = '2020' \n    AND T.PartitionMonth = '01'\nGROUP BY\n    T.PartitionYear\n    ,T.PartitionMonth\n    ,Z.Borough\n    ,CAST (T.PickupDateTime AS DATE)\n    ,C.DayName;\n\n\n-- Copy Data to Serverless and ADLS (Delete Serverless)\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '01';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '02';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '03';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '04';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '05';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '06';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '07';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '08';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '09';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '10';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '11';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '12';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '01';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '02';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '03';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '04';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '05';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '06';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '07';",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/create_tbl_trip_csv_processed')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -449,6 +495,29 @@
 				},
 				"content": {
 					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Rate Code (JSON Source)\nDROP VIEW IF EXISTS Raw.View_RateCode\nGO\n\nCREATE VIEW Raw.View_RateCode\nAS\n    SELECT\n        RateCodeID\n        ,RateCodeDescription\n    FROM\n        OPENROWSET (\n            BULK 'rate_code.json',\n            DATA_SOURCE = 'NYC_Taxi_Raw',\n            FORMAT = 'CSV', -- Even for JSON\n            PARSER_VERSION = '1.0',\n            FIELDTERMINATOR = '0x0b',\n            FIELDQUOTE = '0x0b',\n            ROWTERMINATOR = '0x0b' -- Vertical Tab\n        ) \n\n            WITH (\n                jsonDoc NVARCHAR(MAX)\n            ) AS RateCode\n\n    CROSS APPLY OPENJSON(jsonDoc) -- Return Key Value Pairs\n        WITH (\n            RateCodeID              TINYINT     '$.rate_code_id'\n            ,RateCodeDescription    VARCHAR(20) '$.rate_code'\n        );\nGO\n\nSELECT * FROM Raw.View_RateCode;\nGO\n\n\n-- Payment Type\nDROP VIEW IF EXISTS Raw.View_PaymentType\nGO\n\nCREATE VIEW Raw.View_PaymentType\nAS\n    SELECT\n        PaymentType\n        ,PaymentTypeDescription\n    FROM\n        OPENROWSET (\n            BULK 'payment_type.json'\n            ,DATA_SOURCE = 'NYC_Taxi_Raw'\n            ,FORMAT = 'CSV' -- Even for JSON\n            ,PARSER_VERSION = '1.0'\n            ,FIELDTERMINATOR = '0x0b'\n            ,FIELDQUOTE = '0x0b'\n            ,ROWTERMINATOR = '0x0a'\n        ) \n\n            WITH (\n                jsonDoc NVARCHAR(MAX)\n            ) AS PaymentType\n\n    CROSS APPLY OPENJSON(jsonDoc) -- Return Key Value Pairs\n        WITH (\n            PaymentType             SMALLINT    '$.payment_type'\n            ,PaymentTypeDescription VARCHAR(15) '$.payment_type_desc'\n        )\nGO\n\nSELECT * FROM Raw.View_PaymentType;\nGO\n\n\n-- Partition Pruning for Views (Workaround for External Table Pruning)\n-- External Tables Do Not Support Partition Pruning\nDROP VIEW IF EXISTS Raw.View_TripCSV\nGO\n\nCREATE VIEW Raw.View_TripCSV\nAS\n    SELECT\n        TripCSV.filepath(1) AS PartitionYear\n        ,TripCSV.filepath(2) AS PartitionMonth\n        ,TripCSV.*\n    FROM\n        OPENROWSET (\n            BULK 'trip_data_green_csv/year=*/month=*/*.csv'\n            ,DATA_SOURCE = 'NYC_Taxi_Raw'\n            ,FORMAT = 'CSV'\n            ,PARSER_VERSION = '2.0'\n            ,HEADER_ROW = TRUE\n        )\n\n            WITH (\n                VendorID\t            TINYINT\n                ,lpep_pickup_datetime\tDATETIME2(0)\n                ,lpep_dropoff_datetime\tDATETIME2(0)\n                ,store_and_fwd_flag\t    VARCHAR(10)\n                ,RatecodeID\t            SMALLINT\n                ,PULocationID\t        SMALLINT\n                ,DOLocationID\t        SMALLINT\n                ,passenger_count\t    TINYINT\n                ,trip_distance\t        FLOAT\n                ,fare_amount\t        FLOAT\n                ,extra\t                FLOAT\n                ,mta_tax\t            FLOAT\n                ,tip_amount\t            FLOAT\n                ,tolls_amount\t        FLOAT\n                ,ehail_fee\t            VARCHAR(50)\n                ,improvement_surcharge  FLOAT\n                ,total_amount\t        FLOAT\n                ,payment_type\t        BIGINT\n                ,trip_type              BIGINT\n                ,congestion_surcharge   FLOAT\n            ) AS TripCSV\nGO\n\nSELECT TOP 10 * FROM Raw.View_TripCSV;\n\nSELECT\n    PartitionYear\n    ,PartitionMonth\n    ,COUNT(1) AS RecordCount\nFROM Raw.View_TripCSV\nWHERE PartitionYear = 2020\nGROUP BY PartitionYear,PartitionMonth\nORDER BY PartitionMonth;\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/create_vw_trip_agg_curated')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "dw_serverless/transform_external_objects_curated"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\nDROP VIEW IF EXISTS Curated.View_TripAggregated\nGO\n\nCREATE VIEW Curated.View_TripAggregated\nAS\n    SELECT\n        *\n    FROM\n        OPENROWSET (\n            BULK 'trip_aggregated/**'\n            ,DATA_SOURCE = 'NYC_Taxi_Curated'\n            ,FORMAT = 'PARQUET'\n        )\n\n            WITH (\n                PartitionYear   VARCHAR(4)\n                ,PartitionMonth VARCHAR(2)\n                ,Borough        VARCHAR(20)\n                ,TripDate       DATE\n                ,TripDay        VARCHAR(10)\n                ,IsWeekend      TINYINT\n                ,CardTripCount  INT\n                ,CashTripCount  INT         \n            ) AS TripAggregated\nGO\n\n\n-- Query w/ Partition Pruning\nSELECT TOP 10 *\nFROM Curated.View_TripAggregated\nWHERE PartitionYear = '2020' AND PartitionMonth = '01';",
 					"metadata": {
 						"language": "sql"
 					},
@@ -1002,75 +1071,6 @@
 			},
 			"dependsOn": [],
 			"location": "centralus"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/create_tbl_trip_agg_curated')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"folder": {
-					"name": "dw_serverless/transform_external_objects_curated"
-				},
-				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\n\n-- Pre-Aggregated Taxi Data\nSELECT\n    T.PartitionYear\n    ,T.PartitionMonth\n    ,Z.Borough\n    ,CAST (T.PickupDateTime AS DATE) AS TripDate\n    ,C.DayName AS TripDay\n    ,CASE WHEN C.DayName IN ('Saturday', 'Sunday') THEN 1 ELSE 0 END AS IsWeekend\n    ,SUM (CASE WHEN P.PaymentType = 1 THEN 1 ELSE 0 END) AS CardTripCount -- Payment Type: Card\n    ,SUM (CASE WHEN P.PaymentType = 2 THEN 1 ELSE 0 END) AS CashTripCount -- Payment Type: Cash\nFROM Processed.View_TripPartitioned AS T\n    INNER JOIN Processed.TaxiZone AS Z\n        ON T.PULocationID = Z.LocationID\n    INNER JOIN Processed.Calendar AS C\n        ON CAST (T.PickupDateTime AS DATE) = C.Date\n    INNER JOIN Processed.PaymentType AS P\n        ON T.PaymentType = P.PaymentType\nWHERE 1=1\n    AND T.PartitionYear = '2020' \n    AND T.PartitionMonth = '01'\nGROUP BY\n    T.PartitionYear\n    ,T.PartitionMonth\n    ,Z.Borough\n    ,CAST (T.PickupDateTime AS DATE)\n    ,C.DayName;\n\n\n-- Copy Data to Serverless and ADLS (Delete Serverless)\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '01';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '02';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '03';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '04';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '05';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '06';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '07';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '08';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '09';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '10';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '11';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2020', @PartitionMonth = '12';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '01';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '02';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '03';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '04';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '05';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '06';\nEXEC Curated.InsertTripAggregated @PartitionYear = '2021', @PartitionMonth = '07';",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "NYC_Taxi_Serverless",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/create_sp_partition_trip_agg_curated')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"folder": {
-					"name": "dw_serverless/transform_external_objects_curated"
-				},
-				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\nCREATE OR ALTER PROCEDURE Curated.InsertTripAggregated\n\n@PartitionYear  VARCHAR(4),\n@PartitionMonth VARCHAR(2)\n\nAS\n\nBEGIN\n\n    DECLARE @CreateStatement    NVARCHAR(MAX),\n            @DropStatement      NVARCHAR(MAX);\n    \n\n    SET @CreateStatement =\n        'CREATE EXTERNAL TABLE Curated.TripAggregated_' + @PartitionYear + '_' + @PartitionMonth +\n\n            ' WITH (\n                LOCATION = ''trip_aggregated/year=' + @PartitionYear + '/month=' + @PartitionMonth + '''\n                ,DATA_SOURCE = NYC_Taxi_Curated\n                ,FILE_FORMAT = Parquet_File_Format\n            )\n\n        AS\n\n            SELECT\n                T.PartitionYear\n                ,T.PartitionMonth\n                ,Z.Borough\n                ,CAST (T.PickupDateTime AS DATE) AS TripDate\n                ,C.DayName AS TripDay\n                ,CASE WHEN C.DayName IN (''Saturday'', ''Sunday'') THEN 1 ELSE 0 END AS IsWeekend\n                ,SUM (CASE WHEN P.PaymentType = 1 THEN 1 ELSE 0 END) AS CardTripCount -- Payment Type: Card\n                ,SUM (CASE WHEN P.PaymentType = 2 THEN 1 ELSE 0 END) AS CashTripCount -- Payment Type: Cash\n            FROM Processed.View_TripPartitioned AS T\n                INNER JOIN Processed.TaxiZone AS Z\n                    ON T.PULocationID = Z.LocationID\n                INNER JOIN Processed.Calendar AS C\n                    ON CAST (T.PickupDateTime AS DATE) = C.Date\n                INNER JOIN Processed.PaymentType AS P\n                    ON T.PaymentType = P.PaymentType\n            WHERE 1=1\n                AND T.PartitionYear = ''' + @PartitionYear + ''' \n                AND T.PartitionMonth = ''' + @PartitionMonth + '''\n            GROUP BY\n                T.PartitionYear\n                ,T.PartitionMonth\n                ,Z.Borough\n                ,CAST (T.PickupDateTime AS DATE)\n                ,C.DayName';\n\n\n    PRINT(@CreateStatement)\n    EXEC sp_executesql @CreateStatement;\n\n\n    SET @DropStatement =\n        'DROP EXTERNAL TABLE Curated.TripAggregated_' + @PartitionYear + '_' + @PartitionMonth;\n    \n    PRINT(@DropStatement)\n    EXEC sp_executesql @DropStatement;\n\nEND;",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "NYC_Taxi_Serverless",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/create_vw_trip_agg_curated')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"folder": {
-					"name": "dw_serverless/transform_external_objects_curated"
-				},
-				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\nDROP VIEW IF EXISTS Curated.View_TripAggregated\nGO\n\nCREATE VIEW Curated.View_TripAggregated\nAS\n    SELECT\n        *\n    FROM\n        OPENROWSET (\n            BULK 'trip_aggregated/**'\n            ,DATA_SOURCE = 'NYC_Taxi_Curated'\n            ,FORMAT = 'PARQUET'\n        )\n\n            WITH (\n                PartitionYear   VARCHAR(4)\n                ,PartitionMonth VARCHAR(2)\n                ,Borough        VARCHAR(20)\n                ,TripDate       DATE\n                ,TripDay        VARCHAR(10)\n                ,IsWeekend      TINYINT\n                ,CardTripCount  INT\n                ,CashTripCount  INT         \n            ) AS TripAggregated\nGO\n\n\n-- Query w/ Partition Pruning\nSELECT *\nFROM Curated.View_TripAggregated\nWHERE PartitionYear = '2020' AND PartitionMonth = '01';",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "NYC_Taxi_Serverless",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
 		}
 	]
 }
