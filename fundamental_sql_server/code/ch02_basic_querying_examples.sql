@@ -3,6 +3,10 @@
 -------------------------------------
 USE tsql_fundamentals;
 
+------------------------
+-- ELEMENTS OF SELECT --
+------------------------
+
 -- Syntax Order of a SQL Query
 SELECT empid, YEAR (orderdate) AS orderyear, COUNT (*) as numorder
 FROM Sales.Orders
@@ -204,6 +208,10 @@ FROM Sales.OrderValues
 ORDER BY custid ASC, val ASC;
 
 
+------------------------------
+-- PREDICATES AND OPERATORS --
+------------------------------
+
 -- IN Predicate
 SELECT
     orderid
@@ -364,6 +372,10 @@ To bypass this behavior for filtering, we can use CASE expressions or PEMDAS wit
 This forces the processing in a particular phase to occur in a specified order. 
  */
 
+
+--------------------
+-- CHARACTER DATA --
+--------------------
 
  -- Collation Help
  SELECT
@@ -531,6 +543,10 @@ FROM HR.Employees
 WHERE lastname LIKE N'%!_%' ESCAPE '!'; -- Returns any last name with an underscore in the name (zero results)
 
 
+----------------------
+-- DATE & TIME DATA --
+----------------------
+
 -- Converting to DATE (Not Recommended)
 -- Use language neutral format 'YYYYMMDD' for string representations of dates
 SELECT CONVERT (DATE, '02/12/2016', 101); -- YYYY-MM-DD
@@ -653,10 +669,11 @@ FROM Sales.Orders
 WHERE orderdate = EOMONTH (orderdate); -- Returns all orders placed on the last day of the month
 
 
--- Qyerying Metadata
--------------------
--- CATALOG VIEWS --
--------------------
+-----------------------
+-- QUERYING METADATA --
+-----------------------
+
+-- CATALOG VIEWS
 -- Return Schema and Table Names
 SELECT
     SCHEMA_NAME(schema_id) AS schema_name
@@ -681,9 +698,7 @@ FROM sys.columns
 WHERE object_id = OBJECT_ID(N'CL.VW_AppointmentEvent');
 
 
-------------------------------
--- INFORMATION SCHEMA VIEWS --
-------------------------------
+-- INFORMATION SCHEMA VIEWS 
 -- SAME RESULTS AS CATALOG VIEWS
 
 -- Return Schema and Table Names
@@ -708,9 +723,7 @@ WHERE
     AND TABLE_NAME = N'TableName';
 
 
--------------------------------
--- SYSTEM STORED PROCEDURES  --
--------------------------------
+-- SYSTEM STORED PROCEDURES 
 -- Return Objects That Can be Queried (Tables and Views)
 EXEC sys.sp_tables;
 
@@ -742,9 +755,7 @@ FROM sys.masked_columns AS C
         ON c.object_id = t.object_id;
 
 
-----------------------
--- SYSTEM FUNCTIONS --
-----------------------
+-- SYSTEM FUNCTIONS
 -- Return Instance Product Level
 SELECT SERVERPROPERTY('ProductLevel') AS product_level;
 
