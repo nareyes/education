@@ -5,9 +5,6 @@
 		"workspaceName": {
 			"value": "synlakehousedev"
 		},
-		"syn-dev-WorkspaceDefaultSqlServer_connectionString": {
-			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:syn-dev.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
-		},
 		"synlakehousedev-WorkspaceDefaultSqlServer_connectionString": {
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synlakehousedev.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
