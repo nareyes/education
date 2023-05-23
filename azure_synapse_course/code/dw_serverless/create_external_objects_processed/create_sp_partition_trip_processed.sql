@@ -1,7 +1,7 @@
 USE NYC_Taxi_Serverless
 GO
 
-CREATE OR ALTER PROCEDURE Processed.PartitionTripData
+CREATE OR ALTER PROCEDURE Processed.InsertPartitionTripData
 
 @PartitionYear  VARCHAR(4),
 @PartitionMonth VARCHAR(2)
@@ -27,7 +27,9 @@ BEGIN
 
             SELECT *
             FROM Processed.Trip
-            WHERE PartitionYear = ''' + @PartitionYear + ''' AND PartitionMonth = ''' + @PartitionMonth + '''';
+            WHERE 1=1
+                AND PartitionYear = ''' + @PartitionYear + ''' 
+                AND PartitionMonth = ''' + @PartitionMonth + '''';
     
     PRINT(@CreateStatement)
     EXEC sp_executesql @CreateStatement;
