@@ -385,31 +385,7 @@
 					"name": "dw_serverless/create_objects_tables_processed"
 				},
 				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Data Written to ADLS Cannot be Deleted Here\n-- Delete via Pipelines and Call Script as a Best Practice\n\n-- Taxi Zone\nIF OBJECT_ID ('Processed.Trip') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.Trip\n    GO\n\nCREATE EXTERNAL TABLE Processed.Trip\n\n    WITH (\n        LOCATION = 'trip'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    -- SELECT *\n    -- FROM Raw.TripCSV;\n\n    -- Alternate: Use OPENROWSET if Raw Table Does Not Exists\n    -- Preferred Method, Simple Column Renaming\n    -- Issue w/ Partitioned Data: This Will Not Maintain Partitions (Added ParitionYear and PartitionMonth for Simple Parition-Like Filtering)\n    -- Reference create_trip_csv_sp_processed for Stored Procedure Workaround (Using Spark Pool is a Preferred Solution)\n    SELECT\n        Trip.filepath(1) AS PartitionYear\n        ,Trip.filepath(2) AS PartitionMonth\n        ,Trip.*\n    FROM\n        OPENROWSET (\n            BULK 'trip_data_green_csv/year=*/month=*/*.csv'\n            ,DATA_SOURCE = 'NYC_Taxi_Raw'\n            ,FORMAT = 'CSV'\n            ,PARSER_VERSION = '2.0'\n            ,HEADER_ROW = TRUE\n        ) \n\n        WITH (\n            VendorID\t            TINYINT         1\n            ,PickupDateTime     \tDATETIME2(0)    2\n            ,DropoffDateTime    \tDATETIME2(0)    3\n            ,StoreFwdFlag   \t    VARCHAR(10)     4\n            ,RateCodeID\t            SMALLINT        5\n            ,PULocationID\t        SMALLINT        6\n            ,DOLocationID\t        SMALLINT        7\n            ,PassengerCount \t    TINYINT         8\n            ,TripDistance\t        FLOAT           9\n            ,FareAmount \t        FLOAT           10\n            ,Extra\t                FLOAT           11\n            ,MTATax \t            FLOAT           12\n            ,TipAmount\t            FLOAT           13\n            ,TollsAmount\t        FLOAT           14\n            ,eHailFee\t            VARCHAR(50)     15\n            ,ImprovementSurcharge   FLOAT           16\n            ,TotalAmount\t        FLOAT           17\n            ,PaymentType\t        BIGINT          18\n            ,TripType               BIGINT          19\n            ,CongestionSurcharge    FLOAT           20\n        ) AS Trip\n\n\n-- Query Processed Table\nSELECT TOP 10 * FROM Processed.Trip\nWHERE PartitionYear = 2020;",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "NYC_Taxi_Serverless",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/create_trip_csv_sp_processed')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"description": "Proper Partitions",
-				"folder": {
-					"name": "dw_serverless/create_objects_tables_processed"
-				},
-				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\n",
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Data Written to ADLS Cannot be Deleted Here\n-- Delete via Pipelines and Call Script as a Best Practice\n\n-- Taxi Trip\nIF OBJECT_ID ('Processed.Trip') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.Trip\n    GO\n\nCREATE EXTERNAL TABLE Processed.Trip\n\n    WITH (\n        LOCATION = 'trip'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    -- SELECT *\n    -- FROM Raw.TripCSV;\n\n    -- Alternate: Use OPENROWSET if Raw Table Does Not Exists\n    -- Preferred Method, Simple Column Renaming\n    -- Issue w/ Partitioned Data: This Will Not Maintain Partitions (Added ParitionYear and PartitionMonth for Simple Parition-Like Filtering)\n    -- Reference sp_partition_trip_data for Stored Procedure Workaround (Using Spark Pool is a Preferred Solution)\n    SELECT\n        Trip.filepath(1) AS PartitionYear\n        ,Trip.filepath(2) AS PartitionMonth\n        ,Trip.*\n    FROM\n        OPENROWSET (\n            BULK 'trip_data_green_csv/year=*/month=*/*.csv'\n            ,DATA_SOURCE = 'NYC_Taxi_Raw'\n            ,FORMAT = 'CSV'\n            ,PARSER_VERSION = '2.0'\n            ,HEADER_ROW = TRUE\n        ) \n\n        WITH (\n            VendorID\t            TINYINT         1\n            ,PickupDateTime     \tDATETIME2(0)    2\n            ,DropoffDateTime    \tDATETIME2(0)    3\n            ,StoreFwdFlag   \t    VARCHAR(10)     4\n            ,RateCodeID\t            SMALLINT        5\n            ,PULocationID\t        SMALLINT        6\n            ,DOLocationID\t        SMALLINT        7\n            ,PassengerCount \t    TINYINT         8\n            ,TripDistance\t        FLOAT           9\n            ,FareAmount \t        FLOAT           10\n            ,Extra\t                FLOAT           11\n            ,MTATax \t            FLOAT           12\n            ,TipAmount\t            FLOAT           13\n            ,TollsAmount\t        FLOAT           14\n            ,eHailFee\t            VARCHAR(50)     15\n            ,ImprovementSurcharge   FLOAT           16\n            ,TotalAmount\t        FLOAT           17\n            ,PaymentType\t        BIGINT          18\n            ,TripType               BIGINT          19\n            ,CongestionSurcharge    FLOAT           20\n        ) AS Trip\n\n\n-- Query Processed Table\nSELECT TOP 10 * FROM Processed.Trip\nWHERE PartitionYear = 2020 AND PartitionMonth = 01;\n\n\n-- Run Stored Procedure to Load Partitioned Data\n-- Again, This is Not an Optimal Solution. It's a Workaround\nEXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '01';\nEXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '02';\nEXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '03';\nEXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '04';\nEXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '05';\nEXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '06';\nEXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '07';\nEXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '08';\nEXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '09';\nEXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '10';\nEXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '11';\nEXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '12';\nEXEC Processed.PartitionTripData @PartitionYear = '2021', @PartitionMonth = '01';\nEXEC Processed.PartitionTripData @PartitionYear = '2021', @PartitionMonth = '02';\nEXEC Processed.PartitionTripData @PartitionYear = '2021', @PartitionMonth = '03';\nEXEC Processed.PartitionTripData @PartitionYear = '2021', @PartitionMonth = '04';\nEXEC Processed.PartitionTripData @PartitionYear = '2021', @PartitionMonth = '05';\nEXEC Processed.PartitionTripData @PartitionYear = '2021', @PartitionMonth = '06';\nEXEC Processed.PartitionTripData @PartitionYear = '2021', @PartitionMonth = '07';",
 					"metadata": {
 						"language": "sql"
 					},
@@ -1009,6 +985,52 @@
 			},
 			"dependsOn": [],
 			"location": "centralus"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/sp_partition_trip_data')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "dw_serverless/stored_procedures"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\nCREATE OR ALTER PROCEDURE Processed.PartitionTripData\n\n@PartitionYear  VARCHAR(4),\n@PartitionMonth VARCHAR(2)\n\nAS\n\nBEGIN\n\n    DECLARE @CreateStatement    NVARCHAR(MAX),\n            @DropStatement      NVARCHAR(MAX);\n    \n\n    SET @CreateStatement =\n        'CREATE EXTERNAL TABLE Processed.TripPartitioned_' + @PartitionYear + '_' + @PartitionMonth +\n\n            ' WITH (\n                LOCATION = ''trip_partitioned/year=' + @PartitionYear + '/month=' + @PartitionMonth + '''\n                ,DATA_SOURCE = NYC_Taxi_Processed\n                ,FILE_FORMAT = Parquet_File_Format\n            )\n\n        AS\n\n            SELECT *\n            FROM Processed.Trip\n            WHERE PartitionYear = ''' + @PartitionYear + ''' AND PartitionMonth = ''' + @PartitionMonth + '''';\n    \n    PRINT(@CreateStatement)\n    EXEC sp_executesql @CreateStatement;\n\n\n    SET @DropStatement =\n        'DROP EXTERNAL TABLE Processed.TripPartitioned_' + @PartitionYear + '_' + @PartitionMonth;\n    \n    PRINT(@DropStatement)\n    EXEC sp_executesql @DropStatement;\n\nEND;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/create_trip_partitioned_view_processed')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "dw_serverless/create_objects_tables_processed"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\nDROP VIEW IF EXISTS Processed.View_TripPartitioned\nGO\n\nCREATE VIEW Processed.View_TripPartitioned\nAS\n    SELECT\n        *\n    FROM\n        OPENROWSET (\n            BULK 'trip_partitioned/**'\n            ,DATA_SOURCE = 'NYC_Taxi_Processed'\n            ,FORMAT = 'PARQUET'\n        )\n\n            WITH (\n                PartitionYear           VARCHAR(4)\n                ,PartitionMonth         VARCHAR(2)\n                ,VendorID\t            TINYINT         \n                ,PickupDateTime     \tDATETIME2(0)    \n                ,DropoffDateTime    \tDATETIME2(0)    \n                ,StoreFwdFlag   \t    VARCHAR(10)     \n                ,RateCodeID\t            SMALLINT        \n                ,PULocationID\t        SMALLINT        \n                ,DOLocationID\t        SMALLINT        \n                ,PassengerCount \t    TINYINT         \n                ,TripDistance\t        FLOAT           \n                ,FareAmount \t        FLOAT           \n                ,Extra\t                FLOAT           \n                ,MTATax \t            FLOAT           \n                ,TipAmount\t            FLOAT           \n                ,TollsAmount\t        FLOAT           \n                ,eHailFee\t            VARCHAR(50)     \n                ,ImprovementSurcharge   FLOAT           \n                ,TotalAmount\t        FLOAT           \n                ,PaymentType\t        BIGINT          \n                ,TripType               BIGINT          \n                ,CongestionSurcharge    FLOAT           \n            ) AS TripPartitioned\nGO\n\n\n-- Query w/ Partition Pruning\nSELECT TOP 10 *\nFROM Processed.View_TripPartitioned\nWHERE PartitionYear = '2020' AND PartitionMonth = '01';",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
 		}
 	]
 }
