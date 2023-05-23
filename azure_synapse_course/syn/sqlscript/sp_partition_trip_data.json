@@ -1,0 +1,20 @@
+{
+	"name": "sp_partition_trip_data",
+	"properties": {
+		"folder": {
+			"name": "dw_serverless/stored_procedures"
+		},
+		"content": {
+			"query": "USE NYC_Taxi_Serverless\nGO\n\nCREATE OR ALTER PROCEDURE Processed.PartitionTripData\n\n@PartitionYear  VARCHAR(4),\n@PartitionMonth VARCHAR(2)\n\nAS\n\nBEGIN\n\n    DECLARE @CreateStatement    NVARCHAR(MAX),\n            @DropStatement      NVARCHAR(MAX);\n    \n\n    SET @CreateStatement =\n        'CREATE EXTERNAL TABLE Processed.TripPartitioned_' + @PartitionYear + '_' + @PartitionMonth +\n\n            ' WITH (\n                LOCATION = ''trip_partitioned/year=' + @PartitionYear + '/month=' + @PartitionMonth + '''\n                ,DATA_SOURCE = NYC_Taxi_Processed\n                ,FILE_FORMAT = Parquet_File_Format\n            )\n\n        AS\n\n            SELECT *\n            FROM Processed.Trip\n            WHERE PartitionYear = ''' + @PartitionYear + ''' AND PartitionMonth = ''' + @PartitionMonth + '''';\n    \n    PRINT(@CreateStatement)\n    EXEC sp_executesql @CreateStatement;\n\n\n    SET @DropStatement =\n        'DROP EXTERNAL TABLE Processed.TripPartitioned_' + @PartitionYear + '_' + @PartitionMonth;\n    \n    PRINT(@DropStatement)\n    EXEC sp_executesql @DropStatement;\n\nEND;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "NYC_Taxi_Serverless",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
