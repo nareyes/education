@@ -1,2 +1,0 @@
-USE NYC_Taxi_Serverless
-GO

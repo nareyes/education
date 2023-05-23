@@ -4,7 +4,7 @@ GO
 -- Data Written to ADLS Cannot be Deleted Here
 -- Delete via Pipelines and Call Script as a Best Practice
 
--- Taxi Zone
+-- Taxi Trip
 IF OBJECT_ID ('Processed.Trip') IS NOT NULL
     DROP EXTERNAL TABLE Processed.Trip
     GO
@@ -25,7 +25,7 @@ AS
     -- Alternate: Use OPENROWSET if Raw Table Does Not Exists
     -- Preferred Method, Simple Column Renaming
     -- Issue w/ Partitioned Data: This Will Not Maintain Partitions (Added ParitionYear and PartitionMonth for Simple Parition-Like Filtering)
-    -- Reference create_trip_csv_sp_processed for Stored Procedure Workaround (Using Spark Pool is a Preferred Solution)
+    -- Reference create_sp_partition_trip_data for Stored Procedure Workaround (Using Spark Pool is a Preferred Solution)
     SELECT
         Trip.filepath(1) AS PartitionYear
         ,Trip.filepath(2) AS PartitionMonth
@@ -65,4 +65,27 @@ AS
 
 -- Query Processed Table
 SELECT TOP 10 * FROM Processed.Trip
-WHERE PartitionYear = 2020;
+WHERE PartitionYear = 2020 AND PartitionMonth = 01;
+
+
+-- Run Stored Procedure to Load Partitioned Data
+-- Again, This is Not an Optimal Solution. It's a Workaround
+EXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '01';
+EXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '02';
+EXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '03';
+EXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '04';
+EXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '05';
+EXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '06';
+EXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '07';
+EXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '08';
+EXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '09';
+EXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '10';
+EXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '11';
+EXEC Processed.PartitionTripData @PartitionYear = '2020', @PartitionMonth = '12';
+EXEC Processed.PartitionTripData @PartitionYear = '2021', @PartitionMonth = '01';
+EXEC Processed.PartitionTripData @PartitionYear = '2021', @PartitionMonth = '02';
+EXEC Processed.PartitionTripData @PartitionYear = '2021', @PartitionMonth = '03';
+EXEC Processed.PartitionTripData @PartitionYear = '2021', @PartitionMonth = '04';
+EXEC Processed.PartitionTripData @PartitionYear = '2021', @PartitionMonth = '05';
+EXEC Processed.PartitionTripData @PartitionYear = '2021', @PartitionMonth = '06';
+EXEC Processed.PartitionTripData @PartitionYear = '2021', @PartitionMonth = '07';
