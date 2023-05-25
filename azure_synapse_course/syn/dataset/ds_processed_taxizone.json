@@ -1,0 +1,37 @@
+{
+	"name": "ds_processed_taxizone",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_synlakehousedev",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "processed/taxi_zone",
+				"fileSystem": "nyc-taxi"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "LocationID",
+				"type": "INT_16"
+			},
+			{
+				"name": "Borough",
+				"type": "UTF8"
+			},
+			{
+				"name": "Zone",
+				"type": "UTF8"
+			},
+			{
+				"name": "ServiceZone",
+				"type": "UTF8"
+			}
+		]
+	}
+}
