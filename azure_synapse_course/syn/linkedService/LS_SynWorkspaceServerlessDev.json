@@ -1,0 +1,14 @@
+{
+	"name": "LS_SynWorkspaceServerlessDev",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlDW",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synlakehousedev-ondemand.sql.azuresynapse.net,1433;Initial Catalog=NYC_Taxi_Serverless"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
