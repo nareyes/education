@@ -48,7 +48,7 @@
 				},
 				"userProperties": [],
 				"linkedServiceName": {
-					"referenceName": "LS_SynWorkspaceDev",
+					"referenceName": "LS_SynWorkspaceServerlessDev",
 					"type": "LinkedServiceReference"
 				},
 				"typeProperties": {
@@ -81,7 +81,7 @@
 				},
 				"userProperties": [],
 				"linkedServiceName": {
-					"referenceName": "LS_SynWorkspaceDev",
+					"referenceName": "LS_SynWorkspaceServerlessDev",
 					"type": "LinkedServiceReference"
 				},
 				"typeProperties": {
