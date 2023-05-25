@@ -1,8 +1,8 @@
 {
-	"name": "ds_processed_taxizone",
+	"name": "DS_Processed_TaxiZone",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "ls_synlakehousedev",
+			"referenceName": "LS_SynLakehouseDev",
 			"type": "LinkedServiceReference"
 		},
 		"annotations": [],
