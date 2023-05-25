@@ -7,16 +7,25 @@
 			"metadata": "Workspace name",
 			"defaultValue": "synlakehousedev"
 		},
-		"ls_synlakehousedev_accountKey": {
+		"LS_SynLakehouseDev_accountKey": {
 			"type": "secureString",
-			"metadata": "Secure string for 'accountKey' of 'ls_synlakehousedev'"
+			"metadata": "Secure string for 'accountKey' of 'LS_SynLakehouseDev'"
+		},
+		"LS_SynWorkspaceDev_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_SynWorkspaceDev'"
 		},
 		"synlakehousedev-WorkspaceDefaultSqlServer_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'synlakehousedev-WorkspaceDefaultSqlServer'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synlakehousedev.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
-		"ls_synlakehousedev_properties_typeProperties_url": {
+		"LS_SynWorkspaceServerlessDev_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_SynWorkspaceServerlessDev'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synlakehousedev-ondemand.sql.azuresynapse.net,1433;Initial Catalog=NYC_Taxi_Serverless"
+		},
+		"LS_SynLakehouseDev_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://synlakehousedev.dfs.core.windows.net"
 		},
@@ -30,12 +39,124 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('workspaceName'), '/ds_processed_taxizone')]",
+			"name": "[concat(parameters('workspaceName'), '/PL_Raw_Processed_TaxiZone_Script')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "DeleteTaxiZone",
+						"description": "Delete taxi_zone folder from Lakehouse.",
+						"type": "Delete",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "DS_Processed_TaxiZone",
+								"type": "DatasetReference",
+								"parameters": {}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							}
+						}
+					},
+					{
+						"name": "DropTaxiZoneTbl",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "DeleteTaxiZone",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "LS_SynWorkspaceServerlessDev",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "NonQuery",
+									"text": "IF OBJECT_ID ('Processed.TaxiZone') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.TaxiZone;"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					},
+					{
+						"name": "CreateTaxiZoneTbl",
+						"type": "Script",
+						"dependsOn": [
+							{
+								"activity": "DropTaxiZoneTbl",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"linkedServiceName": {
+							"referenceName": "LS_SynWorkspaceDev",
+							"type": "LinkedServiceReference"
+						},
+						"typeProperties": {
+							"scripts": [
+								{
+									"type": "NonQuery",
+									"text": "CREATE EXTERNAL TABLE Processed.TaxiZone\n\n    WITH (\n        LOCATION = 'taxi_zone'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    SELECT *\n    FROM Raw.TaxiZone"
+								}
+							],
+							"scriptBlockExecutionTimeout": "02:00:00"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/DS_Processed_TaxiZone')]",
+				"[concat(variables('workspaceId'), '/linkedServices/LS_SynWorkspaceServerlessDev')]",
+				"[concat(variables('workspaceId'), '/linkedServices/LS_SynWorkspaceDev')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DS_Processed_TaxiZone')]",
 			"type": "Microsoft.Synapse/workspaces/datasets",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "ls_synlakehousedev",
+					"referenceName": "LS_SynLakehouseDev",
 					"type": "LinkedServiceReference"
 				},
 				"annotations": [],
@@ -68,22 +189,41 @@
 				]
 			},
 			"dependsOn": [
-				"[concat(variables('workspaceId'), '/linkedServices/ls_synlakehousedev')]"
+				"[concat(variables('workspaceId'), '/linkedServices/LS_SynLakehouseDev')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/ls_synlakehousedev')]",
+			"name": "[concat(parameters('workspaceName'), '/LS_SynLakehouseDev')]",
 			"type": "Microsoft.Synapse/workspaces/linkedServices",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
 				"annotations": [],
 				"type": "AzureBlobFS",
 				"typeProperties": {
-					"url": "[parameters('ls_synlakehousedev_properties_typeProperties_url')]",
+					"url": "[parameters('LS_SynLakehouseDev_properties_typeProperties_url')]",
 					"accountKey": {
 						"type": "SecureString",
-						"value": "[parameters('ls_synlakehousedev_accountKey')]"
+						"value": "[parameters('LS_SynLakehouseDev_accountKey')]"
 					}
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/LS_SynWorkspaceDev')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('LS_SynWorkspaceDev_connectionString')]"
 				},
 				"connectVia": {
 					"referenceName": "AutoResolveIntegrationRuntime",
@@ -1213,6 +1353,25 @@
 			},
 			"dependsOn": [],
 			"location": "centralus"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/LS_SynWorkspaceServerlessDev')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('LS_SynWorkspaceServerlessDev_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
 		}
 	]
 }
