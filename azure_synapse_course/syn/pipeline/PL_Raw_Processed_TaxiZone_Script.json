@@ -88,7 +88,7 @@
 					"scripts": [
 						{
 							"type": "NonQuery",
-							"text": "CREATE EXTERNAL TABLE Processed.TaxiZone\n\n    WITH (\n        LOCATION = 'taxi_zone'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    SELECT *\n    FROM Raw.TaxiZone"
+							"text": "CREATE EXTERNAL TABLE Processed.TaxiZone\n\n    WITH (\n        LOCATION = 'taxi_zone'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    SELECT *\n    FROM Raw.TaxiZone;"
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
