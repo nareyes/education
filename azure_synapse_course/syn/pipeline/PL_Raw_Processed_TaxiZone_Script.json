@@ -1,6 +1,100 @@
 {
-	"name": "PL_Raw_Processed_TaxiZone",
+	"name": "PL_Raw_Processed_TaxiZone_Script",
 	"properties": {
+		"activities": [
+			{
+				"name": "DeleteTaxiZone",
+				"description": "Delete taxi_zone folder from Lakehouse.",
+				"type": "Delete",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "DS_Processed_TaxiZone",
+						"type": "DatasetReference"
+					},
+					"enableLogging": false,
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
+						"enablePartitionDiscovery": false
+					}
+				}
+			},
+			{
+				"name": "DropTaxiZoneTbl",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "DeleteTaxiZone",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "LS_SynWorkspaceDev",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "NonQuery",
+							"text": "IF OBJECT_ID ('Processed.TaxiZone') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.TaxiZone;"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "CreateTaxiZoneTbl",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "DropTaxiZoneTbl",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "LS_SynWorkspaceDev",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "CREATE EXTERNAL TABLE Processed.TaxiZone\n\n    WITH (\n        LOCATION = 'taxi_zone'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n\n    SELECT\n        *\n    FROM\n        OPENROWSET (\n            BULK 'taxi_zone.csv'\n            ,DATA_SOURCE = 'NYC_Taxi_Raw'\n            ,FORMAT = 'CSV'\n            ,PARSER_VERSION = '2.0'\n            ,HEADER_ROW = TRUE\n        )\n\n        WITH (\n            LocationID      SMALLINT    1\n            ,Borough        VARCHAR(15) 2\n            ,Zone           VARCHAR(50) 3\n            ,ServiceZone    VARCHAR(15) 4\n        ) AS TaxiZone;"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			}
+		],
 		"annotations": []
 	}
 }
