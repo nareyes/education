@@ -5,13 +5,16 @@
 		"workspaceName": {
 			"value": "synlakehousedev"
 		},
+		"ls_synlakehousedev_accountKey": {
+			"value": ""
+		},
 		"synlakehousedev-WorkspaceDefaultSqlServer_connectionString": {
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synlakehousedev.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
-		"synlakehousedev-WorkspaceDefaultStorage_properties_typeProperties_url": {
+		"ls_synlakehousedev_properties_typeProperties_url": {
 			"value": "https://synlakehousedev.dfs.core.windows.net"
 		},
-		"ls_synlakehousedev_properties_typeProperties_url": {
+		"synlakehousedev-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://synlakehousedev.dfs.core.windows.net"
 		}
 	}
