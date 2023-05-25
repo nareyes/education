@@ -15,15 +15,15 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'LS_SynWorkspaceDev'"
 		},
-		"synlakehousedev-WorkspaceDefaultSqlServer_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'synlakehousedev-WorkspaceDefaultSqlServer'",
-			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synlakehousedev.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
-		},
 		"LS_SynWorkspaceServerlessDev_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'LS_SynWorkspaceServerlessDev'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synlakehousedev-ondemand.sql.azuresynapse.net,1433;Initial Catalog=NYC_Taxi_Serverless"
+		},
+		"synlakehousedev-WorkspaceDefaultSqlServer_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'synlakehousedev-WorkspaceDefaultSqlServer'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synlakehousedev.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
 		"LS_SynLakehouseDev_properties_typeProperties_url": {
 			"type": "string",
@@ -124,14 +124,14 @@
 						},
 						"userProperties": [],
 						"linkedServiceName": {
-							"referenceName": "LS_SynWorkspaceDev",
+							"referenceName": "LS_SynWorkspaceServerlessDev",
 							"type": "LinkedServiceReference"
 						},
 						"typeProperties": {
 							"scripts": [
 								{
 									"type": "NonQuery",
-									"text": "CREATE EXTERNAL TABLE Processed.TaxiZone\n\n    WITH (\n        LOCATION = 'taxi_zone'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    SELECT *\n    FROM Raw.TaxiZone"
+									"text": "CREATE EXTERNAL TABLE Processed.TaxiZone\n\n    WITH (\n        LOCATION = 'taxi_zone'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    SELECT *\n    FROM Raw.TaxiZone;"
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -146,8 +146,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('workspaceId'), '/datasets/DS_Processed_TaxiZone')]",
-				"[concat(variables('workspaceId'), '/linkedServices/LS_SynWorkspaceServerlessDev')]",
-				"[concat(variables('workspaceId'), '/linkedServices/LS_SynWorkspaceDev')]"
+				"[concat(variables('workspaceId'), '/linkedServices/LS_SynWorkspaceServerlessDev')]"
 			]
 		},
 		{
@@ -224,6 +223,25 @@
 				"type": "AzureSqlDW",
 				"typeProperties": {
 					"connectionString": "[parameters('LS_SynWorkspaceDev_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/LS_SynWorkspaceServerlessDev')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('LS_SynWorkspaceServerlessDev_connectionString')]"
 				},
 				"connectVia": {
 					"referenceName": "AutoResolveIntegrationRuntime",
@@ -1353,25 +1371,6 @@
 			},
 			"dependsOn": [],
 			"location": "centralus"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/LS_SynWorkspaceServerlessDev')]",
-			"type": "Microsoft.Synapse/workspaces/linkedServices",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDW",
-				"typeProperties": {
-					"connectionString": "[parameters('LS_SynWorkspaceServerlessDev_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
 		}
 	]
 }
