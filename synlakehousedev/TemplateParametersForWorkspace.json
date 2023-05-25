@@ -10,6 +10,9 @@
 		},
 		"synlakehousedev-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"value": "https://synlakehousedev.dfs.core.windows.net"
+		},
+		"ls_synlakehousedev_properties_typeProperties_url": {
+			"value": "https://synlakehousedev.dfs.core.windows.net"
 		}
 	}
 }

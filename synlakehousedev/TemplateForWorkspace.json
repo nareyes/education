@@ -15,6 +15,10 @@
 		"synlakehousedev-WorkspaceDefaultStorage_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://synlakehousedev.dfs.core.windows.net"
+		},
+		"ls_synlakehousedev_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://synlakehousedev.dfs.core.windows.net"
 		}
 	},
 	"variables": {
@@ -278,6 +282,29 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/create_sp_partition_trip_demand_curated')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "dw_serverless/transform_external_objects_curated"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\nCREATE OR ALTER PROCEDURE Curated.InsertTripDemand\n\n@PartitionYear  VARCHAR(4),\n@PartitionMonth VARCHAR(2)\n\nAS\n\nBEGIN\n\n    DECLARE @CreateStatement    NVARCHAR(MAX),\n            @DropStatement      NVARCHAR(MAX);\n    \n\n    SET @CreateStatement =\n        'CREATE EXTERNAL TABLE Curated.TripDemand_' + @PartitionYear + '_' + @PartitionMonth +\n\n            ' WITH (\n                LOCATION = ''trip_demand/year=' + @PartitionYear + '/month=' + @PartitionMonth + '''\n                ,DATA_SOURCE = NYC_Taxi_Curated\n                ,FILE_FORMAT = Parquet_File_Format\n            )\n\n        AS\n\n            SELECT\n                T.PartitionYear\n                ,T.PartitionMonth\n                ,Z.Borough\n                ,CAST (T.PickupDateTime AS DATE) AS TripDate\n                ,C.DayName AS TripDay\n                ,CASE WHEN C.DayName IN (''Saturday'', ''Sunday'') THEN 1 ELSE 0 END AS IsWeekend\n                ,SUM (CASE WHEN TT.TripType = 1 THEN 1 ELSE 0 END) AS StreetHailCount -- Trip Type: Street Hail\n                ,SUM (CASE WHEN TT.TripType = 2 THEN 1 ELSE 0 END) AS DispatchCount -- Trip Type: Dispatch\n                ,SUM (T.TripDistance) AS TripDistance\n                ,SUM (DATEDIFF (MINUTE, T.PickupDateTime, T.DropoffDateTime)) AS TripDuration\n                ,SUM (T.FareAmount) AS FareAmount\n            FROM Processed.View_TripPartitioned AS T\n                INNER JOIN Processed.TaxiZone AS Z\n                    ON T.PULocationID = Z.LocationID\n                INNER JOIN Processed.Calendar AS C\n                    ON CAST (T.PickupDateTime AS DATE) = C.Date\n                INNER JOIN Processed.PaymentType AS P\n                    ON T.PaymentType = P.PaymentType\n                INNER JOIN Processed.TripType AS TT\n                    ON T.TripType = TT.TripType \n            WHERE 1=1\n                AND T.PartitionYear = ''' + @PartitionYear + ''' \n                AND T.PartitionMonth = ''' + @PartitionMonth + '''\n            GROUP BY\n                T.PartitionYear\n                ,T.PartitionMonth\n                ,Z.Borough\n                ,CAST (T.PickupDateTime AS DATE)\n                ,C.DayName';\n\n\n    PRINT(@CreateStatement)\n    EXEC sp_executesql @CreateStatement;\n\n\n    SET @DropStatement =\n        'DROP EXTERNAL TABLE Curated.TripDemand_' + @PartitionYear + '_' + @PartitionMonth;\n    \n    PRINT(@DropStatement)\n    EXEC sp_executesql @DropStatement;\n\nEND;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/create_sp_partition_trip_processed')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -440,6 +467,29 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/create_tbl_trip_demand_curated')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "dw_serverless/transform_external_objects_curated"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n\n-- Demand Taxi Data\nSELECT\n    T.PartitionYear\n    ,T.PartitionMonth\n    ,Z.Borough\n    ,CAST (T.PickupDateTime AS DATE) AS TripDate\n    ,C.DayName AS TripDay\n    ,CASE WHEN C.DayName IN ('Saturday', 'Sunday') THEN 1 ELSE 0 END AS IsWeekend\n    ,SUM (CASE WHEN TT.TripType = 1 THEN 1 ELSE 0 END) AS StreetHailCount -- Trip Type: Street Hail\n    ,SUM (CASE WHEN TT.TripType = 2 THEN 1 ELSE 0 END) AS DispatchCount -- Trip Type: Dispatch\n    ,SUM (T.TripDistance) AS TripDistance\n    ,SUM (DATEDIFF (MINUTE, T.PickupDateTime, T.DropoffDateTime)) AS TripDuration\n    ,SUM (T.FareAmount) AS FareAmount\nFROM Processed.View_TripPartitioned AS T\n    INNER JOIN Processed.TaxiZone AS Z\n        ON T.PULocationID = Z.LocationID\n    INNER JOIN Processed.Calendar AS C\n        ON CAST (T.PickupDateTime AS DATE) = C.Date\n    INNER JOIN Processed.PaymentType AS P\n        ON T.PaymentType = P.PaymentType\n    INNER JOIN Processed.TripType AS TT\n        ON T.TripType = TT.TripType \nWHERE 1=1\n    AND T.PartitionYear = '2020' \n    AND T.PartitionMonth = '01'\nGROUP BY\n    T.PartitionYear\n    ,T.PartitionMonth\n    ,Z.Borough\n    ,CAST (T.PickupDateTime AS DATE)\n    ,C.DayName;\n\n\n-- Copy Data to Serverless and ADLS (Delete Serverless)\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '01';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '02';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '03';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '04';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '05';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '06';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '07';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '08';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '09';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '10';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '11';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '12';\nEXEC Curated.InsertTripDemand @PartitionYear = '2021', @PartitionMonth = '01';\nEXEC Curated.InsertTripDemand @PartitionYear = '2021', @PartitionMonth = '02';\nEXEC Curated.InsertTripDemand @PartitionYear = '2021', @PartitionMonth = '03';\nEXEC Curated.InsertTripDemand @PartitionYear = '2021', @PartitionMonth = '04';\nEXEC Curated.InsertTripDemand @PartitionYear = '2021', @PartitionMonth = '05';\nEXEC Curated.InsertTripDemand @PartitionYear = '2021', @PartitionMonth = '06';\nEXEC Curated.InsertTripDemand @PartitionYear = '2021', @PartitionMonth = '07';",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/create_tbl_trip_type_csv_processed')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -518,6 +568,29 @@
 				},
 				"content": {
 					"query": "USE NYC_Taxi_Serverless\nGO\n\nDROP VIEW IF EXISTS Curated.View_TripAggregated\nGO\n\nCREATE VIEW Curated.View_TripAggregated\nAS\n    SELECT\n        *\n    FROM\n        OPENROWSET (\n            BULK 'trip_aggregated/**'\n            ,DATA_SOURCE = 'NYC_Taxi_Curated'\n            ,FORMAT = 'PARQUET'\n        )\n\n            WITH (\n                PartitionYear   VARCHAR(4)\n                ,PartitionMonth VARCHAR(2)\n                ,Borough        VARCHAR(20)\n                ,TripDate       DATE\n                ,TripDay        VARCHAR(10)\n                ,IsWeekend      TINYINT\n                ,CardTripCount  INT\n                ,CashTripCount  INT         \n            ) AS TripAggregated\nGO\n\n\n-- Query w/ Partition Pruning\nSELECT TOP 10 *\nFROM Curated.View_TripAggregated\nWHERE PartitionYear = '2020' AND PartitionMonth = '01';",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/create_vw_trip_demand_curated')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "dw_serverless/transform_external_objects_curated"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\nDROP VIEW IF EXISTS Curated.View_TripDemand\nGO\n\nCREATE VIEW Curated.View_TripDemand\nAS\n    SELECT\n        *\n    FROM\n        OPENROWSET (\n            BULK 'trip_demand/**'\n            ,DATA_SOURCE = 'NYC_Taxi_Curated'\n            ,FORMAT = 'PARQUET'\n        )\n\n            WITH (\n                PartitionYear       VARCHAR(4)\n                ,PartitionMonth     VARCHAR(2)\n                ,Borough            VARCHAR(20)\n                ,TripDate           DATE\n                ,TripDay            VARCHAR(10)\n                ,IsWeekend          TINYINT\n                ,StreetHailCount    INT\n                ,DispatchCount      INT\n                ,TripDistance       FLOAT\n                ,TripDuration       INT  \n                ,FareAmount         FLOAT      \n            ) AS TripDemand\nGO\n\n\n-- Query w/ Partition Pruning\nSELECT TOP 10 *\nFROM Curated.View_TripDemand\nWHERE PartitionYear = '2020' AND PartitionMonth = '01';",
 					"metadata": {
 						"language": "sql"
 					},
@@ -1073,73 +1146,23 @@
 			"location": "centralus"
 		},
 		{
-			"name": "[concat(parameters('workspaceName'), '/create_sp_partition_trip_demand_curated')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"name": "[concat(parameters('workspaceName'), '/ls_synlakehousedev')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
-				"folder": {
-					"name": "dw_serverless/transform_external_objects_curated"
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('ls_synlakehousedev_properties_typeProperties_url')]"
 				},
-				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\nCREATE OR ALTER PROCEDURE Curated.InsertTripDemand\n\n@PartitionYear  VARCHAR(4),\n@PartitionMonth VARCHAR(2)\n\nAS\n\nBEGIN\n\n    DECLARE @CreateStatement    NVARCHAR(MAX),\n            @DropStatement      NVARCHAR(MAX);\n    \n\n    SET @CreateStatement =\n        'CREATE EXTERNAL TABLE Curated.TripDemand_' + @PartitionYear + '_' + @PartitionMonth +\n\n            ' WITH (\n                LOCATION = ''trip_demand/year=' + @PartitionYear + '/month=' + @PartitionMonth + '''\n                ,DATA_SOURCE = NYC_Taxi_Curated\n                ,FILE_FORMAT = Parquet_File_Format\n            )\n\n        AS\n\n            SELECT\n                T.PartitionYear\n                ,T.PartitionMonth\n                ,Z.Borough\n                ,CAST (T.PickupDateTime AS DATE) AS TripDate\n                ,C.DayName AS TripDay\n                ,CASE WHEN C.DayName IN (''Saturday'', ''Sunday'') THEN 1 ELSE 0 END AS IsWeekend\n                ,SUM (CASE WHEN TT.TripType = 1 THEN 1 ELSE 0 END) AS StreetHailCount -- Trip Type: Street Hail\n                ,SUM (CASE WHEN TT.TripType = 2 THEN 1 ELSE 0 END) AS DispatchCount -- Trip Type: Dispatch\n                ,SUM (T.TripDistance) AS TripDistance\n                ,SUM (DATEDIFF (MINUTE, T.PickupDateTime, T.DropoffDateTime)) AS TripDuration\n                ,SUM (T.FareAmount) AS FareAmount\n            FROM Processed.View_TripPartitioned AS T\n                INNER JOIN Processed.TaxiZone AS Z\n                    ON T.PULocationID = Z.LocationID\n                INNER JOIN Processed.Calendar AS C\n                    ON CAST (T.PickupDateTime AS DATE) = C.Date\n                INNER JOIN Processed.PaymentType AS P\n                    ON T.PaymentType = P.PaymentType\n                INNER JOIN Processed.TripType AS TT\n                    ON T.TripType = TT.TripType \n            WHERE 1=1\n                AND T.PartitionYear = ''' + @PartitionYear + ''' \n                AND T.PartitionMonth = ''' + @PartitionMonth + '''\n            GROUP BY\n                T.PartitionYear\n                ,T.PartitionMonth\n                ,Z.Borough\n                ,CAST (T.PickupDateTime AS DATE)\n                ,C.DayName';\n\n\n    PRINT(@CreateStatement)\n    EXEC sp_executesql @CreateStatement;\n\n\n    SET @DropStatement =\n        'DROP EXTERNAL TABLE Curated.TripDemand_' + @PartitionYear + '_' + @PartitionMonth;\n    \n    PRINT(@DropStatement)\n    EXEC sp_executesql @DropStatement;\n\nEND;",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "NYC_Taxi_Serverless",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
 			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/create_tbl_trip_demand_curated')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"folder": {
-					"name": "dw_serverless/transform_external_objects_curated"
-				},
-				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\n\n-- Demand Taxi Data\nSELECT\n    T.PartitionYear\n    ,T.PartitionMonth\n    ,Z.Borough\n    ,CAST (T.PickupDateTime AS DATE) AS TripDate\n    ,C.DayName AS TripDay\n    ,CASE WHEN C.DayName IN ('Saturday', 'Sunday') THEN 1 ELSE 0 END AS IsWeekend\n    ,SUM (CASE WHEN TT.TripType = 1 THEN 1 ELSE 0 END) AS StreetHailCount -- Trip Type: Street Hail\n    ,SUM (CASE WHEN TT.TripType = 2 THEN 1 ELSE 0 END) AS DispatchCount -- Trip Type: Dispatch\n    ,SUM (T.TripDistance) AS TripDistance\n    ,SUM (DATEDIFF (MINUTE, T.PickupDateTime, T.DropoffDateTime)) AS TripDuration\n    ,SUM (T.FareAmount) AS FareAmount\nFROM Processed.View_TripPartitioned AS T\n    INNER JOIN Processed.TaxiZone AS Z\n        ON T.PULocationID = Z.LocationID\n    INNER JOIN Processed.Calendar AS C\n        ON CAST (T.PickupDateTime AS DATE) = C.Date\n    INNER JOIN Processed.PaymentType AS P\n        ON T.PaymentType = P.PaymentType\n    INNER JOIN Processed.TripType AS TT\n        ON T.TripType = TT.TripType \nWHERE 1=1\n    AND T.PartitionYear = '2020' \n    AND T.PartitionMonth = '01'\nGROUP BY\n    T.PartitionYear\n    ,T.PartitionMonth\n    ,Z.Borough\n    ,CAST (T.PickupDateTime AS DATE)\n    ,C.DayName;\n\n\n-- Copy Data to Serverless and ADLS (Delete Serverless)\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '01';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '02';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '03';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '04';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '05';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '06';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '07';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '08';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '09';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '10';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '11';\nEXEC Curated.InsertTripDemand @PartitionYear = '2020', @PartitionMonth = '12';\nEXEC Curated.InsertTripDemand @PartitionYear = '2021', @PartitionMonth = '01';\nEXEC Curated.InsertTripDemand @PartitionYear = '2021', @PartitionMonth = '02';\nEXEC Curated.InsertTripDemand @PartitionYear = '2021', @PartitionMonth = '03';\nEXEC Curated.InsertTripDemand @PartitionYear = '2021', @PartitionMonth = '04';\nEXEC Curated.InsertTripDemand @PartitionYear = '2021', @PartitionMonth = '05';\nEXEC Curated.InsertTripDemand @PartitionYear = '2021', @PartitionMonth = '06';\nEXEC Curated.InsertTripDemand @PartitionYear = '2021', @PartitionMonth = '07';",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "NYC_Taxi_Serverless",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/create_vw_trip_demand_curated')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"folder": {
-					"name": "dw_serverless/transform_external_objects_curated"
-				},
-				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\nDROP VIEW IF EXISTS Curated.View_TripDemand\nGO\n\nCREATE VIEW Curated.View_TripDemand\nAS\n    SELECT\n        *\n    FROM\n        OPENROWSET (\n            BULK 'trip_demand/**'\n            ,DATA_SOURCE = 'NYC_Taxi_Curated'\n            ,FORMAT = 'PARQUET'\n        )\n\n            WITH (\n                PartitionYear       VARCHAR(4)\n                ,PartitionMonth     VARCHAR(2)\n                ,Borough            VARCHAR(20)\n                ,TripDate           DATE\n                ,TripDay            VARCHAR(10)\n                ,IsWeekend          TINYINT\n                ,StreetHailCount    INT\n                ,DispatchCount      INT\n                ,TripDistance       FLOAT\n                ,TripDuration       INT  \n                ,FareAmount         FLOAT      \n            ) AS TripDemand\nGO\n\n\n-- Query w/ Partition Pruning\nSELECT TOP 10 *\nFROM Curated.View_TripDemand\nWHERE PartitionYear = '2020' AND PartitionMonth = '01';",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "NYC_Taxi_Serverless",
-						"poolName": "Built-in"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
 		}
 	]
 }
