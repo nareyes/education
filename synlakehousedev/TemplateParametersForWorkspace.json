@@ -8,11 +8,8 @@
 		"LS_SynLakehouseDev_accountKey": {
 			"value": ""
 		},
-		"LS_SynWorkspaceDev_connectionString": {
-			"value": ""
-		},
 		"LS_SynWorkspaceServerlessDev_connectionString": {
-			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synlakehousedev-ondemand.sql.azuresynapse.net,1433;Initial Catalog=NYC_Taxi_Serverless"
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=synlakehousedev-ondemand.sql.azuresynapse.net;Initial Catalog=NYC_Taxi_Serverless"
 		},
 		"synlakehousedev-WorkspaceDefaultSqlServer_connectionString": {
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synlakehousedev.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"

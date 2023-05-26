@@ -11,14 +11,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'accountKey' of 'LS_SynLakehouseDev'"
 		},
-		"LS_SynWorkspaceDev_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'LS_SynWorkspaceDev'"
-		},
 		"LS_SynWorkspaceServerlessDev_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'LS_SynWorkspaceServerlessDev'",
-			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synlakehousedev-ondemand.sql.azuresynapse.net,1433;Initial Catalog=NYC_Taxi_Serverless"
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=synlakehousedev-ondemand.sql.azuresynapse.net;Initial Catalog=NYC_Taxi_Serverless"
 		},
 		"synlakehousedev-WorkspaceDefaultSqlServer_connectionString": {
 			"type": "secureString",
@@ -204,25 +200,6 @@
 						"type": "SecureString",
 						"value": "[parameters('LS_SynLakehouseDev_accountKey')]"
 					}
-				},
-				"connectVia": {
-					"referenceName": "AutoResolveIntegrationRuntime",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/LS_SynWorkspaceDev')]",
-			"type": "Microsoft.Synapse/workspaces/linkedServices",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"annotations": [],
-				"type": "AzureSqlDW",
-				"typeProperties": {
-					"connectionString": "[parameters('LS_SynWorkspaceDev_connectionString')]"
 				},
 				"connectVia": {
 					"referenceName": "AutoResolveIntegrationRuntime",
