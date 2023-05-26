@@ -88,7 +88,7 @@
 					"scripts": [
 						{
 							"type": "NonQuery",
-							"text": "CREATE EXTERNAL TABLE Processed.TaxiZone\n\n    WITH (\n        LOCATION = 'taxi_zone'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    SELECT\n        *\n    FROM\n        OPENROWSET (\n            BULK 'taxi_zone.csv'\n            ,DATA_SOURCE = 'NYC_Taxi_Raw'\n            ,FORMAT = 'CSV'\n            ,PARSER_VERSION = '2.0'\n            ,HEADER_ROW = TRUE\n        )\n\n        WITH (\n            LocationID      SMALLINT       1\n            ,Borough         VARCHAR(15) 2\n            ,Zone               VARCHAR(50) 3\n            ,ServiceZone    VARCHAR(15) 4\n        ) AS TaxiZone"
+							"text": "CREATE EXTERNAL TABLE Processed.TaxiZone\n\n    WITH (\n        LOCATION = 'taxi_zone'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    SELECT\n        *\n    FROM Raw.TaxiZone;"
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
