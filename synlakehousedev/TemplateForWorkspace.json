@@ -39,7 +39,7 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('workspaceName'), '/PL_Raw_Processed_TaxiZone_Script')]",
+			"name": "[concat(parameters('workspaceName'), '/PL_Raw_Processed_TaxiZone_SQLScript')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
 			"properties": {
@@ -131,7 +131,7 @@
 							"scripts": [
 								{
 									"type": "NonQuery",
-									"text": "CREATE EXTERNAL TABLE Processed.TaxiZone\n\n    WITH (\n        LOCATION = 'taxi_zone'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    SELECT *\n    FROM Raw.TaxiZone;"
+									"text": "CREATE EXTERNAL TABLE Processed.TaxiZone\n\n    WITH (\n        LOCATION = 'taxi_zone'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    SELECT\n        *\n    FROM\n        OPENROWSET (\n            BULK 'taxi_zone.csv'\n            ,DATA_SOURCE = 'NYC_Taxi_Raw'\n            ,FORMAT = 'CSV'\n            ,PARSER_VERSION = '2.0'\n            ,HEADER_ROW = TRUE\n        )\n\n        WITH (\n            LocationID      SMALLINT    1\n            ,Borough        VARCHAR(15) 2\n            ,Zone           VARCHAR(50) 3\n            ,ServiceZone    VARCHAR(15) 4\n        ) AS TaxiZone\n"
 								}
 							],
 							"scriptBlockExecutionTimeout": "02:00:00"
@@ -321,6 +321,26 @@
 			"properties": {
 				"type": "ManagedIdentity",
 				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/SQL script 1')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"content": {
+					"query": "SELECT * FROM Raw.TaxiZone;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
 			},
 			"dependsOn": []
 		},
