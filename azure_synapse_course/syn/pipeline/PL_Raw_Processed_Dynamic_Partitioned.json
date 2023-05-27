@@ -1,0 +1,166 @@
+{
+	"name": "PL_Raw_Processed_Dynamic_Partitioned",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetPartitionedDir",
+				"type": "Script",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "LS_SynWorkspaceServerlessDev",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "Query",
+							"text": "SELECT DISTINCT\n    PartitionYear\n    ,PartitionMonth\nFROM Processed.View_TripPartitioned;"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			},
+			{
+				"name": "ForEach PartitionedDir",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "GetPartitionedDir",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('GetPartitionedDir').output.resultSets[0].Rows",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "DeletePartitions",
+							"type": "Delete",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "DS_Dynamic",
+									"type": "DatasetReference",
+									"parameters": {
+										"paramFolderPath": {
+											"value": "processed/trip_partitioned/year=@{item().PartitionYear}/month=@{item().PartitionMonth}",
+											"type": "Expression"
+										}
+									}
+								},
+								"enableLogging": false,
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								}
+							}
+						},
+						{
+							"name": "ExecStoredProc",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "DeletePartitions",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[Processed].[InsertPartitionTripData]",
+								"storedProcedureParameters": {
+									"PartitionMonth": {
+										"value": {
+											"value": "@item().PartitionMonth",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"PartitionYear": {
+										"value": {
+											"value": "@item().PartitionYear",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "LS_SynWorkspaceServerlessDev",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "CreateView",
+				"type": "Script",
+				"dependsOn": [
+					{
+						"activity": "ForEach PartitionedDir",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"linkedServiceName": {
+					"referenceName": "LS_SynWorkspaceServerlessDev",
+					"type": "LinkedServiceReference"
+				},
+				"typeProperties": {
+					"scripts": [
+						{
+							"type": "NonQuery",
+							"text": "DROP VIEW IF EXISTS Processed.View_TripPartitioned;"
+						},
+						{
+							"type": "Query",
+							"text": "CREATE VIEW Processed.View_TripPartitioned\nAS\n\n    SELECT\n        *\n    FROM\n        OPENROWSET (\n            BULK 'trip_partitioned/**'\n            ,DATA_SOURCE = 'NYC_Taxi_Processed'\n            ,FORMAT = 'PARQUET'\n        )\n\n            WITH (\n                PartitionYear           VARCHAR(4)\n                ,PartitionMonth         VARCHAR(2)\n                ,VendorID\t            TINYINT         \n                ,PickupDateTime     \tDATETIME2(0)    \n                ,DropoffDateTime    \tDATETIME2(0)    \n                ,StoreFwdFlag   \t    VARCHAR(10)     \n                ,RateCodeID\t            SMALLINT        \n                ,PULocationID\t        SMALLINT        \n                ,DOLocationID\t        SMALLINT        \n                ,PassengerCount \t    TINYINT         \n                ,TripDistance\t        FLOAT           \n                ,FareAmount \t        FLOAT           \n                ,Extra\t                FLOAT           \n                ,MTATax \t            FLOAT           \n                ,TipAmount\t            FLOAT           \n                ,TollsAmount\t        FLOAT           \n                ,eHailFee\t            VARCHAR(50)     \n                ,ImprovementSurcharge   FLOAT           \n                ,TotalAmount\t        FLOAT           \n                ,PaymentType\t        BIGINT          \n                ,TripType               BIGINT          \n                ,CongestionSurcharge    FLOAT           \n            ) AS TripPartitioned;"
+						}
+					],
+					"scriptBlockExecutionTimeout": "02:00:00"
+				}
+			}
+		],
+		"annotations": []
+	}
+}
