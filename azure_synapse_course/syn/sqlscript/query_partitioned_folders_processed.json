@@ -1,5 +1,5 @@
 {
-	"name": "query_partitioned_folders",
+	"name": "query_partitioned_folders_processed",
 	"properties": {
 		"folder": {
 			"name": "dw_serverless/create_external_objects_processed"
