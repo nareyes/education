@@ -64,7 +64,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"paramFolderPath": {
-											"value": "curate/trip_aggregated/year=@{item().PartitionYear}/month=@{item().PartitionMonth}",
+											"value": "curated/trip_aggregated/year=@{item().PartitionYear}/month=@{item().PartitionMonth}",
 											"type": "Expression"
 										}
 									}
