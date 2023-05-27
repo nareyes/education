@@ -1,0 +1,45 @@
+{
+	"name": "DS_Dynamic",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SynLakehouseDev",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"paramFolderPath": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@dataset().paramFolderPath",
+					"type": "Expression"
+				},
+				"fileSystem": "nyc-taxi"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "LocationID",
+				"type": "INT_16"
+			},
+			{
+				"name": "Borough",
+				"type": "UTF8"
+			},
+			{
+				"name": "Zone",
+				"type": "UTF8"
+			},
+			{
+				"name": "ServiceZone",
+				"type": "UTF8"
+			}
+		]
+	}
+}
