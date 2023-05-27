@@ -1,0 +1,20 @@
+{
+	"name": "query_partitioned_folders",
+	"properties": {
+		"folder": {
+			"name": "dw_serverless/create_external_objects_processed"
+		},
+		"content": {
+			"query": "USE NYC_Taxi_Serverless\nGO\n\nSELECT DISTINCT\n    PartitionYear\n    ,PartitionMonth\nFROM Processed.View_TripPartitioned;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "NYC_Taxi_Serverless",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
