@@ -14,6 +14,9 @@
 		"synlakehousedev-WorkspaceDefaultSqlServer_connectionString": {
 			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synlakehousedev.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
+		"LS_SynWorkspaceDedicatedDev_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=synlakehousedev.sql.azuresynapse.net;Initial Catalog=NYC_Taxi_Dedicated"
+		},
 		"LS_SynLakehouseDev_properties_typeProperties_url": {
 			"value": "https://synlakehousedev.dfs.core.windows.net"
 		},

@@ -21,6 +21,11 @@
 			"metadata": "Secure string for 'connectionString' of 'synlakehousedev-WorkspaceDefaultSqlServer'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synlakehousedev.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
 		},
+		"LS_SynWorkspaceDedicatedDev_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'LS_SynWorkspaceDedicatedDev'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=synlakehousedev.sql.azuresynapse.net;Initial Catalog=NYC_Taxi_Dedicated"
+		},
 		"LS_SynLakehouseDev_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://synlakehousedev.dfs.core.windows.net"
@@ -678,7 +683,7 @@
 					"name": "dw_serverless/create_external_objects_processed"
 				},
 				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Data Written to ADLS Cannot be Deleted Here\n-- Delete via Pipelines and Call Script as a Best Practice\n\n-- Taxi Zone\nIF OBJECT_ID ('Processed.PaymentType') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.PaymentType\n    GO\n\nCREATE EXTERNAL TABLE Processed.PaymentType\n\n    WITH (\n        LOCATION = 'payment_type'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    -- SELECT *\n    -- FROM Raw.View_RateCode;\n\n    -- Alternate: Use OPENROWSET if Raw Table Does Not Exists\n    -- Preferred Method, Simple Column Renaming\n    SELECT\n        PaymentType\n        ,PaymentTypeDescription\n    FROM\n        OPENROWSET (\n            BULK 'payment_type.json'\n            ,DATA_SOURCE = 'NYC_Taxi_Raw'\n            ,FORMAT = 'CSV' -- Even for JSON\n            ,PARSER_VERSION = '1.0'\n            ,FIELDTERMINATOR = '0x0b'\n            ,FIELDQUOTE = '0x0b'\n            ,ROWTERMINATOR = '0x0a'\n        ) \n\n            WITH (\n                jsonDoc NVARCHAR(MAX)\n            ) AS PaymentType\n\n    CROSS APPLY OPENJSON(jsonDoc) -- Return Key Value Pairs\n        WITH (\n            PaymentType             SMALLINT    '$.payment_type'\n            ,PaymentTypeDescription VARCHAR(15) '$.payment_type_desc'\n        )\n\n\n-- Query Processed Table\n-- SELECT TOP 10 * FROM Processed.PaymentType;",
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Data Written to ADLS Cannot be Deleted Here\n-- Delete via Pipelines and Call Script as a Best Practice\n\n-- Payment Type\nIF OBJECT_ID ('Processed.PaymentType') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.PaymentType\n    GO\n\nCREATE EXTERNAL TABLE Processed.PaymentType\n\n    WITH (\n        LOCATION = 'payment_type'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    -- SELECT *\n    -- FROM Raw.View_RateCode;\n\n    -- Alternate: Use OPENROWSET if Raw Table Does Not Exists\n    -- Preferred Method, Simple Column Renaming\n    SELECT\n        PaymentType\n        ,PaymentTypeDescription\n    FROM\n        OPENROWSET (\n            BULK 'payment_type.json'\n            ,DATA_SOURCE = 'NYC_Taxi_Raw'\n            ,FORMAT = 'CSV' -- Even for JSON\n            ,PARSER_VERSION = '1.0'\n            ,FIELDTERMINATOR = '0x0b'\n            ,FIELDQUOTE = '0x0b'\n            ,ROWTERMINATOR = '0x0a'\n        ) \n\n            WITH (\n                jsonDoc NVARCHAR(MAX)\n            ) AS PaymentType\n\n    CROSS APPLY OPENJSON(jsonDoc) -- Return Key Value Pairs\n        WITH (\n            PaymentType             SMALLINT    '$.payment_type'\n            ,PaymentTypeDescription VARCHAR(15) '$.payment_type_desc'\n        )\n\n\n-- Query Processed Table\n-- SELECT TOP 10 * FROM Processed.PaymentType;",
 					"metadata": {
 						"language": "sql"
 					},
@@ -701,7 +706,7 @@
 					"name": "dw_serverless/create_external_objects_processed"
 				},
 				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Data Written to ADLS Cannot be Deleted Here\n-- Delete via Pipelines and Call Script as a Best Practice\n\n-- Taxi Zone\nIF OBJECT_ID ('Processed.RateCode') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.RateCode\n    GO\n\nCREATE EXTERNAL TABLE Processed.RateCode\n\n    WITH (\n        LOCATION = 'rate_code'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    -- SELECT *\n    -- FROM Raw.View_RateCode;\n\n    -- Alternate: Use OPENROWSET if Raw Table Does Not Exists\n    -- Preferred Method, Simple Column Renaming\n    SELECT\n        RateCodeID\n        ,RateCodeDescription\n    FROM\n        OPENROWSET (\n            BULK 'rate_code.json'\n            ,DATA_SOURCE = 'NYC_Taxi_Raw'\n            ,FORMAT = 'CSV' -- Even for JSON\n            ,PARSER_VERSION = '1.0'\n            ,FIELDTERMINATOR = '0x0b'\n            ,FIELDQUOTE = '0x0b'\n            ,ROWTERMINATOR = '0x0b' -- Vertical Tab\n        ) \n\n            WITH (\n                jsonDoc NVARCHAR(MAX)\n            ) AS RateCode\n\n    CROSS APPLY OPENJSON(jsonDoc) -- Return Key Value Pairs\n        WITH (\n            RateCodeID              TINYINT     '$.rate_code_id'\n            ,RateCodeDescription    VARCHAR(20) '$.rate_code'\n        )\n\n\n-- Query Processed Table\n-- SELECT TOP 10 * FROM Processed.RateCode;",
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Data Written to ADLS Cannot be Deleted Here\n-- Delete via Pipelines and Call Script as a Best Practice\n\n-- Rate Code\nIF OBJECT_ID ('Processed.RateCode') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.RateCode\n    GO\n\nCREATE EXTERNAL TABLE Processed.RateCode\n\n    WITH (\n        LOCATION = 'rate_code'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    -- SELECT *\n    -- FROM Raw.View_RateCode;\n\n    -- Alternate: Use OPENROWSET if Raw Table Does Not Exists\n    -- Preferred Method, Simple Column Renaming\n    SELECT\n        RateCodeID\n        ,RateCodeDescription\n    FROM\n        OPENROWSET (\n            BULK 'rate_code.json'\n            ,DATA_SOURCE = 'NYC_Taxi_Raw'\n            ,FORMAT = 'CSV' -- Even for JSON\n            ,PARSER_VERSION = '1.0'\n            ,FIELDTERMINATOR = '0x0b'\n            ,FIELDQUOTE = '0x0b'\n            ,ROWTERMINATOR = '0x0b' -- Vertical Tab\n        ) \n\n            WITH (\n                jsonDoc NVARCHAR(MAX)\n            ) AS RateCode\n\n    CROSS APPLY OPENJSON(jsonDoc) -- Return Key Value Pairs\n        WITH (\n            RateCodeID              TINYINT     '$.rate_code_id'\n            ,RateCodeDescription    VARCHAR(20) '$.rate_code'\n        )\n\n\n-- Query Processed Table\n-- SELECT TOP 10 * FROM Processed.RateCode;",
 					"metadata": {
 						"language": "sql"
 					},
@@ -817,7 +822,7 @@
 					"name": "dw_serverless/create_external_objects_processed"
 				},
 				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Data Written to ADLS Cannot be Deleted Here\n-- Delete via Pipelines and Call Script as a Best Practice\n\n-- Taxi Zone\nIF OBJECT_ID ('Processed.TripType') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.TripType\n    GO\n\nCREATE EXTERNAL TABLE Processed.TripType\n\n    WITH (\n        LOCATION = 'trip_type'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    -- SELECT *\n    -- FROM Raw.TripType;\n\n    -- Alternate: Use OPENROWSET if Raw Table Does Not Exists\n    -- Preferred Method, Simple Column Renaming\n    SELECT\n        *\n    FROM\n        OPENROWSET (\n            BULK 'trip_type.tsv'\n            ,DATA_SOURCE = 'NYC_Taxi_Raw'\n            ,FORMAT = 'CSV'\n            ,FIELDTERMINATOR = '\\t'\n            ,PARSER_VERSION = '2.0'\n            ,HEADER_ROW = TRUE\n        )\n\n        WITH (\n            TripType                SMALLINT    1\n            ,TripTypeDescription    VARCHAR(25) 2\n        ) AS TripType\n\n\n-- Query Processed Table\n-- SELECT TOP 10 * FROM Processed.TripType;",
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Data Written to ADLS Cannot be Deleted Here\n-- Delete via Pipelines and Call Script as a Best Practice\n\n-- Trip Type\nIF OBJECT_ID ('Processed.TripType') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.TripType\n    GO\n\nCREATE EXTERNAL TABLE Processed.TripType\n\n    WITH (\n        LOCATION = 'trip_type'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    -- SELECT *\n    -- FROM Raw.TripType;\n\n    -- Alternate: Use OPENROWSET if Raw Table Does Not Exists\n    -- Preferred Method, Simple Column Renaming\n    SELECT\n        *\n    FROM\n        OPENROWSET (\n            BULK 'trip_type.tsv'\n            ,DATA_SOURCE = 'NYC_Taxi_Raw'\n            ,FORMAT = 'CSV'\n            ,FIELDTERMINATOR = '\\t'\n            ,PARSER_VERSION = '2.0'\n            ,HEADER_ROW = TRUE\n        )\n\n        WITH (\n            TripType                SMALLINT    1\n            ,TripTypeDescription    VARCHAR(25) 2\n        ) AS TripType\n\n\n-- Query Processed Table\n-- SELECT TOP 10 * FROM Processed.TripType;",
 					"metadata": {
 						"language": "sql"
 					},
@@ -840,7 +845,7 @@
 					"name": "dw_serverless/create_external_objects_processed"
 				},
 				"content": {
-					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Data Written to ADLS Cannot be Deleted Here\n-- Delete via Pipelines and Call Script as a Best Practice\n\n-- Taxi Zone\nIF OBJECT_ID ('Processed.Vendor') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.Vendor\n    GO\n\nCREATE EXTERNAL TABLE Processed.Vendor\n\n    WITH (\n        LOCATION = 'vendor'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    -- SELECT *\n    -- FROM Raw.Vendor;\n\n    -- Alternate: Use OPENROWSET if Raw Table Does Not Exists\n    -- Preferred Method, Simple Column Renaming\n    SELECT\n        *\n    FROM\n        OPENROWSET(\n            BULK 'vendor.csv'\n            ,DATA_SOURCE = 'NYC_Taxi_Raw'\n            ,FORMAT = 'CSV'\n            ,PARSER_VERSION = '2.0'\n            ,HEADER_ROW = TRUE\n        )\n\n        WITH (\n            VendorID    SMALLINT    1\n            ,VendorName VARCHAR(50) 2\n        ) AS Vendor\n\n\n-- Query Processed Table\n-- SELECT TOP 10 * FROM Processed.Vendor;",
+					"query": "USE NYC_Taxi_Serverless\nGO\n\n-- Data Written to ADLS Cannot be Deleted Here\n-- Delete via Pipelines and Call Script as a Best Practice\n\n-- Vendor\nIF OBJECT_ID ('Processed.Vendor') IS NOT NULL\n    DROP EXTERNAL TABLE Processed.Vendor\n    GO\n\nCREATE EXTERNAL TABLE Processed.Vendor\n\n    WITH (\n        LOCATION = 'vendor'\n        ,DATA_SOURCE = NYC_Taxi_Processed\n        ,FILE_FORMAT = Parquet_File_Format\n    )\n\nAS\n\n    -- SELECT *\n    -- FROM Raw.Vendor;\n\n    -- Alternate: Use OPENROWSET if Raw Table Does Not Exists\n    -- Preferred Method, Simple Column Renaming\n    SELECT\n        *\n    FROM\n        OPENROWSET(\n            BULK 'vendor.csv'\n            ,DATA_SOURCE = 'NYC_Taxi_Raw'\n            ,FORMAT = 'CSV'\n            ,PARSER_VERSION = '2.0'\n            ,HEADER_ROW = TRUE\n        )\n\n        WITH (\n            VendorID    SMALLINT    1\n            ,VendorName VARCHAR(50) 2\n        ) AS Vendor\n\n\n-- Query Processed Table\n-- SELECT TOP 10 * FROM Processed.Vendor;",
 					"metadata": {
 						"language": "sql"
 					},
@@ -1463,6 +1468,428 @@
 			},
 			"dependsOn": [],
 			"location": "centralus"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/LS_SynWorkspaceDedicatedDev')]",
+			"type": "Microsoft.Synapse/workspaces/linkedServices",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('LS_SynWorkspaceDedicatedDev_connectionString')]"
+				},
+				"connectVia": {
+					"referenceName": "AutoResolveIntegrationRuntime",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/integrationRuntimes/AutoResolveIntegrationRuntime')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/DS_Dynamic')]",
+			"type": "Microsoft.Synapse/workspaces/datasets",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_SynLakehouseDev",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"paramFolderPath": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": {
+							"value": "@dataset().paramFolderPath",
+							"type": "Expression"
+						},
+						"fileSystem": "nyc-taxi"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "LocationID",
+						"type": "INT_16"
+					},
+					{
+						"name": "Borough",
+						"type": "UTF8"
+					},
+					{
+						"name": "Zone",
+						"type": "UTF8"
+					},
+					{
+						"name": "ServiceZone",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/linkedServices/LS_SynLakehouseDev')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/PL_Raw_Processed_TaxiZone_Param')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "DeleteDirectory",
+						"description": "Delete taxi_zone folder from Lakehouse.",
+						"type": "Delete",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataset": {
+								"referenceName": "DS_Dynamic",
+								"type": "DatasetReference",
+								"parameters": {
+									"paramFolderPath": {
+										"value": "@variables('varFolderPath')",
+										"type": "Expression"
+									}
+								}
+							},
+							"enableLogging": false,
+							"storeSettings": {
+								"type": "AzureBlobFSReadSettings",
+								"recursive": true,
+								"enablePartitionDiscovery": false
+							}
+						}
+					},
+					{
+						"name": "ExecStoredProc",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "DeleteDirectory",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": {
+								"value": "@variables('varStoredProc')",
+								"type": "Expression"
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "LS_SynWorkspaceServerlessDev",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"variables": {
+					"varFolderPath": {
+						"type": "String",
+						"defaultValue": "processed/taxi_zone"
+					},
+					"varStoredProc": {
+						"type": "String",
+						"defaultValue": "[Processed].[InsertTaxiZone]"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/DS_Dynamic')]",
+				"[concat(variables('workspaceId'), '/linkedServices/LS_SynWorkspaceServerlessDev')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/PL_Raw_Processed_Dynamic')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "ForEach FolderPath",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@variables('varInputArray')",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "DeleteDirectory",
+									"description": "Delete taxi_zone folder from Lakehouse.",
+									"type": "Delete",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"dataset": {
+											"referenceName": "DS_Dynamic",
+											"type": "DatasetReference",
+											"parameters": {
+												"paramFolderPath": {
+													"value": "@item().varFolderPath",
+													"type": "Expression"
+												}
+											}
+										},
+										"enableLogging": false,
+										"storeSettings": {
+											"type": "AzureBlobFSReadSettings",
+											"recursive": true,
+											"enablePartitionDiscovery": false
+										}
+									}
+								},
+								{
+									"name": "ExecStoredProc",
+									"type": "SqlServerStoredProcedure",
+									"dependsOn": [
+										{
+											"activity": "DeleteDirectory",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"storedProcedureName": {
+											"value": "@item().varStoredProc",
+											"type": "Expression"
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "LS_SynWorkspaceServerlessDev",
+										"type": "LinkedServiceReference"
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"variables": {
+					"varInputArray": {
+						"type": "Array",
+						"defaultValue": [
+							{
+								"varFolderPath": "processed/calendar",
+								"varStoredProc": "Processed.InsertCalendar"
+							},
+							{
+								"varFolderPath": "processed/payment_type",
+								"varStoredProc": "Processed.InsertPaymentType"
+							},
+							{
+								"varFolderPath": "processed/rate_code",
+								"varStoredProc": "Processed.InsertRateCode"
+							},
+							{
+								"varFolderPath": "processed/taxi_zone",
+								"varStoredProc": "Processed.InsertTaxiZone"
+							},
+							{
+								"varFolderPath": "processed/trip_type",
+								"varStoredProc": "Processed.InsertTripType"
+							},
+							{
+								"varFolderPath": "processed/vendor",
+								"varStoredProc": "Processed.InsertVendor"
+							}
+						]
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/datasets/DS_Dynamic')]",
+				"[concat(variables('workspaceId'), '/linkedServices/LS_SynWorkspaceServerlessDev')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/create_sp_calendar_processed')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "dw_serverless/create_external_objects_processed"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\nCREATE OR ALTER PROCEDURE Processed.InsertCalendar\n\nAS\n\nBEGIN\n\n    -- Calendar\n    IF OBJECT_ID ('Processed.Calendar') IS NOT NULL\n        DROP EXTERNAL TABLE Processed.Calendar;\n\n    CREATE EXTERNAL TABLE Processed.Calendar\n\n        WITH (\n            LOCATION = 'calendar'\n            ,DATA_SOURCE = NYC_Taxi_Processed\n            ,FILE_FORMAT = Parquet_File_Format\n        )\n\n    AS\n\n        SELECT\n            *\n        FROM\n            OPENROWSET (\n                BULK 'calendar.csv'\n                ,DATA_SOURCE = 'NYC_Taxi_Raw'\n                ,FORMAT = 'CSV'\n                ,PARSER_VERSION = '2.0'\n                ,FIRSTROW = 2\n            )\n\n            WITH (\n                DateKey         INT         1\n                ,Date           DATE        2\n                ,Year           SMALLINT    3\n                ,Month          TINYINT     4\n                ,Day            TINYINT     5\n                ,DayName        VARCHAR(10) 6\n                ,DayOfYear      SMALLINT    7\n                ,WeekOfMonth    TINYINT     8\n                ,WeekOfYear     TINYINT     9\n                ,MonthName      VARCHAR(10) 10\n                ,YearMonth      INT         11\n                ,YearWeek       INT         12\n            ) AS Calendar\n\nEND;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/create_sp_payment_type_processed')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "dw_serverless/create_external_objects_processed"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\nCREATE OR ALTER PROCEDURE Processed.InsertPaymentType\n\nAS\n\nBEGIN\n\n    -- Payment Type\n    IF OBJECT_ID ('Processed.PaymentType') IS NOT NULL\n        DROP EXTERNAL TABLE Processed.PaymentType;\n\n    CREATE EXTERNAL TABLE Processed.PaymentType\n\n        WITH (\n            LOCATION = 'payment_type'\n            ,DATA_SOURCE = NYC_Taxi_Processed\n            ,FILE_FORMAT = Parquet_File_Format\n        )\n\n    AS\n\n        SELECT\n            PaymentType\n            ,PaymentTypeDescription\n        FROM\n            OPENROWSET (\n                BULK 'payment_type.json'\n                ,DATA_SOURCE = 'NYC_Taxi_Raw'\n                ,FORMAT = 'CSV' -- Even for JSON\n                ,PARSER_VERSION = '1.0'\n                ,FIELDTERMINATOR = '0x0b'\n                ,FIELDQUOTE = '0x0b'\n                ,ROWTERMINATOR = '0x0a'\n            ) \n\n                WITH (\n                    jsonDoc NVARCHAR(MAX)\n                ) AS PaymentType\n\n        CROSS APPLY OPENJSON(jsonDoc) -- Return Key Value Pairs\n            WITH (\n                PaymentType             SMALLINT    '$.payment_type'\n                ,PaymentTypeDescription VARCHAR(15) '$.payment_type_desc'\n            )\n\nEND;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/create_sp_rate_code_processed')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "dw_serverless/create_external_objects_processed"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\nCREATE OR ALTER PROCEDURE Processed.InsertRateCode\n\nAS\n\nBEGIN\n\n    -- Rate Code\n    IF OBJECT_ID ('Processed.RateCode') IS NOT NULL\n        DROP EXTERNAL TABLE Processed.RateCode;\n\n    CREATE EXTERNAL TABLE Processed.RateCode\n\n        WITH (\n            LOCATION = 'rate_code'\n            ,DATA_SOURCE = NYC_Taxi_Processed\n            ,FILE_FORMAT = Parquet_File_Format\n        )\n\n    AS\n\n        SELECT\n            RateCodeID\n            ,RateCodeDescription\n        FROM\n            OPENROWSET (\n                BULK 'rate_code.json'\n                ,DATA_SOURCE = 'NYC_Taxi_Raw'\n                ,FORMAT = 'CSV' -- Even for JSON\n                ,PARSER_VERSION = '1.0'\n                ,FIELDTERMINATOR = '0x0b'\n                ,FIELDQUOTE = '0x0b'\n                ,ROWTERMINATOR = '0x0b' -- Vertical Tab\n            ) \n\n                WITH (\n                    jsonDoc NVARCHAR(MAX)\n                ) AS RateCode\n\n        CROSS APPLY OPENJSON(jsonDoc) -- Return Key Value Pairs\n            WITH (\n                RateCodeID              TINYINT     '$.rate_code_id'\n                ,RateCodeDescription    VARCHAR(20) '$.rate_code'\n            )\n\nEND;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/create_sp_trip_type_processed')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "dw_serverless/create_external_objects_processed"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\nCREATE OR ALTER PROCEDURE Processed.InsertTripType\n\nAS\n\nBEGIN\n\n    -- Trip Type\n    IF OBJECT_ID ('Processed.TripType') IS NOT NULL\n        DROP EXTERNAL TABLE Processed.TripType;\n\n    CREATE EXTERNAL TABLE Processed.TripType\n\n        WITH (\n            LOCATION = 'trip_type'\n            ,DATA_SOURCE = NYC_Taxi_Processed\n            ,FILE_FORMAT = Parquet_File_Format\n        )\n\n    AS\n\n        SELECT\n            *\n        FROM\n            OPENROWSET (\n                BULK 'trip_type.tsv'\n                ,DATA_SOURCE = 'NYC_Taxi_Raw'\n                ,FORMAT = 'CSV'\n                ,FIELDTERMINATOR = '\\t'\n                ,PARSER_VERSION = '2.0'\n                ,HEADER_ROW = TRUE\n            )\n\n            WITH (\n                TripType                SMALLINT    1\n                ,TripTypeDescription    VARCHAR(25) 2\n            ) AS TripType\n\nEND;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/create_sp_vendor_processed')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "dw_serverless/create_external_objects_processed"
+				},
+				"content": {
+					"query": "USE NYC_Taxi_Serverless\nGO\n\nCREATE OR ALTER PROCEDURE Processed.InsertVendor\n\nAS\n\nBEGIN\n\n    -- Vendor\n    IF OBJECT_ID ('Processed.Vendor') IS NOT NULL\n        DROP EXTERNAL TABLE Processed.Vendor;\n\n    CREATE EXTERNAL TABLE Processed.Vendor\n\n        WITH (\n            LOCATION = 'vendor'\n            ,DATA_SOURCE = NYC_Taxi_Processed\n            ,FILE_FORMAT = Parquet_File_Format\n        )\n\n    AS\n\n        SELECT\n            *\n        FROM\n            OPENROWSET(\n                BULK 'vendor.csv'\n                ,DATA_SOURCE = 'NYC_Taxi_Raw'\n                ,FORMAT = 'CSV'\n                ,PARSER_VERSION = '2.0'\n                ,HEADER_ROW = TRUE\n            )\n\n            WITH (\n                VendorID    SMALLINT    1\n                ,VendorName VARCHAR(50) 2\n            ) AS Vendor\n\nEND;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Serverless",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/pipeline_input_array_json')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "dw_serverless/create_external_objects_processed"
+				},
+				"content": {
+					"query": "[\n    {\n        \"varFolderPath\": \"processed/calendar\",\n        \"varStoredProc\": \"Processed.InsertCalendar\"\n    },\n    {\n        \"varFolderPath\": \"processed/payment_type\",\n        \"varStoredProc\": \"Processed.InsertPaymentType\"\n    },\n    {\n        \"varFolderPath\": \"processed/rate_code\",\n        \"varStoredProc\": \"Processed.InsertRateCode\"\n    },\n    {\n        \"varFolderPath\": \"processed/taxi_zone\",\n        \"varStoredProc\": \"Processed.InsertTaxiZone\"\n    },\n    {\n        \"varFolderPath\": \"processed/trip_type\",\n        \"varStoredProc\": \"Processed.InsertTripType\"\n    },\n    {\n        \"varFolderPath\": \"processed/vendor\",\n        \"varStoredProc\": \"Processed.InsertVendor\"\n    }\n]",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "master",
+						"poolName": "Built-in"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
 		}
 	]
 }
