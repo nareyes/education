@@ -4,7 +4,7 @@ GO
 -- Data Written to ADLS Cannot be Deleted Here
 -- Delete via Pipelines and Call Script as a Best Practice
 
--- Taxi Zone
+-- Vendor
 IF OBJECT_ID ('Processed.Vendor') IS NOT NULL
     DROP EXTERNAL TABLE Processed.Vendor
     GO

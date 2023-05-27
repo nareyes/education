@@ -6,6 +6,7 @@ GO
 
 CREATE VIEW Curated.View_TripAggregated
 AS
+
     SELECT
         *
     FROM

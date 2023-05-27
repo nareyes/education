@@ -6,6 +6,7 @@ GO
 
 CREATE VIEW Curated.View_TripDemand
 AS
+
     SELECT
         *
     FROM

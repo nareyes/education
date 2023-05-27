@@ -1,0 +1,26 @@
+[
+    {
+        "varFolderPath": "processed/calendar",
+        "varStoredProc": "Processed.InsertCalendar"
+    },
+    {
+        "varFolderPath": "processed/payment_type",
+        "varStoredProc": "Processed.InsertPaymentType"
+    },
+    {
+        "varFolderPath": "processed/rate_code",
+        "varStoredProc": "Processed.InsertRateCode"
+    },
+    {
+        "varFolderPath": "processed/taxi_zone",
+        "varStoredProc": "Processed.InsertTaxiZone"
+    },
+    {
+        "varFolderPath": "processed/trip_type",
+        "varStoredProc": "Processed.InsertTripType"
+    },
+    {
+        "varFolderPath": "processed/vendor",
+        "varStoredProc": "Processed.InsertVendor"
+    }
+]

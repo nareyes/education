@@ -4,7 +4,7 @@ GO
 -- Data Written to ADLS Cannot be Deleted Here
 -- Delete via Pipelines and Call Script as a Best Practice
 
--- Taxi Zone
+-- Payment Type
 IF OBJECT_ID ('Processed.PaymentType') IS NOT NULL
     DROP EXTERNAL TABLE Processed.PaymentType
     GO

@@ -6,6 +6,7 @@ GO
 
 CREATE VIEW Processed.View_TripPartitioned
 AS
+
     SELECT
         *
     FROM
