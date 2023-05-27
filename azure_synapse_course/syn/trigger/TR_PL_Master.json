@@ -1,0 +1,25 @@
+{
+	"name": "TR_PL_Master",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "PL_Master",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2023-05-27T06:00:00",
+				"endTime": "2023-05-28T05:00:00",
+				"timeZone": "Central Standard Time"
+			}
+		}
+	}
+}
