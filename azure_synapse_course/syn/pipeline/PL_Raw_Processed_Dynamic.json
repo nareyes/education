@@ -3,79 +3,111 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "DeleteDirectory",
-				"description": "Delete taxi_zone folder from Lakehouse.",
-				"type": "Delete",
+				"name": "ForEach FolderPath",
+				"type": "ForEach",
 				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
 				"userProperties": [],
 				"typeProperties": {
-					"dataset": {
-						"referenceName": "DS_Dynamic",
-						"type": "DatasetReference",
-						"parameters": {
-							"paramFolderPath": {
-								"value": "@variables('varFolderPath')",
-								"type": "Expression"
+					"items": {
+						"value": "@variables('varInputArray')",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "DeleteDirectory",
+							"description": "Delete taxi_zone folder from Lakehouse.",
+							"type": "Delete",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "DS_Dynamic",
+									"type": "DatasetReference",
+									"parameters": {
+										"paramFolderPath": {
+											"value": "@item().varFolderPath",
+											"type": "Expression"
+										}
+									}
+								},
+								"enableLogging": false,
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"enablePartitionDiscovery": false
+								}
+							}
+						},
+						{
+							"name": "ExecStoredProc",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "DeleteDirectory",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": {
+									"value": "@item().varStoredProc",
+									"type": "Expression"
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "LS_SynWorkspaceServerlessDev",
+								"type": "LinkedServiceReference"
 							}
 						}
-					},
-					"enableLogging": false,
-					"storeSettings": {
-						"type": "AzureBlobFSReadSettings",
-						"recursive": true,
-						"enablePartitionDiscovery": false
-					}
-				}
-			},
-			{
-				"name": "ExecStoredProc",
-				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "DeleteDirectory",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": {
-						"value": "@variables('varStoredProc')",
-						"type": "Expression"
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "LS_SynWorkspaceServerlessDev",
-					"type": "LinkedServiceReference"
+					]
 				}
 			}
 		],
 		"variables": {
-			"varFolderPath": {
-				"type": "String",
-				"defaultValue": "processed/taxi_zone"
-			},
-			"varStoredProc": {
-				"type": "String",
-				"defaultValue": "[Processed].[InsertTaxiZone]"
-			},
 			"varInputArray": {
-				"type": "String"
+				"type": "Array",
+				"defaultValue": [
+					{
+						"varFolderPath": "processed/calendar",
+						"varStoredProc": "Processed.InsertCalendar"
+					},
+					{
+						"varFolderPath": "processed/payment_type",
+						"varStoredProc": "Processed.InsertPaymentType"
+					},
+					{
+						"varFolderPath": "processed/rate_code",
+						"varStoredProc": "Processed.InsertRateCode"
+					},
+					{
+						"varFolderPath": "processed/taxi_zone",
+						"varStoredProc": "Processed.InsertTaxiZone"
+					},
+					{
+						"varFolderPath": "processed/trip_type",
+						"varStoredProc": "Processed.InsertTripType"
+					},
+					{
+						"varFolderPath": "processed/vendor",
+						"varStoredProc": "Processed.InsertVendor"
+					}
+				]
 			}
 		},
 		"annotations": []
