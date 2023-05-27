@@ -1,5 +1,5 @@
 {
-	"name": "PL_Raw_Processed_Dynamic_Partitioned",
+	"name": "PL_Raw_Processed_Trip_Partitioned",
 	"properties": {
 		"activities": [
 			{
