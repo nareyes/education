@@ -1,0 +1,20 @@
+{
+	"name": "pipeline_input_array_json",
+	"properties": {
+		"folder": {
+			"name": "dw_serverless/create_external_objects_processed"
+		},
+		"content": {
+			"query": "[\n    {\n        \"varFolderPath\": \"processed/calendar\",\n        \"varStoredProc\": \"Processed.InsertCalendar\"\n    },\n    {\n        \"varFolderPath\": \"processed/payment_type\",\n        \"varStoredProc\": \"Processed.InsertPaymentType\"\n    },\n    {\n        \"varFolderPath\": \"processed/rate_code\",\n        \"varStoredProc\": \"Processed.InsertRateCode\"\n    },\n    {\n        \"varFolderPath\": \"processed/taxi_zone\",\n        \"varStoredProc\": \"Processed.InsertTaxiZone\"\n    },\n    {\n        \"varFolderPath\": \"processed/trip_type\",\n        \"varStoredProc\": \"Processed.InsertTripType\"\n    },\n    {\n        \"varFolderPath\": \"processed/vendor\",\n        \"varStoredProc\": \"Processed.InsertVendor\"\n    }\n]",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
