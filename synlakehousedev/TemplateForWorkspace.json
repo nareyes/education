@@ -2571,6 +2571,234 @@
 			},
 			"dependsOn": [],
 			"location": "centralus"
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/NYCSpark')]",
+			"type": "Microsoft.Synapse/workspaces/bigDataPools",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/create_trip_agg_curated_spark')]",
+			"type": "Microsoft.Synapse/workspaces/notebooks",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"nbformat": 4,
+				"nbformat_minor": 2,
+				"bigDataPool": {
+					"referenceName": "NYCSpark",
+					"type": "BigDataPoolReference"
+				},
+				"sessionProperties": {
+					"driverMemory": "28g",
+					"driverCores": 4,
+					"executorMemory": "28g",
+					"executorCores": 4,
+					"numExecutors": 2,
+					"conf": {
+						"spark.dynamicAllocation.enabled": "false",
+						"spark.dynamicAllocation.minExecutors": "2",
+						"spark.dynamicAllocation.maxExecutors": "2",
+						"spark.autotune.trackingId": "dc720832-9b54-4dbc-81e7-c3e3eaa712e7"
+					}
+				},
+				"metadata": {
+					"saveOutput": true,
+					"enableDebugMode": false,
+					"kernelspec": {
+						"name": "synapse_pyspark",
+						"display_name": "Synapse PySpark"
+					},
+					"language_info": {
+						"name": "python"
+					},
+					"a365ComputeOptions": {
+						"id": "/subscriptions/bcf56a43-4dae-4887-97fd-bc7d98b6d806/resourceGroups/rg-lakehouse-sandbox/providers/Microsoft.Synapse/workspaces/synlakehousedev/bigDataPools/NYCSpark",
+						"name": "NYCSpark",
+						"type": "Spark",
+						"endpoint": "https://synlakehousedev.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/NYCSpark",
+						"auth": {
+							"type": "AAD",
+							"authResource": "https://dev.azuresynapse.net"
+						},
+						"sparkVersion": "3.3",
+						"nodeCount": 3,
+						"cores": 4,
+						"memory": 28,
+						"automaticScaleJobs": false
+					},
+					"sessionKeepAliveTimeout": 30
+				},
+				"cells": [
+					{
+						"cell_type": "markdown",
+						"metadata": {
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Trip Data Aggregation\n",
+							"\n",
+							"### Group By Columns\n",
+							"1. Year\n",
+							"2. Month\n",
+							"3. Pickup Location ID\n",
+							"4. Drop Off Location ID\n",
+							"\n",
+							"### Aggregated Columns\n",
+							"1. Total Trip Count\n",
+							"2. Total Fare Amount\n",
+							"\n",
+							"### Purpose of the Notebook\n",
+							"Demonstrate the integration between Spark Pool and Serverless SQL Pool\n",
+							"\n",
+							"1. Create the aggregated table in Spark Pool\n",
+							"2. Access the data from Serverless SQL Pool "
+						]
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#Set Folder Paths\n",
+							"raw_folder_path = 'abfss://nyc-taxi@synlakehousedev.dfs.core.windows.net/raw'\n",
+							"processed_folder_path = 'abfss://nyc-taxi@synlakehousedev.dfs.core.windows.net/processed'\n",
+							"curated_folder_path = 'abfss://nyc-taxi@synlakehousedev.dfs.core.windows.net/curated'"
+						],
+						"outputs": [],
+						"execution_count": 6
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"#Set Spark Config (Partition Year and Month as Strings)\n",
+							"spark.conf.set(\"spark.sql.sources.partitionColumnTypeInference.enabled\", \"false\")"
+						],
+						"outputs": [],
+						"execution_count": 2
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							},
+							"microsoft": {
+								"language": "sparksql"
+							},
+							"collapsed": false
+						},
+						"source": [
+							"%%sql -- Create Database\n",
+							"CREATE DATABASE IF NOT EXISTS NYC_Taxi_Spark\n",
+							"LOCATION 'abfss://nyc-taxi@synlakehousedev.dfs.core.windows.net/curated_spark';"
+						],
+						"outputs": [],
+						"execution_count": 12
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Read the Processed Data \n",
+							"trip_processed_df = spark.read.parquet(f\"{processed_folder_path}/trip_partitioned\") \n",
+							"\n",
+							"trip_processed_df.head()"
+						],
+						"outputs": [],
+						"execution_count": 8
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Perform the Required aggregations\n",
+							"from pyspark.sql.functions import *\n",
+							"\n",
+							"trip_curated_agg_df = trip_processed_df \\\n",
+							"                        .groupBy(\"PartitionYear\", \"PartitionMonth\", \"PULocationID\", \"DOLocationID\") \\\n",
+							"                        .agg(count(lit(1)).alias(\"TotalTripCount\"),\n",
+							"                        round(sum(\"FareAmount\"), 2).alias(\"TotalFareAmount\"))"
+						],
+						"outputs": [],
+						"execution_count": 9
+					},
+					{
+						"cell_type": "code",
+						"metadata": {
+							"jupyter": {
+								"source_hidden": false,
+								"outputs_hidden": false
+							},
+							"nteract": {
+								"transient": {
+									"deleting": false
+								}
+							}
+						},
+						"source": [
+							"# Write the Aggregated Data to Curated Layer for Consumption\n",
+							"trip_curated_agg_df.write.mode(\"overwrite\").partitionBy(\"PartitionYear\", \"PartitionMonth\").format(\"parquet\").saveAsTable(\"NYC_Taxi_Spark.TripAggregated\")"
+						],
+						"outputs": [],
+						"execution_count": 11
+					}
+				]
+			},
+			"dependsOn": []
 		}
 	]
 }
