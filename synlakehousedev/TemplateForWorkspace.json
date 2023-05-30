@@ -114,7 +114,7 @@
 						"type": "ExecutePipeline",
 						"dependsOn": [
 							{
-								"activity": "CuratedTripAgg",
+								"activity": "CuratedTripAggSpk",
 								"dependencyConditions": [
 									"Succeeded"
 								]
@@ -124,6 +124,28 @@
 						"typeProperties": {
 							"pipeline": {
 								"referenceName": "PL_Processed_Curated_TripDem_Partitioned",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					},
+					{
+						"name": "CuratedTripAggSpk",
+						"description": "Spark Notebook",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "CuratedTripAgg",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "PL_Processed_Curated_TripAgg_Partitioned_Spark",
 								"type": "PipelineReference"
 							},
 							"waitOnCompletion": true,
@@ -141,7 +163,8 @@
 				"[concat(variables('workspaceId'), '/pipelines/PL_Raw_Processed_Dynamic')]",
 				"[concat(variables('workspaceId'), '/pipelines/PL_Raw_Processed_Trip_Partitioned')]",
 				"[concat(variables('workspaceId'), '/pipelines/PL_Processed_Curated_TripAgg_Partitioned')]",
-				"[concat(variables('workspaceId'), '/pipelines/PL_Processed_Curated_TripDem_Partitioned')]"
+				"[concat(variables('workspaceId'), '/pipelines/PL_Processed_Curated_TripDem_Partitioned')]",
+				"[concat(variables('workspaceId'), '/pipelines/PL_Processed_Curated_TripAgg_Partitioned_Spark')]"
 			]
 		},
 		{
