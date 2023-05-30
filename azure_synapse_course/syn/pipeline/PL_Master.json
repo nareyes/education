@@ -89,7 +89,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "PL_Processed_Curated_TripAgg_Partitioned",
+						"referenceName": "PL_Processed_Curated_TripAgg_Partitioned_Spark",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true
