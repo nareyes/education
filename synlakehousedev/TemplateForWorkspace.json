@@ -321,6 +321,53 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/PL_Processed_Curated_TripAgg_Partitioned_Spark')]",
+			"type": "Microsoft.Synapse/workspaces/pipelines",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"activities": [
+					{
+						"name": "CreateTripAgg",
+						"type": "SynapseNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebook": {
+								"referenceName": "create_trip_agg_curated_spark",
+								"type": "NotebookReference"
+							},
+							"snapshot": true,
+							"sparkPool": {
+								"referenceName": "NYCSpark",
+								"type": "BigDataPoolReference"
+							},
+							"executorSize": "Small",
+							"conf": {
+								"spark.dynamicAllocation.enabled": false
+							},
+							"driverSize": "Small"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('workspaceId'), '/notebooks/create_trip_agg_curated_spark')]",
+				"[concat(variables('workspaceId'), '/bigDataPools/NYCSpark')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/PL_Processed_Curated_TripDem_Partitioned')]",
 			"type": "Microsoft.Synapse/workspaces/pipelines",
 			"apiVersion": "2019-06-01-preview",
@@ -2590,7 +2637,7 @@
 						"spark.dynamicAllocation.enabled": "false",
 						"spark.dynamicAllocation.minExecutors": "2",
 						"spark.dynamicAllocation.maxExecutors": "2",
-						"spark.autotune.trackingId": "1b9b500a-fcd8-4895-a3ff-45ca6f897b3a"
+						"spark.autotune.trackingId": "1c81da9a-3cef-4461-8180-9e1a69ac51f3"
 					}
 				},
 				"metadata": {
@@ -2615,8 +2662,7 @@
 						"sparkVersion": "3.3",
 						"nodeCount": 3,
 						"cores": 4,
-						"memory": 28,
-						"automaticScaleJobs": false
+						"memory": 28
 					},
 					"sessionKeepAliveTimeout": 5
 				},
