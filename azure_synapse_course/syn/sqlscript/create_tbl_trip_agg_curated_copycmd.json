@@ -1,6 +1,7 @@
 {
-	"name": "create_tbl_agg_curated_copycmd",
+	"name": "create_tbl_trip_agg_curated_copycmd",
 	"properties": {
+		"description": "Using Bulk Load Option",
 		"folder": {
 			"name": "dw_dedicated"
 		},

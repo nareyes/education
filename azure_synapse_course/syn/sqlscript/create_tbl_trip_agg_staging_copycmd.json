@@ -1,0 +1,21 @@
+{
+	"name": "create_tbl_trip_agg_staging_copycmd",
+	"properties": {
+		"description": "Using Bulk Load Option",
+		"folder": {
+			"name": "dw_dedicated"
+		},
+		"content": {
+			"query": "-- Create Table Using Bulk Load\nIF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = 'TripDemand' AND O.TYPE = 'U' AND S.NAME = 'Staging')\n\nCREATE TABLE Staging.TripDemand (\n\t[PartitionYear]      NVARCHAR(4000)\n\t,[PartitionMonth]    NVARCHAR(4000)\n\t,[Borough]           NVARCHAR(4000)\n\t,[TripDate]          DATE\n\t,[TripDay]           NVARCHAR(4000)\n\t,[IsWeekend]         INT\n\t,[StreetHailCount]   INT\n\t,[DispatchCount]     INT\n\t,[TripDistance]      FLOAT\n\t,[TripDuration]      INT\n\t,[FareAmount]        FLOAT\n)\n\tWITH (\n\t\tCLUSTERED COLUMNSTORE INDEX\n\t\t,DISTRIBUTION = ROUND_ROBIN\n\t)\n\nGO\n\n\n-- Copy Intro Table\nCOPY INTO Staging.TripDemand (\n\tPartitionYear \t\t1\n\t,PartitionMonth \t2\n\t,Borough \t\t\t3\n\t,TripDate \t\t\t4\n\t,TripDay \t\t\t5\n\t,IsWeekend \t\t\t6\n\t,StreetHailCount\t7\n\t,DispatchCount \t\t8\n\t,TripDistance \t\t9\n\t,TripDuration \t\t10\n\t,FareAmount \t\t11\n)\n\tFROM 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/curated/trip_demand'\n\n\tWITH (\n\t\tFILE_TYPE = 'PARQUET'\n\t\t,MAXERRORS = 0\n\t\t,COMPRESSION = 'snappy'\n\t\t,AUTO_CREATE_TABLE = 'ON'\n\t)\n\nGO\n\n\nSELECT TOP 100 * FROM Staging.TripDemand;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "NYC_Taxi_Dedicated",
+				"poolName": "NYC_Taxi_Dedicated"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
