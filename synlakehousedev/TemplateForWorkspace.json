@@ -1871,6 +1871,100 @@
 			"dependsOn": []
 		},
 		{
+			"name": "[concat(parameters('workspaceName'), '/create_tbl_trip_agg_curated_copycmd')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "Using Bulk Load Option",
+				"folder": {
+					"name": "dw_dedicated"
+				},
+				"content": {
+					"query": "-- Create Table Using Bulk Load\nIF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = 'TripDemand' AND O.TYPE = 'U' AND S.NAME = 'Curated')\n\nCREATE TABLE Curated.TripDemand (\n\t[PartitionYear]      NVARCHAR(4000)\n\t,[PartitionMonth]    NVARCHAR(4000)\n\t,[Borough]           NVARCHAR(4000)\n\t,[TripDate]          DATE\n\t,[TripDay]           NVARCHAR(4000)\n\t,[IsWeekend]         INT\n\t,[StreetHailCount]   INT\n\t,[DispatchCount]     INT\n\t,[TripDistance]      FLOAT\n\t,[TripDuration]      INT\n\t,[FareAmount]        FLOAT\n)\n\tWITH (\n\t\tCLUSTERED COLUMNSTORE INDEX\n\t\t,DISTRIBUTION = ROUND_ROBIN\n\t)\n\nGO\n\n\n-- Copy Intro Table\nCOPY INTO Curated.TripDemand (\n\tPartitionYear \t\t1\n\t,PartitionMonth \t2\n\t,Borough \t\t\t3\n\t,TripDate \t\t\t4\n\t,TripDay \t\t\t5\n\t,IsWeekend \t\t\t6\n\t,StreetHailCount\t7\n\t,DispatchCount \t\t8\n\t,TripDistance \t\t9\n\t,TripDuration \t\t10\n\t,FareAmount \t\t11\n)\n\tFROM 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/curated/trip_demand'\n\n\tWITH (\n\t\tFILE_TYPE = 'PARQUET'\n\t\t,MAXERRORS = 0\n\t\t,COMPRESSION = 'snappy'\n\t\t,AUTO_CREATE_TABLE = 'ON'\n\t)\n\nGO\n\n\nSELECT TOP 100 * FROM Curated.TripDemand;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Dedicated",
+						"poolName": "NYC_Taxi_Dedicated"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/create_tbl_trip_agg_curated_polybase')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "dw_dedicated"
+				},
+				"content": {
+					"query": "-- Create Schema\nCREATE SCHEMA Curated\nGO\n\n\n-- Create Table\nCREATE TABLE Curated.TripAggregated\n    WITH (\n        CLUSTERED COLUMNSTORE INDEX\n        ,DISTRIBUTION = ROUND_ROBIN\n    )\n\n    AS\n\n    SELECT\n        [PartitionYear] \t\n        ,[PartitionMonth]\t\n        ,[Borough] \t\t\t\n        ,[TripDate] \t\t\n        ,[TripDay] \t\t\t\n        ,[IsWeekend] \t\t\n        ,[CardTripCount]\t\n        ,[CashTripCount]\n    FROM Staging.TripAggregated\n\nGO\n\n\nSELECT * FROM Curated.TripAggregated;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Dedicated",
+						"poolName": "NYC_Taxi_Dedicated"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/create_tbl_trip_agg_staging_copycmd')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"description": "Using Bulk Load Option",
+				"folder": {
+					"name": "dw_dedicated"
+				},
+				"content": {
+					"query": "-- Create Table Using Bulk Load\nIF NOT EXISTS (SELECT * FROM sys.objects O JOIN sys.schemas S ON O.schema_id = S.schema_id WHERE O.NAME = 'TripDemand' AND O.TYPE = 'U' AND S.NAME = 'Staging')\n\nCREATE TABLE Staging.TripDemand (\n\t[PartitionYear]      NVARCHAR(4000)\n\t,[PartitionMonth]    NVARCHAR(4000)\n\t,[Borough]           NVARCHAR(4000)\n\t,[TripDate]          DATE\n\t,[TripDay]           NVARCHAR(4000)\n\t,[IsWeekend]         INT\n\t,[StreetHailCount]   INT\n\t,[DispatchCount]     INT\n\t,[TripDistance]      FLOAT\n\t,[TripDuration]      INT\n\t,[FareAmount]        FLOAT\n)\n\tWITH (\n\t\tCLUSTERED COLUMNSTORE INDEX\n\t\t,DISTRIBUTION = ROUND_ROBIN\n\t)\n\nGO\n\n\n-- Copy Intro Table\nCOPY INTO Staging.TripDemand (\n\tPartitionYear \t\t1\n\t,PartitionMonth \t2\n\t,Borough \t\t\t3\n\t,TripDate \t\t\t4\n\t,TripDay \t\t\t5\n\t,IsWeekend \t\t\t6\n\t,StreetHailCount\t7\n\t,DispatchCount \t\t8\n\t,TripDistance \t\t9\n\t,TripDuration \t\t10\n\t,FareAmount \t\t11\n)\n\tFROM 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/curated/trip_demand'\n\n\tWITH (\n\t\tFILE_TYPE = 'PARQUET'\n\t\t,MAXERRORS = 0\n\t\t,COMPRESSION = 'snappy'\n\t\t,AUTO_CREATE_TABLE = 'ON'\n\t)\n\nGO\n\n\nSELECT TOP 100 * FROM Staging.TripDemand;",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Dedicated",
+						"poolName": "NYC_Taxi_Dedicated"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('workspaceName'), '/create_tbl_trip_agg_staging_polybase')]",
+			"type": "Microsoft.Synapse/workspaces/sqlscripts",
+			"apiVersion": "2019-06-01-preview",
+			"properties": {
+				"folder": {
+					"name": "dw_dedicated"
+				},
+				"content": {
+					"query": "-- Creaye Data Format\nIF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'Parquet_File_Format') \n\tCREATE EXTERNAL FILE FORMAT [Parquet_File_Format] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\n\n-- Create Data Source\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'NYC_Taxi_Curated') \n\tCREATE EXTERNAL DATA SOURCE NYC_Taxi_Curated \n\tWITH (\n\t\tLOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/curated' \n\t)\nGO\n\n\n-- Create Schema\nCREATE SCHEMA Staging\nGO\n\n\n-- Create Staging Table (External)\nCREATE EXTERNAL TABLE Staging.TripAggregated (\n\t[PartitionYear] \tNVARCHAR(4000)\n\t,[PartitionMonth]\tNVARCHAR(4000)\n\t,[Borough] \t\t\tNVARCHAR(4000)\n\t,[TripDate] \t\tDATE\n\t,[TripDay] \t\t\tNVARCHAR(4000)\n\t,[IsWeekend] \t\tINT\n\t,[CardTripCount]\tINT\n\t,[CashTripCount] \tINT\n\t)\n\n\tWITH (\n\tLOCATION = 'trip_aggregated',\n\tDATA_SOURCE = NYC_Taxi_Curated,\n\tFILE_FORMAT = Parquet_File_Format\n\t)\n\nGO\n\n\nSELECT TOP 100 * FROM Staging.TripAggregated\nGO",
+					"metadata": {
+						"language": "sql"
+					},
+					"currentConnection": {
+						"databaseName": "NYC_Taxi_Dedicated",
+						"poolName": "NYC_Taxi_Dedicated"
+					},
+					"resultLimit": 5000
+				},
+				"type": "SqlQuery"
+			},
+			"dependsOn": []
+		},
+		{
 			"name": "[concat(parameters('workspaceName'), '/create_tbl_trip_csv_processed')]",
 			"type": "Microsoft.Synapse/workspaces/sqlscripts",
 			"apiVersion": "2019-06-01-preview",
@@ -2884,52 +2978,6 @@
 			},
 			"dependsOn": [],
 			"location": "centralus"
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/create_tbl_trip_agg_staging_polybase')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"folder": {
-					"name": "dw_dedicated"
-				},
-				"content": {
-					"query": "-- Creaye Data Format\nIF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'Parquet_File_Format') \n\tCREATE EXTERNAL FILE FORMAT [Parquet_File_Format] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\n\n-- Create Data Source\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'NYC_Taxi_Curated') \n\tCREATE EXTERNAL DATA SOURCE NYC_Taxi_Curated \n\tWITH (\n\t\tLOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/curated' \n\t)\nGO\n\n\n-- Create Schema\nCREATE SCHEMA Staging\nGO\n\n\n-- Create Staging Table (External)\nCREATE EXTERNAL TABLE Staging.TripAggregated (\n\t[PartitionYear] \tNVARCHAR(4000)\n\t,[PartitionMonth]\tNVARCHAR(4000)\n\t,[Borough] \t\t\tNVARCHAR(4000)\n\t,[TripDate] \t\tDATE\n\t,[TripDay] \t\t\tNVARCHAR(4000)\n\t,[IsWeekend] \t\tINT\n\t,[CardTripCount]\tINT\n\t,[CashTripCount] \tINT\n\t)\n\n\tWITH (\n\tLOCATION = 'trip_aggregated',\n\tDATA_SOURCE = NYC_Taxi_Curated,\n\tFILE_FORMAT = Parquet_File_Format\n\t)\n\nGO\n\n\nSELECT TOP 100 * FROM Staging.TripAggregated\nGO",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "NYC_Taxi_Dedicated",
-						"poolName": "NYC_Taxi_Dedicated"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('workspaceName'), '/create_tbl_trip_agg_curated_polybase')]",
-			"type": "Microsoft.Synapse/workspaces/sqlscripts",
-			"apiVersion": "2019-06-01-preview",
-			"properties": {
-				"folder": {
-					"name": "dw_dedicated"
-				},
-				"content": {
-					"query": "-- Create Schema\nCREATE SCHEMA Curated\nGO\n\n\n-- Create Table\nCREATE TABLE Curated.TripAggregated\n    WITH (\n        CLUSTERED COLUMNSTORE INDEX\n        ,DISTRIBUTION = ROUND_ROBIN\n    )\n\n    AS\n\n    SELECT\n        [PartitionYear] \t\n        ,[PartitionMonth]\t\n        ,[Borough] \t\t\t\n        ,[TripDate] \t\t\n        ,[TripDay] \t\t\t\n        ,[IsWeekend] \t\t\n        ,[CardTripCount]\t\n        ,[CashTripCount]\n    FROM Staging.TripAggregated\n\nGO\n\n\nSELECT * FROM Curated.TripAggregated;",
-					"metadata": {
-						"language": "sql"
-					},
-					"currentConnection": {
-						"databaseName": "NYC_Taxi_Dedicated",
-						"poolName": "NYC_Taxi_Dedicated"
-					},
-					"resultLimit": 5000
-				},
-				"type": "SqlQuery"
-			},
-			"dependsOn": []
 		}
 	]
 }
