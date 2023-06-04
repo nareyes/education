@@ -1,0 +1,20 @@
+{
+	"name": "create_tbl_trip_agg_curated_polybase",
+	"properties": {
+		"folder": {
+			"name": "dw_dedicated"
+		},
+		"content": {
+			"query": "-- Create Schema\nCREATE SCHEMA Curated\nGO\n\n\n-- Create Table\nCREATE TABLE Curated.TripAggregated\n    WITH (\n        CLUSTERED COLUMNSTORE INDEX\n        ,DISTRIBUTION = ROUND_ROBIN\n    )\n\n    AS\n\n    SELECT\n        [PartitionYear] \t\n        ,[PartitionMonth]\t\n        ,[Borough] \t\t\t\n        ,[TripDate] \t\t\n        ,[TripDay] \t\t\t\n        ,[IsWeekend] \t\t\n        ,[CardTripCount]\t\n        ,[CashTripCount]\n    FROM Staging.TripAggregated\n\nGO\n\n\nSELECT * FROM Curated.TripAggregated;",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "NYC_Taxi_Dedicated",
+				"poolName": "NYC_Taxi_Dedicated"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}

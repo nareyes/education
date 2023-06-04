@@ -1,0 +1,20 @@
+{
+	"name": "create_tbl_trip_agg_staging_polybase",
+	"properties": {
+		"folder": {
+			"name": "dw_dedicated"
+		},
+		"content": {
+			"query": "-- Creaye Data Format\nIF NOT EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'Parquet_File_Format') \n\tCREATE EXTERNAL FILE FORMAT [Parquet_File_Format] \n\tWITH ( FORMAT_TYPE = PARQUET)\nGO\n\n-- Create Data Source\nIF NOT EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'NYC_Taxi_Curated') \n\tCREATE EXTERNAL DATA SOURCE NYC_Taxi_Curated \n\tWITH (\n\t\tLOCATION = 'https://synlakehousedev.dfs.core.windows.net/nyc-taxi/curated' \n\t)\nGO\n\n-- Create Schema\nCREATE SCHEMA Staging\nGO\n\n-- Create Staging Table (External)\nCREATE EXTERNAL TABLE Staging.TripAggregated (\n\t[PartitionYear] \tNVARCHAR(4000)\n\t,[PartitionMonth]\tNVARCHAR(4000)\n\t,[Borough] \t\t\tNVARCHAR(4000)\n\t,[TripDate] \t\tDATE\n\t,[TripDay] \t\t\tNVARCHAR(4000)\n\t,[IsWeekend] \t\tINT\n\t,[CardTripCount]\tINT\n\t,[CashTripCount] \tINT\n\t)\n\n\tWITH (\n\tLOCATION = 'trip_aggregated',\n\tDATA_SOURCE = NYC_Taxi_Curated,\n\tFILE_FORMAT = Parquet_File_Format\n\t)\n\nGO\n\n\nSELECT TOP 100 * FROM Staging.TripAggregated\nGO",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "NYC_Taxi_Dedicated",
+				"poolName": "NYC_Taxi_Dedicated"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
