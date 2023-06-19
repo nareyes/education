@@ -47,6 +47,7 @@
 
 ## Formula1 Data Overview
 [API Documentation](http://ergast.com/mrd/)
+<br>
 
 ![](https://github.com/nareyes/education/blob/main/azure_databricks_course/imgs/ergast_er_diagram.png)
 
