@@ -22,6 +22,10 @@
 		"ls_formula1_lakehouse_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://dbcourselakehouse.dfs.core.windows.net/"
+		},
+		"tr_formula1_processing_master_properties_pipeline_parameters_file_date": {
+			"type": "string",
+			"defaultValue": "@trigger().outputs.windowEndTime"
 		}
 	},
 	"variables": {
@@ -620,6 +624,40 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/db_notebook_ingestion_demo')]",
 				"[concat(variables('factoryId'), '/pipelines/db_notebook_transformation_demo')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/tr_formula1_processing_master')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"runtimeState": "Started",
+				"pipeline": {
+					"pipelineReference": {
+						"referenceName": "db_notebook_processing_master_demo",
+						"type": "PipelineReference"
+					},
+					"parameters": {
+						"file_date": "[parameters('tr_formula1_processing_master_properties_pipeline_parameters_file_date')]"
+					}
+				},
+				"type": "TumblingWindowTrigger",
+				"typeProperties": {
+					"frequency": "Hour",
+					"interval": 168,
+					"startTime": "2021-03-14T20:00:00Z",
+					"endTime": "2021-04-18T20:00:00Z",
+					"delay": "00:00:00",
+					"maxConcurrency": 1,
+					"retryPolicy": {
+						"intervalInSeconds": 30
+					},
+					"dependsOn": []
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/db_notebook_processing_master_demo')]"
 			]
 		}
 	]

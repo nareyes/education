@@ -16,6 +16,9 @@
 		},
 		"ls_formula1_lakehouse_properties_typeProperties_url": {
 			"value": "https://dbcourselakehouse.dfs.core.windows.net/"
+		},
+		"tr_formula1_processing_master_properties_pipeline_parameters_file_date": {
+			"value": "@trigger().outputs.windowEndTime"
 		}
 	}
 }
