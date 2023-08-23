@@ -4,7 +4,7 @@
 		"description": "run incremental load transformation notebooks with file data parameter",
 		"activities": [
 			{
-				"name": "Notebook1",
+				"name": "transform race results",
 				"type": "DatabricksNotebook",
 				"dependsOn": [],
 				"policy": {
@@ -14,7 +14,68 @@
 					"secureOutput": false,
 					"secureInput": false
 				},
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Formula1-Dev/03-Transformation-Incremental/01-Join-Race-Results"
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_formula1_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "transform driver standings",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "transform race results",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Formula1-Dev/03-Transformation-Incremental/02-Driver Standings"
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_formula1_databricks",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "transform team standings",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "transform race results",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Formula1-Dev/03-Transformation-Incremental/03-Constructor-Standings"
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_formula1_databricks",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"annotations": []
