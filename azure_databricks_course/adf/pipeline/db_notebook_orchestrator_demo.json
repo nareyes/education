@@ -1,5 +1,5 @@
 {
-	"name": "db_notebook_orchestration_demo",
+	"name": "db_notebook_orchestrator_demo",
 	"properties": {
 		"description": "ingest master notebook orchestrator",
 		"activities": [

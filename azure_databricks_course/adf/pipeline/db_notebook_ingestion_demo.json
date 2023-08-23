@@ -1,7 +1,7 @@
 {
 	"name": "db_notebook_ingestion_demo",
 	"properties": {
-		"description": "ingest incremental load notebooks with file data parameter",
+		"description": "run incremental load ingestion notebooks with file data parameter",
 		"activities": [
 			{
 				"name": "get folder detail",
@@ -31,6 +31,7 @@
 					],
 					"storeSettings": {
 						"type": "AzureBlobFSReadSettings",
+						"recursive": true,
 						"enablePartitionDiscovery": false
 					},
 					"formatSettings": {
