@@ -17,6 +17,10 @@
 				"userProperties": [],
 				"typeProperties": {
 					"notebookPath": "/Formula1-Dev/02-Ingestion/00-Run-All-Notebooks"
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_formula1_databricks",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
