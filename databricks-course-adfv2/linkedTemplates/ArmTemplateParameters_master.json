@@ -5,11 +5,17 @@
 		"factoryName": {
 			"value": "databricks-course-adfv2"
 		},
-		"ls_databricks_course_accessToken": {
+		"ls_formula1_databricks_accessToken": {
 			"value": ""
 		},
-		"ls_databricks_course_properties_typeProperties_existingClusterId": {
+		"ls_formula1_lakehouse_accountKey": {
+			"value": ""
+		},
+		"ls_formula1_databricks_properties_typeProperties_existingClusterId": {
 			"value": "0615-130520-q9luod2y"
+		},
+		"ls_formula1_lakehouse_properties_typeProperties_url": {
+			"value": "https://dbcourselakehouse.dfs.core.windows.net/"
 		},
 		"containerUri": {
 			"value": ""

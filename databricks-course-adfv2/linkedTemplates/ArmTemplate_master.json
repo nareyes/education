@@ -7,13 +7,21 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "databricks-course-adfv2"
 		},
-		"ls_databricks_course_accessToken": {
+		"ls_formula1_databricks_accessToken": {
 			"type": "secureString",
-			"metadata": "Secure string for 'accessToken' of 'ls_databricks_course'"
+			"metadata": "Secure string for 'accessToken' of 'ls_formula1_databricks'"
 		},
-		"ls_databricks_course_properties_typeProperties_existingClusterId": {
+		"ls_formula1_lakehouse_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'ls_formula1_lakehouse'"
+		},
+		"ls_formula1_databricks_properties_typeProperties_existingClusterId": {
 			"type": "string",
 			"defaultValue": "0615-130520-q9luod2y"
+		},
+		"ls_formula1_lakehouse_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://dbcourselakehouse.dfs.core.windows.net/"
 		},
 		"containerUri": {
 			"type": "string",
@@ -42,11 +50,17 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
-					"ls_databricks_course_accessToken": {
-						"value": "[parameters('ls_databricks_course_accessToken')]"
+					"ls_formula1_databricks_accessToken": {
+						"value": "[parameters('ls_formula1_databricks_accessToken')]"
 					},
-					"ls_databricks_course_properties_typeProperties_existingClusterId": {
-						"value": "[parameters('ls_databricks_course_properties_typeProperties_existingClusterId')]"
+					"ls_formula1_lakehouse_accountKey": {
+						"value": "[parameters('ls_formula1_lakehouse_accountKey')]"
+					},
+					"ls_formula1_databricks_properties_typeProperties_existingClusterId": {
+						"value": "[parameters('ls_formula1_databricks_properties_typeProperties_existingClusterId')]"
+					},
+					"ls_formula1_lakehouse_properties_typeProperties_url": {
+						"value": "[parameters('ls_formula1_lakehouse_properties_typeProperties_url')]"
 					}
 				}
 			},
