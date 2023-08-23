@@ -1,6 +1,7 @@
 {
 	"name": "db_notebook_ingestion_demo",
 	"properties": {
+		"description": "ingest incremental load notebooks with file data parameter",
 		"activities": [
 			{
 				"name": "ingest circuits",
