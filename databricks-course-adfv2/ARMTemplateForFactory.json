@@ -1,0 +1,273 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "databricks-course-adfv2"
+		},
+		"ls_databricks_course_accessToken": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accessToken' of 'ls_databricks_course'"
+		},
+		"ls_databricks_course_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "0615-130520-q9luod2y"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/db_notebook_ingestion_demo')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "ingest incremental load notebooks with file data parameter",
+				"activities": [
+					{
+						"name": "ingest circuits",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Formula1-Dev/02-Ingestion-Incremental/01-Circuits-CSV",
+							"baseParameters": {
+								"FileDate": {
+									"value": "@formatDateTime(pipeline().parameters.FileDate, 'yyy-MM-dd')",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_databricks_course",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ingest races",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Formula1-Dev/02-Ingestion-Incremental/02-Races-CSV",
+							"baseParameters": {
+								"FileDate": {
+									"value": "@formatDateTime(pipeline().parameters.FileDate, 'yyy-MM-dd')",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_databricks_course",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ingest constructors",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Formula1-Dev/02-Ingestion-Incremental/03-Constructors-JSON",
+							"baseParameters": {
+								"FileDate": {
+									"value": "@formatDateTime(pipeline().parameters.FileDate, 'yyy-MM-dd')",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_databricks_course",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ingest drivers",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Formula1-Dev/02-Ingestion-Incremental/04-Drivers-JSON",
+							"baseParameters": {
+								"FileDate": {
+									"value": "@formatDateTime(pipeline().parameters.FileDate, 'yyy-MM-dd')",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_databricks_course",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ingest results",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Formula1-Dev/02-Ingestion-Incremental/05-Results-JSON",
+							"baseParameters": {
+								"FileDate": {
+									"value": "@formatDateTime(pipeline().parameters.FileDate, 'yyy-MM-dd')",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_databricks_course",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ingest pitstops",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Formula1-Dev/02-Ingestion-Incremental/06-Pitstops-JSON",
+							"baseParameters": {
+								"FileDate": {
+									"value": "@formatDateTime(pipeline().parameters.FileDate, 'yyy-MM-dd')",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_databricks_course",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ingest laptimes",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Formula1-Dev/02-Ingestion-Incremental/07-Lap-Times-CSV",
+							"baseParameters": {
+								"FileDate": {
+									"value": "@formatDateTime(pipeline().parameters.FileDate, 'yyy-MM-dd')",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_databricks_course",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "ingest qualifying",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Formula1-Dev/02-Ingestion-Incremental/08-Qualifying-JSON",
+							"baseParameters": {
+								"FileDate": {
+									"value": "@formatDateTime(pipeline().parameters.FileDate, 'yyy-MM-dd')",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_databricks_course",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"FileDate": {
+						"type": "string"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_databricks_course')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ls_databricks_course')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-3664947913524615.15.azuredatabricks.net",
+					"accessToken": {
+						"type": "SecureString",
+						"value": "[parameters('ls_databricks_course_accessToken')]"
+					},
+					"existingClusterId": "[parameters('ls_databricks_course_properties_typeProperties_existingClusterId')]"
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

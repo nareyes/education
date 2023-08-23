@@ -1,0 +1,15 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "databricks-course-adfv2"
+		},
+		"ls_databricks_course_accessToken": {
+			"value": ""
+		},
+		"ls_databricks_course_properties_typeProperties_existingClusterId": {
+			"value": "0615-130520-q9luod2y"
+		}
+	}
+}
