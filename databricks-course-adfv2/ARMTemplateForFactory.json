@@ -33,7 +33,7 @@
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "ingest incremental load notebooks with file data parameter",
+				"description": "run incremental load ingestion notebooks with file data parameter",
 				"activities": [
 					{
 						"name": "get folder detail",
@@ -330,7 +330,7 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/db_notebook_orchestration_demo')]",
+			"name": "[concat(parameters('factoryName'), '/db_notebook_orchestrator_demo')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -350,6 +350,163 @@
 						"userProperties": [],
 						"typeProperties": {
 							"notebookPath": "/Formula1-Dev/02-Ingestion/00-Run-All-Notebooks"
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_formula1_databricks",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_formula1_databricks')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/db_notebook_processing_master_demo')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "master pipeline that invokes ingestion and transformation pipelines",
+				"activities": [
+					{
+						"name": "ingest formula1 data",
+						"type": "ExecutePipeline",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "db_notebook_ingestion_demo",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {
+								"file_date": {
+									"value": "@pipeline().parameters.file_date",
+									"type": "Expression"
+								}
+							}
+						}
+					},
+					{
+						"name": "transform formula1 data",
+						"type": "ExecutePipeline",
+						"dependsOn": [
+							{
+								"activity": "ingest formula1 data",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"pipeline": {
+								"referenceName": "db_notebook_transformation_demo",
+								"type": "PipelineReference"
+							},
+							"waitOnCompletion": true,
+							"parameters": {}
+						}
+					}
+				],
+				"concurrency": 1,
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"file_date": {
+						"type": "string"
+					}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/pipelines/db_notebook_ingestion_demo')]",
+				"[concat(variables('factoryId'), '/pipelines/db_notebook_transformation_demo')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/db_notebook_transformation_demo')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "run incremental load transformation notebooks with file data parameter",
+				"activities": [
+					{
+						"name": "transform race results",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Formula1-Dev/03-Transformation-Incremental/01-Join-Race-Results"
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_formula1_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "transform driver standings",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "transform race results",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Formula1-Dev/03-Transformation-Incremental/02-Driver Standings"
+						},
+						"linkedServiceName": {
+							"referenceName": "ls_formula1_databricks",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "transform team standings",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "transform race results",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/Formula1-Dev/03-Transformation-Incremental/03-Constructor-Standings"
 						},
 						"linkedServiceName": {
 							"referenceName": "ls_formula1_databricks",
