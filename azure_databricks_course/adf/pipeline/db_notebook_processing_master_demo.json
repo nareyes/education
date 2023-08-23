@@ -1,0 +1,54 @@
+{
+	"name": "db_notebook_processing_master_demo",
+	"properties": {
+		"description": "master pipeline that invokes ingestion and transformation pipelines",
+		"activities": [
+			{
+				"name": "ingest formula1 data",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "db_notebook_ingestion_demo",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"file_date": {
+							"value": "@pipeline().parameters.file_date",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "transform formula1 data",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "ingest formula1 data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "db_notebook_transformation_demo",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true
+				}
+			}
+		],
+		"concurrency": 1,
+		"parameters": {
+			"file_date": {
+				"type": "string"
+			}
+		},
+		"annotations": []
+	}
+}
