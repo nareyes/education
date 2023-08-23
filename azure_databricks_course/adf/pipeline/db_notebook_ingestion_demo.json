@@ -286,6 +286,9 @@
 				"type": "string"
 			}
 		},
+		"folder": {
+			"name": "demos"
+		},
 		"annotations": []
 	}
 }

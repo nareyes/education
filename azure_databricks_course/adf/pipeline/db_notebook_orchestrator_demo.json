@@ -24,6 +24,9 @@
 				}
 			}
 		],
+		"folder": {
+			"name": "demos"
+		},
 		"annotations": []
 	}
 }
