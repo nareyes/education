@@ -1,0 +1,29 @@
+{
+	"name": "db_notebook_orchestration_demo",
+	"properties": {
+		"description": "ingest master notebook orchestrator",
+		"activities": [
+			{
+				"name": "ingest notebook orchestrator",
+				"type": "DatabricksNotebook",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Formula1-Dev/02-Ingestion/00-Run-All-Notebooks"
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_databricks_course",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"annotations": []
+	}
+}

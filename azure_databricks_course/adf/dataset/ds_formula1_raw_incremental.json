@@ -1,0 +1,46 @@
+{
+	"name": "ds_formula1_raw_incremental",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_formula1_lakehouse",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"file_date": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": {
+					"value": "@formatDateTime(dataset().file_date, 'yyy-MM-dd')",
+					"type": "Expression"
+				},
+				"fileSystem": "raw-incremental"
+			}
+		},
+		"schema": {
+			"type": "object",
+			"properties": {
+				"constructorId": {
+					"type": "integer"
+				},
+				"constructorRef": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"nationality": {
+					"type": "string"
+				},
+				"url": {
+					"type": "string"
+				}
+			}
+		}
+	}
+}

@@ -18,8 +18,8 @@
 				"typeProperties": {
 					"notebookPath": "/Formula1-Dev/02-Ingestion-Incremental/01-Circuits-CSV",
 					"baseParameters": {
-						"FileDate": {
-							"value": "@formatDateTime(pipeline().parameters.FileDate, 'yyy-MM-dd')",
+						"file_date": {
+							"value": "@formatDateTime(pipeline().parameters.file_date, 'yyy-MM-dd')",
 							"type": "Expression"
 						}
 					}
@@ -44,8 +44,8 @@
 				"typeProperties": {
 					"notebookPath": "/Formula1-Dev/02-Ingestion-Incremental/02-Races-CSV",
 					"baseParameters": {
-						"FileDate": {
-							"value": "@formatDateTime(pipeline().parameters.FileDate, 'yyy-MM-dd')",
+						"file_date": {
+							"value": "@formatDateTime(pipeline().parameters.file_date, 'yyy-MM-dd')",
 							"type": "Expression"
 						}
 					}
@@ -70,8 +70,8 @@
 				"typeProperties": {
 					"notebookPath": "/Formula1-Dev/02-Ingestion-Incremental/03-Constructors-JSON",
 					"baseParameters": {
-						"FileDate": {
-							"value": "@formatDateTime(pipeline().parameters.FileDate, 'yyy-MM-dd')",
+						"file_date": {
+							"value": "@formatDateTime(pipeline().parameters.file_date, 'yyy-MM-dd')",
 							"type": "Expression"
 						}
 					}
@@ -96,8 +96,8 @@
 				"typeProperties": {
 					"notebookPath": "/Formula1-Dev/02-Ingestion-Incremental/04-Drivers-JSON",
 					"baseParameters": {
-						"FileDate": {
-							"value": "@formatDateTime(pipeline().parameters.FileDate, 'yyy-MM-dd')",
+						"file_date": {
+							"value": "@formatDateTime(pipeline().parameters.file_date, 'yyy-MM-dd')",
 							"type": "Expression"
 						}
 					}
@@ -122,8 +122,8 @@
 				"typeProperties": {
 					"notebookPath": "/Formula1-Dev/02-Ingestion-Incremental/05-Results-JSON",
 					"baseParameters": {
-						"FileDate": {
-							"value": "@formatDateTime(pipeline().parameters.FileDate, 'yyy-MM-dd')",
+						"file_date": {
+							"value": "@formatDateTime(pipeline().parameters.file_date, 'yyy-MM-dd')",
 							"type": "Expression"
 						}
 					}
@@ -148,8 +148,8 @@
 				"typeProperties": {
 					"notebookPath": "/Formula1-Dev/02-Ingestion-Incremental/06-Pitstops-JSON",
 					"baseParameters": {
-						"FileDate": {
-							"value": "@formatDateTime(pipeline().parameters.FileDate, 'yyy-MM-dd')",
+						"file_date": {
+							"value": "@formatDateTime(pipeline().parameters.file_date, 'yyy-MM-dd')",
 							"type": "Expression"
 						}
 					}
@@ -174,8 +174,8 @@
 				"typeProperties": {
 					"notebookPath": "/Formula1-Dev/02-Ingestion-Incremental/07-Lap-Times-CSV",
 					"baseParameters": {
-						"FileDate": {
-							"value": "@formatDateTime(pipeline().parameters.FileDate, 'yyy-MM-dd')",
+						"file_date": {
+							"value": "@formatDateTime(pipeline().parameters.file_date, 'yyy-MM-dd')",
 							"type": "Expression"
 						}
 					}
@@ -200,8 +200,8 @@
 				"typeProperties": {
 					"notebookPath": "/Formula1-Dev/02-Ingestion-Incremental/08-Qualifying-JSON",
 					"baseParameters": {
-						"FileDate": {
-							"value": "@formatDateTime(pipeline().parameters.FileDate, 'yyy-MM-dd')",
+						"file_date": {
+							"value": "@formatDateTime(pipeline().parameters.file_date, 'yyy-MM-dd')",
 							"type": "Expression"
 						}
 					}
@@ -210,10 +210,37 @@
 					"referenceName": "ls_databricks_course",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "get folder detail",
+				"type": "GetMetadata",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataset": {
+						"referenceName": "ds_formula1_raw_incremental",
+						"type": "DatasetReference"
+					},
+					"fieldList": [],
+					"storeSettings": {
+						"type": "AzureBlobFSReadSettings",
+						"enablePartitionDiscovery": false
+					},
+					"formatSettings": {
+						"type": "JsonReadSettings"
+					}
+				}
 			}
 		],
 		"parameters": {
-			"FileDate": {
+			"file_date": {
 				"type": "string"
 			}
 		},
