@@ -322,6 +322,9 @@
 						"type": "string"
 					}
 				},
+				"folder": {
+					"name": "demos"
+				},
 				"annotations": []
 			},
 			"dependsOn": [
@@ -360,6 +363,9 @@
 				"policy": {
 					"elapsedTimeMetric": {},
 					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "demos"
 				},
 				"annotations": []
 			},
@@ -424,6 +430,9 @@
 					"file_date": {
 						"type": "string"
 					}
+				},
+				"folder": {
+					"name": "demos"
 				},
 				"annotations": []
 			},
@@ -517,6 +526,9 @@
 				"policy": {
 					"elapsedTimeMetric": {},
 					"cancelAfter": {}
+				},
+				"folder": {
+					"name": "demos"
 				},
 				"annotations": []
 			},
