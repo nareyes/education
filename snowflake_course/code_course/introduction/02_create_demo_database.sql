@@ -3,17 +3,23 @@
 -- better to use if not exists syntax
 create or replace database demo_db;
 
+
 -- create demo schema
-use database demo_db;
-create or replace schema demo_schema;
+create or replace schema demo_db.demo_schema;
+
 
 -- create demo table
 create or replace table demo_db.demo_schema.demo_table (
-    col1 string
+    col1 string,
     col2 string,
-    col3 string,
-)
-comment = 'create demo table with sql command';
+    col3 string
+);
+
 
 -- query table
 select * from demo_db.demo_schema.demo_table;
+
+
+-- clean up
+drop table if exists demo_db.demo_schema.demo_table;
+drop schema if exists demo_db.demo_schema;

@@ -1,4 +1,13 @@
-use database demo_db;
+use warehouse compute_wh;
+
+
+-- create demo database
+create or replace database demo_db;
+
+
+-- create demo schema
+create or replace schema demo_db.demo_schema;
+
 
 -- create demo table
 create or replace table demo_db.demo_schema.loan_payment (
@@ -15,8 +24,6 @@ create or replace table demo_db.demo_schema.loan_payment (
     gender string 
 );
 
--- query table
-select * from demo_db.demo_schema.loan_payment;
 
 -- load data from aws s3
 copy into demo_db.demo_schema.loan_payment
@@ -27,5 +34,12 @@ copy into demo_db.demo_schema.loan_payment
         skip_header = 1
     );
 
+
 -- validate data
-select * from demo_db.demo_schema.loan_payment;
+select * from demo_db.demo_schema.loan_payment
+limit 10;
+
+
+-- clean up
+drop table if exists demo_db.demo_schema.loan_payment;
+drop schema if exists demo_db.demo_schema;

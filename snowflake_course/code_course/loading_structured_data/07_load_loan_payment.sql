@@ -1,33 +1,28 @@
-USE WAREHOUSE COMPUTE_WH;
+use warehouse compute_wh;
 
 
--- CREATE TABLE
-CREATE OR REPLACE TABLE DEMO_DB.PUBLIC.LOAN_PAYMENT (
-    LOAN_ID STRING,
-    LOAN_STATUS STRING,
-    PRINCIPAL STRING,
-    TERMS STRING,
-    EFFECTIVE_DATE STRING,
-    DUE_DATE STRING,
-    PAID_OFF_TIME STRING,
-    PAST_DUE_DAYS STRING,
-    AGE STRING,
-    EDUCATION STRING,
-    GENDER STRING
+-- create table
+create or replace table demo_db.public.loan_payment (
+    loan_id string,
+    loan_status string,
+    principal string,
+    terms string,
+    effective_date string,
+    due_date string,
+    paid_off_time string,
+    past_due_days string,
+    age string,
+    education string,
+    gender string
 );
 
-SELECT * FROM DEMO_DB.PUBLIC.LOAN_PAYMENT;
 
-
--- LOAD DATA FROM S3 BUCKET
-COPY INTO DEMO_DB.PUBLIC.LOAN_PAYMENT
-    FROM s3://bucketsnowflakes3/Loan_payments_data.csv 
-    FILE_FORMAT = (
-        TYPE = CSV 
-        FIELD_DELIMITER = ',' 
-        SKIP_HEADER = 1 -- TRUE
-    );
+-- load data
+copy into demo_db.public.loan_payment
+    from 's3://bucketsnowflakes3/Loan_payments_data.csv'
+    file_format = manage_db.file_formats.csv_format;
     
     
--- INSPECT DATA
-SELECT * FROM DEMO_DB.PUBLIC.LOAN_PAYMENT;
+-- inspect data
+select * from demo_db.public.loan_payment
+limit 10;

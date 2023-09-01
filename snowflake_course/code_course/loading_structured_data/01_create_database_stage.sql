@@ -1,12 +1,13 @@
-use warehouse compute_wh
+use warehouse compute_wh;
+
 
 -- create managed object database
 create or replace database manage_db;
 
-use manage_db;
 
 -- create schema for external stage
 create or replace schema manage_db.external_stage;
+
 
 -- create external stage
 -- use storage integration object in production env
@@ -17,8 +18,10 @@ create or replace stage manage_db.external_stage.aws_stage
     --     aws_secret_key = '<>'
     -- );
 
+
 -- describe stage
 desc stage manage_db.external_stage.aws_stage;
+
 
 -- list files in stage
 list @manage_db.external_stage.aws_stage;
