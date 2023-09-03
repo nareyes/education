@@ -1,3 +1,7 @@
+-- set role context
+use role sysadmin;
+
+-- create virtual warehouse
 create or replace warehouse compute_wh_sql
 with
     warehouse_size = xsmall
@@ -9,4 +13,6 @@ with
     auto_suspend = 600 -- in seconds
     initially_suspended = true;
 
+
+-- drop virtual warehouse
 drop warehouse compute_wh_sql;

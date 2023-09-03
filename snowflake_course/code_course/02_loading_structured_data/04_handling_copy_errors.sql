@@ -98,7 +98,3 @@ copy into demo_db.public.order_details_errors
     on_error = 'skip_file_1%'; -- specify percentage of errors to skip
 
 truncate table demo_db.public.order_details_errors;
-
-
--- clean up
-drop table if exists demo_db.public.order_details_errors;
