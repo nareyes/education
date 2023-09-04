@@ -1,3 +1,10 @@
+// Snowflake Definitive Guide 1st Edition by Joyce Kay Avila - August 2022
+// ISBN-10 : 1098103823
+// ISBN-13 : 978-1098103828
+// Contact the author: https://www.linkedin.com/in/joycekayavila/
+// Chapter 2: Creating and Managing the Snowflake Architecture
+
+
 /* create warehouse syntax
 create [ or replace ] warehouse [ if not exists ] <name>
        [ [ with ] objectproperties ]

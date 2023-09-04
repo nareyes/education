@@ -1,3 +1,6 @@
+-- use context
+use role sysadmin;
+
 use warehouse exercise_wh;
 
 

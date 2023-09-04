@@ -1,3 +1,6 @@
+-- set context
+use role sysadmin;
+
 use warehouse compute_wh;
 
 
