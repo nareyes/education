@@ -35,7 +35,7 @@ copyoptions ::=
 */
 
 
-use role accountadmin;
+use role sysadmin;
 use warehouse compute_wh;
 
 
