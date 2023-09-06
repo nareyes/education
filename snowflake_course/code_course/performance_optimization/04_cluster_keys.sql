@@ -1,63 +1,105 @@
--- INTRODUCE CLUSTER KEYS FOR LARGE TABLES
--- CLUSTER KEYS CREATE SUBSET OF DATA IN MICRO-PARTITIONS
--- IMPROVES SCAN EFFICIENCY FOR LARGE TABLES
--- TYPICALLY AUTOMATED BY SNOWFLAKE
+use role sysadmin;
+use warehouse compute_wh;
+
+-- introduce cluster keys for large tables
+-- cluster keys create subset of data in micro-partitions
+-- improves scan efficiency for large tables
+-- typically automated by snowflake (but can be manually set)
+-- snowflake automaticlaly maintains cluster keys
+-- clusters should be set on column(s) that are frequently used in joins, where clauses, group by, order by
 
 
--- CREATE STAGE
-CREATE OR REPLACE STAGE MANAGE_DB.PUBLIC.AWS_STAGE
-    URL = 's3://bucketsnowflakes3/';
+-- create stage
+create or replace stage manage_db.external_stage.aws_stage_cluster
+    url = 's3://bucketsnowflakes3/';
 
-LIST @MANAGE_DB.PUBLIC.AWS_STAGE;
-
-
--- LOAD DATA INTO ORDERS TABLE
-TRUNCATE TABLE DEMO_DB.PUBLIC.ORDERS;
-
-COPY INTO DEMO_DB.PUBLIC.ORDERS
-    FROM @MANAGE_DB.PUBLIC.AWS_STAGE
-    FILE_FORMAT = MANAGE_DB.PUBLIC.CSV_FORMAT
-    PATTERN = '.*OrderDetails.*';
-
-SELECT * FROM DEMO_DB.PUBLIC.ORDERS;
+list @manage_db.external_stage.aws_stage_cluster;
 
 
--- CREATE TABLE FOR CACHING DEMO
-CREATE OR REPLACE TABLE DEMO_DB.PUBLIC.ORDERS_CACHING (
-    ORDER_ID    VARCHAR(30),
-    AMOUNT      NUMBER(38, 0),
-    PROFIT      NUMBER(38, 0),
-    QUANTITY    NUMBER(38, 0),
-    CATEGORY    VARCHAR(30),
-    SUBCATEGORY VARCHAR(30),
-    DATE        DATE
+-- load data into orders table
+truncate table demo_db.public.orders;
+
+copy into demo_db.public.orders
+    from @manage_db.external_stage.aws_stage_cluster
+    file_format = manage_db.file_formats.csv_format
+    pattern = '.*OrderDetails.*';
+
+select * from demo_db.public.orders;
+
+
+-- create table for caching demo (without defining cluster key)
+create or replace table demo_db.public.orders_cluster (
+    order_id varchar(30),
+    amount number(38, 0),
+    profit number(38, 0),
+    quantity number(38, 0),
+    category varchar(30),
+    subcategory varchar(30),
+    date date
 );
 
-SELECT * FROM DEMO_DB.PUBLIC.ORDERS_CACHING;
+-- cluster by (date);
 
 
--- INSERT DUPLICATE DATA INTO ORDERS CACHING FOR DEMO
-INSERT INTO DEMO_DB.PUBLIC.ORDERS_CACHING (
-    SELECT
-        T1.ORDER_ID,
-        T1.AMOUNT,
-        T1.PROFIT,	
-        T1.QUANTITY,	
-        T1.CATEGORY,	
-        T1.SUBCATEGORY,	
-        DATE(UNIFORM(1500000000,1700000000,(RANDOM())))
-    FROM DEMO_DB.PUBLIC.ORDERS T1
-        CROSS JOIN (SELECT * FROM DEMO_DB.PUBLIC.ORDERS) T2
-        CROSS JOIN (SELECT TOP 100 * FROM DEMO_DB.PUBLIC.ORDERS) T3
+-- insert duplicate data into orders caching for demo
+insert into demo_db.public.orders_cluster (
+    select
+        t1.order_id,
+        t1.amount,
+        t1.profit,	
+        t1.quantity,	
+        t1.category,	
+        t1.subcategory,	
+        date(uniform(1500000000,1700000000,(random())))
+    from demo_db.public.orders t1
+        cross join (select * from demo_db.public.orders) t2
+        cross join (select top 100 * from demo_db.public.orders) t3
 );
 
 
--- QUERY PERFORMANCE BEFORE CLUSTER KEY
-SELECT * FROM DEMO_DB.PUBLIC.ORDERS_CACHING WHERE DATE = '2020-06-09';
+-- query performance before cluster key
+select * 
+from demo_db.public.orders_cluster 
+where date = '2020-06-09';
 
 
--- ADD CLUSTER AND RUN QUERY TO COMPARE RESULTS
-ALTER TABLE DEMO_DB.PUBLIC.ORDERS_CACHING
-    CLUSTER BY (DATE);
+-- add cluster and run query to compare results
+alter table demo_db.public.orders_cluster
+    cluster by (date);
 
-SELECT * FROM DEMO_DB.PUBLIC.ORDERS_CACHING WHERE DATE = '2020-01-05'; -- DIFFERENT DATE TO PREVENT CACHING BENEFIT
+select * 
+from demo_db.public.orders_cluster 
+where date = '2020-01-05'; -- different date to prevent caching benefit
+
+
+-- show cluster key
+select clustering_key
+from demo_db.information_schema.tables
+where table_name = 'orders_cluster';
+
+
+
+-- multiple cluster example
+-- drop cluster
+alter table demo_db.public.orders_cluster
+    drop clustering key;
+
+
+-- query performance before cluster key
+select * 
+from demo_db.public.orders_cluster 
+where date = '2020-06-09' and category = 'Electronics';
+
+
+-- add cluster and run query to compare results
+alter table demo_db.public.orders_cluster
+    cluster by (date, category);
+
+select * 
+from demo_db.public.orders_cluster 
+where date = '2020-01-05' and category = 'Electronics'; -- different date to prevent caching benefit
+
+-- show cluster key
+select clustering_key
+from demo_db.information_schema.tables
+where table_name = 'orders_cluster';

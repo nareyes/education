@@ -1,103 +1,107 @@
-USE ROLE ACCOUNTADMIN;
--- DEDICATED VIRTUAL WAREHOUSE FOR DIFFERENT USER GROUPS AND/OR WORK LOADS
+use role sysadmin;
+-- dedicated virtual warehouse for different user groups and/or work loads
 
 
--- CRAETE DEDICATED VIRTUAL WAREHOUSES FOR EVERY CLASS OF WORKLOAD DESIRED
--- DATA SCIENTIST GROUP 
-CREATE WAREHOUSE DS_WH
-    WITH WAREHOUSE_SIZE = 'SMALL'
-    WAREHOUSE_TYPE = 'STANDARD'
-    AUTO_SUSPEND = 300
-    AUTO_RESUME = TRUE
-    MIN_CLUSTER_COUNT = 1
-    MAX_CLUSTER_COUNT = 1
-    SCALING_POLICY = 'STANDARD';
+-- craete dedicated virtual warehouses for every class of workload desired
+-- data scientist group 
+create warehouse ds_wh
+with 
+    warehouse_size = 'small'
+    warehouse_type = 'standard'
+    auto_suspend = 300
+    auto_resume = true
+    min_cluster_count = 1
+    max_cluster_count = 3
+    scaling_policy = 'standard';
     
--- DBA GROUP
-CREATE WAREHOUSE DBA_WH
-    WITH WAREHOUSE_SIZE = 'SMALL'
-    WAREHOUSE_TYPE = 'STANDARD'
-    AUTO_SUSPEND = 300
-    AUTO_RESUME = TRUE
-    MIN_CLUSTER_COUNT = 1
-    MAX_CLUSTER_COUNT = 1
-    SCALING_POLICY = 'STANDARD';
-
-
--- CREATE ROLES FOR DS AND DBAs
-CREATE ROLE DATA_SCIENTIST;
-GRANT USAGE ON WAREHOUSE DS_WH TO ROLE DATA_SCIENTIST;
-
-CREATE ROLE DBA;
-GRANT USAGE ON WAREHOUSE DBA_WH TO ROLE DBA;
-
-
--- CREATE USERS AND ASSIGN ROLES/WH
--- DATA SCIENTISTS
-CREATE USER DS1
-    PASSWORD = 'DS1'
-    LOGIN_NAME = 'DS1'
-    DEFAULT_ROLE = 'DATA_SCIENTIST'
-    DEFAULT_WAREHOUSE = 'DS_WH'
-    MUST_CHANGE_PASSWORD = TRUE;
-
-CREATE USER DS2
-    PASSWORD = 'DS2'
-    LOGIN_NAME = 'DS2'
-    DEFAULT_ROLE = 'DATA_SCIENTIST'
-    DEFAULT_WAREHOUSE = 'DS_WH'
-    MUST_CHANGE_PASSWORD = TRUE;
-
-CREATE USER DS3
-    PASSWORD = 'DS3'
-    LOGIN_NAME = 'DS3'
-    DEFAULT_ROLE = 'DATA_SCIENTIST'
-    DEFAULT_WAREHOUSE = 'DS_WH'
-    MUST_CHANGE_PASSWORD = TRUE;
-
--- DBAs
-CREATE USER DBA1
-    PASSWORD = 'DBA1'
-    LOGIN_NAME = 'DBA1'
-    DEFAULT_ROLE = 'DBA'
-    DEFAULT_WAREHOUSE = 'DBA_WH'
-    MUST_CHANGE_PASSWORD = TRUE;
-
-CREATE USER DBA2
-    PASSWORD = 'DBA2'
-    LOGIN_NAME = 'DBA2'
-    DEFAULT_ROLE = 'DBA'
-    DEFAULT_WAREHOUSE = 'DBA_WH'
-    MUST_CHANGE_PASSWORD = TRUE;
-
-CREATE USER DBA3
-    PASSWORD = 'DBA3'
-    LOGIN_NAME = 'DBA3'
-    DEFAULT_ROLE = 'DBA'
-    DEFAULT_WAREHOUSE = 'DBA_WH'
-    MUST_CHANGE_PASSWORD = TRUE;
-
-
--- ASIGN ROLES TO WAREHOUSES
-GRANT ROLE DATA_SCIENTIST TO USER DS1;
-GRANT ROLE DATA_SCIENTIST TO USER DS2;
-GRANT ROLE DATA_SCIENTIST TO USER DS3;
     
-GRANT ROLE DBA TO USER DBA1;
-GRANT ROLE DBA TO USER DBA2;
-GRANT ROLE DBA TO USER DBA3;
+-- dba group
+create warehouse dba_wh
+with 
+    warehouse_size = 'small'
+    warehouse_type = 'standard'
+    auto_suspend = 300
+    auto_resume = true
+    min_cluster_count = 1
+    max_cluster_count = 3
+    scaling_policy = 'standard';
 
 
--- DROP OBJECTS
-DROP USER DS1;
-DROP USER DS2;
-DROP USER DS3;
-DROP USER DBA1;
-DROP USER DBA2;
-DROP USER DBA3;
+use role accountadmin;
+-- create roles for ds and dbas
+create role data_scientist;
+grant usage on warehouse ds_wh to role data_scientist;
 
-DROP ROLE DATA_SCIENTIST;
-DROP ROLE DBA;
+create role dba;
+grant usage on warehouse dba_wh to role dba;
 
-DROP WAREHOUSE DS_WH;
-DROP WAREHOUSE DBA_WH;
+
+-- create users and assign roles/wh
+-- data scientists
+create user ds1
+    password = 'ds1'
+    login_name = 'ds1'
+    default_role = 'data_scientist'
+    default_warehouse = 'ds_wh'
+    must_change_password = true;
+
+create user ds2
+    password = 'ds2'
+    login_name = 'ds2'
+    default_role = 'data_scientist'
+    default_warehouse = 'ds_wh'
+    must_change_password = true;
+
+create user ds3
+    password = 'ds3'
+    login_name = 'ds3'
+    default_role = 'data_scientist'
+    default_warehouse = 'ds_wh'
+    must_change_password = true;
+
+-- dbas
+create user dba1
+    password = 'dba1'
+    login_name = 'dba1'
+    default_role = 'dba'
+    default_warehouse = 'dba_wh'
+    must_change_password = true;
+
+create user dba2
+    password = 'dba2'
+    login_name = 'dba2'
+    default_role = 'dba'
+    default_warehouse = 'dba_wh'
+    must_change_password = true;
+
+create user dba3
+    password = 'dba3'
+    login_name = 'dba3'
+    default_role = 'dba'
+    default_warehouse = 'dba_wh'
+    must_change_password = true;
+
+
+-- asign roles to users (default set in the create user statement)
+grant role data_scientist to user ds1;
+grant role data_scientist to user ds2;
+grant role data_scientist to user ds3;
+    
+grant role dba to user dba1;
+grant role dba to user dba2;
+grant role dba to user dba3;
+
+
+-- drop objects
+drop user ds1;
+drop user ds2;
+drop user ds3;
+drop user dba1;
+drop user dba2;
+drop user dba3;
+
+drop role data_scientist;
+drop role dba;
+
+drop warehouse ds_wh;
+drop warehouse dba_wh;
