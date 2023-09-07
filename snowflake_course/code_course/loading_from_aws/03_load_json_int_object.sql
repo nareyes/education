@@ -1,89 +1,90 @@
-USE WAREHOUSE COMPUTE_WH;
+use role sysadmin;
+use warehouse compute_wh;
 
 
--- CREATE FILE FORMAT OBJECT
-CREATE OR REPLACE FILE FORMAT MANAGE_DB.PUBLIC.JSON_FORMAT
-    TYPE = JSON;
+-- create file format object
+create or replace file format manage_db.public.json_format
+    type = json;
 
-DESC FILE FORMAT MANAGE_DB.PUBLIC.JSON_FORMAT;
-
-
--- CREATE STAGE
-CREATE OR REPLACE STAGE MANAGE_DB.PUBLIC.INSTRUMENT_STAGE
-    URL = 's3://s3snowflakestorage/json/'
-    STORAGE_INTEGRATION = S3_INT
-    FILE_FORMAT = MANAGE_DB.PUBLIC.JSON_FORMAT;
-
-LIST @MANAGE_DB.PUBLIC.INSTRUMENT_STAGE;
+desc file format manage_db.public.json_format;
 
 
--- QUERY STAGE TO DETERMINE JSON FORMAT
-SELECT * FROM @MANAGE_DB.PUBLIC.INSTRUMENT_STAGE;
+-- create stage
+create or replace stage manage_db.public.instrument_stage
+    url = 's3://s3snowflakestorage/json/'
+    storage_integration = s3_int
+    file_format = manage_db.public.json_format;
+
+list @manage_db.public.instrument_stage;
 
 
--- QUERY STAGE WITH FORMATTED COLUMNS
-SELECT 
-    $1:asin::STRING                 AS ASIN,
-    $1:helpful                      AS HELPFUL,
-    $1:overall                      AS OVERALL,
-    $1:reviewText::STRING           AS REVIEW_TEXT,
-    $1:reviewTime::STRING           AS REVIEW_TIME,
-    DATE_FROM_PARTS (
-        RIGHT ($1:reviewTime::STRING,4),
-        LEFT ($1:reviewTime::STRING,2),
-        CASE 
-            WHEN SUBSTRING ($1:reviewTime::STRING,5,1) = ','
-            THEN SUBSTRING ($1:reviewTime::STRING,4,1)
-            ELSE SUBSTRING ($1:reviewTime::STRING,4,2)
-        END
-    )                               AS REVIEW_TIME_FORMATTED,
-    $1:reviewerID::STRING           AS REVIEWER_ID,
-    $1:reviewerName::STRING         AS REVIEWER_NAME,
-    $1:summary::STRING              AS SUMMARY,
-    DATE($1:unixReviewTime::INT)    AS UNIX_REVIEW_TIME
-FROM @MANAGE_DB.PUBLIC.INSTRUMENT_STAGE;
+-- query stage to determine json format
+select * from @manage_db.public.instrument_stage;
 
 
--- CREATE DESTINATION TABLE
-CREATE OR REPLACE TABLE DEMO_DB.PUBLIC.INSTRUMENT_REVIEWS (
-    ASIN                STRING,
-    HELPFUL             STRING,
-    OVERALL             STRING,
-    REVIEW_TEXT         STRING,
-    REVIEW_TIME         DATE,
-    REVIEWER_ID         STRING,
-    REVIEWER_NAME       STRING,
-    SUMMARY             STRING,
-    UNIX_REVIEW_TIME    DATE
+-- query stage with formatted columns
+select 
+    $1:asin::string as asin,
+    $1:helpful as helpful,
+    $1:overall as overall,
+    $1:reviewtext::string as review_text,
+    $1:reviewtime::string as review_time,
+    date_from_parts (
+        right ($1:reviewtime::string,4),
+        left ($1:reviewtime::string,2),
+        case 
+            when substring ($1:reviewtime::string,5,1) = ','
+            then substring ($1:reviewtime::string,4,1)
+            else substring ($1:reviewtime::string,4,2)
+        end
+    ) as review_time_formatted,
+    $1:reviewerid::string as reviewer_id,
+    $1:reviewername::string as reviewer_name,
+    $1:summary::string as summary,
+    date($1:unixreviewtime::int) as unix_review_time
+from @manage_db.public.instrument_stage;
+
+
+-- create destination table
+create or replace table demo_db.public.instrument_reviews (
+    asin string,
+    helpful string,
+    overall string,
+    review_text string,
+    review_time date,
+    reviewer_id string,
+    reviewer_name string,
+    summary string,
+    unix_review_time date
 );
 
-SELECT * FROM DEMO_DB.PUBLIC.INSTRUMENT_REVIEWS;
+select * from demo_db.public.instrument_reviews;
 
 
--- LOAD TRANSOFRMED JSON DATA
-COPY INTO DEMO_DB.PUBLIC.INSTRUMENT_REVIEWS
-    FROM (
-        SELECT 
-            $1:asin::STRING                 AS ASIN,
-            $1:helpful                      AS HELPFUL,
-            $1:overall                      AS OVERALL,
-            $1:reviewText::STRING           AS REVIEW_TEXT,
-            DATE_FROM_PARTS (
-                RIGHT ($1:reviewTime::STRING,4),
-                LEFT ($1:reviewTime::STRING,2),
-                CASE 
-                    WHEN SUBSTRING ($1:reviewTime::STRING,5,1) = ','
-                    THEN SUBSTRING ($1:reviewTime::STRING,4,1)
-                    ELSE SUBSTRING ($1:reviewTime::STRING,4,2)
-                END
-            )                               AS REVIEW_TIME,
-            $1:reviewerID::STRING           AS REVIEWER_ID,
-            $1:reviewerName::STRING         AS REVIEWER_NAME,
-            $1:summary::STRING              AS SUMMARY,
-            DATE($1:unixReviewTime::INT)    AS UNIX_REVIEW_TIME
-        FROM @MANAGE_DB.PUBLIC.INSTRUMENT_STAGE
+-- load transofrmed json data
+copy into demo_db.public.instrument_reviews
+    from (
+        select 
+            $1:asin::string as asin,
+            $1:helpful as helpful,
+            $1:overall as overall,
+            $1:reviewtext::string as review_text,
+            date_from_parts (
+                right ($1:reviewtime::string,4),
+                left ($1:reviewtime::string,2),
+                case 
+                    when substring ($1:reviewtime::string,5,1) = ','
+                    then substring ($1:reviewtime::string,4,1)
+                    else substring ($1:reviewtime::string,4,2)
+                end
+            ) as review_time,
+            $1:reviewerid::string as reviewer_id,
+            $1:reviewername::string as reviewer_name,
+            $1:summary::string as summary,
+            date($1:unixreviewtime::int) as unix_review_time
+        from @manage_db.public.instrument_stage
     );
 
 
--- INSPECT DATA
-SELECT * FROM DEMO_DB.PUBLIC.INSTRUMENT_REVIEWS;
+-- inspect data
+select * from demo_db.public.instrument_reviews;

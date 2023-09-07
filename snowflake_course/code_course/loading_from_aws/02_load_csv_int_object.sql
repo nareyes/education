@@ -1,51 +1,50 @@
-USE WAREHOUSE COMPUTE_WH;
+use role sysadmin;
+use warehouse compute_wh;
 
 
--- CREATE TABLE
-CREATE OR REPLACE TABLE DEMO_DB.PUBLIC.MOVIE_TITLES (
-    SHOW_ID         STRING,
-    TYPE            STRING,
-    TITLE           STRING,
-    DIRECTOR        STRING,
-    CAST            STRING,
-    COUNTRY         STRING,
-    DATE_ADDED      STRING,
-    RELEASE_YEAR    STRING,
-    RATING          STRING,
-    DURATION        STRING,
-    LISTED_IN       STRING,
-    DESCRIPTION     STRING
+-- create table
+create or replace table demo_db.public.movie_titles (
+    show_id string,
+    type string,
+    title string,
+    director string,
+    cast string,
+    country string,
+    date_added string,
+    release_year string,
+    rating string,
+    duration string,
+    listed_in string,
+    description string
 );
 
-SELECT * FROM DEMO_DB.PUBLIC.MOVIE_TITLES;
+
+-- create file format object
+create or replace file format manage_db.public.csv_format
+    type = csv
+    field_delimiter = ','
+    skip_header = 1
+    null_if = ('null', 'null')
+    empty_field_as_null = true
+    field_optionally_enclosed_by = '"';
+
+desc file format manage_db.public.csv_format;
 
 
--- CREATE FILE FORMAT OBJECT
-CREATE OR REPLACE FILE FORMAT MANAGE_DB.PUBLIC.CSV_FORMAT
-    TYPE = CSV
-    FIELD_DELIMITER = ','
-    SKIP_HEADER = 1
-    NULL_IF = ('NULL', 'null')
-    EMPTY_FIELD_AS_NULL = TRUE
-    FIELD_OPTIONALLY_ENCLOSED_BY = '"';
+-- create stage
+create or replace stage manage_db.public.netflix_stage
+    url = 's3://s3snowflakestorage/csv/'
+    storage_integration = s3_int
+    file_format = manage_db.public.csv_format;
 
-DESC FILE FORMAT MANAGE_DB.PUBLIC.CSV_FORMAT;
+list @manage_db.public.netflix_stage;
 
 
--- CREATE STAGE
-CREATE OR REPLACE STAGE MANAGE_DB.PUBLIC.NETFLIX_STAGE
-    URL = 's3://s3snowflakestorage/csv/'
-    STORAGE_INTEGRATION = S3_INT
-    FILE_FORMAT = MANAGE_DB.PUBLIC.CSV_FORMAT;
-
-LIST @MANAGE_DB.PUBLIC.NETFLIX_STAGE;
+-- load data
+copy into demo_db.public.movie_titles
+    from @manage_db.public.netflix_stage
+    files = ('netflix_titles.csv');
 
 
--- LOAD DATA
-COPY INTO DEMO_DB.PUBLIC.MOVIE_TITLES
-    FROM @MANAGE_DB.PUBLIC.NETFLIX_STAGE
-    FILES = ('netflix_titles.csv');
-
-
--- INSPECT DATA
-SELECT * FROM DEMO_DB.PUBLIC.MOVIE_TITLES;
+-- inspect data
+select * from demo_db.public.movie_titles;

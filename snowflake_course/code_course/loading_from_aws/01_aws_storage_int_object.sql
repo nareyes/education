@@ -1,12 +1,15 @@
--- CREATE STORAGE INTEGRATION OBJECT
-CREATE OR REPLACE STORAGE INTEGRATION S3_INT
-    TYPE = EXTERNAL_STAGE
-    STORAGE_PROVIDER = S3
-    ENABLED = TRUE
-    STORAGE_AWS_ROLE_ARN = 'arn:aws:iam::929339109708:role/snowflake-access-role'
-    STORAGE_ALLOWED_LOCATIONS = ('s3://s3snowflakestorage/csv', 's3://s3snowflakestorage/json')
-        COMMENT = 'OPTIONAL COMMENT';
+use role sysadmin;
+use warehouse compute_wh;
+
+-- create storage integration object
+create or replace storage integration s3_int
+    type = external_stage
+    storage_provider = s3
+    enabled = true
+    storage_aws_role_arn = 'arn:aws:iam::929339109708:role/snowflake-access-role'
+    storage_allowed_locations = ('s3://s3snowflakestorage/csv', 's3://s3snowflakestorage/json')
+        comment = 'optional comment';
 
 
--- INSPECT STORAGE INTEGRATION PROPERTIES
-DESC INTEGRATION S3_INT;
+-- inspect storage integration properties
+desc integration s3_int;

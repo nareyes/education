@@ -73,6 +73,85 @@ create or replace table demo_db_transient.public.summary (
 show tables;
 
 
+-- create schema by setting context
+use role sysadmin;
+use database demo_db_permanent;
+create or replace schema banking;
+
+
+-- create schema using fully qualified name
+use role sysadmin;
+create or replace schema demo_db_permanent.banking;
+
+
+-- view schema metadata
+show schemas;
+
+
+-- changing schema retention time (defaults to database retention time)
+use role sysadmin;
+alter schema demo_db_permanent.banking
+    set data_retention_time_in_days = 1;
+
+
+-- moving table to a different schema
+use role sysadmin;
+
+create or replace schema demo_db_transient.banking;
+
+alter table demo_db_transient.public.summary
+    rename to demo_db_transient.banking.summary;
+
+
+-- create schema with managed access
+use role sysadmin;
+create or replace schema demo_db_permanent.mschema
+    with managed access;
+
+
+show schemas;
+
+
+-- information_schema account views (database context is irrelevant)
+select * from information_schema.applicable_roles;
+select * from information_schema.databases;
+select * from information_schema.enabled_roles;
+select * from information_schema.load_history;
+select * from information_schema.replication_databases;
+
+
+-- information_schema database views (database context is relevant)
+select * from demo_db_permanent.information_schema.columns;
+select * from demo_db_permanent.information_schema.external_tables;
+select * from demo_db_permanent.information_schema.file_formats;
+select * from demo_db_permanent.information_schema.functions;
+select * from demo_db_permanent.information_schema.object_privileges;
+select * from demo_db_permanent.information_schema.pipes;
+select * from demo_db_permanent.information_schema.procedures;
+select * from demo_db_permanent.information_schema.referential_constraints;
+select * from demo_db_permanent.information_schema.schemata;
+select * from demo_db_permanent.information_schema.sequences;
+select * from demo_db_permanent.information_schema.stages;
+select * from demo_db_permanent.information_schema.table_constraints;
+select * from demo_db_permanent.information_schema.table_privileges;
+select * from demo_db_permanent.information_schema.table_storage_metrics;
+select * from demo_db_permanent.information_schema.tables;
+select * from demo_db_permanent.information_schema.usage_privileges;
+select * from demo_db_permanent.information_schema.views;
+
+
+-- query account_usage schema in showflake database for credits used over time
+use role accountadmin;
+use warehouse compute_wh;
+
+select
+    start_time::date as usage_date,
+    warehouse_name,
+    sum (credits_used) as total_credits_consumed
+from snowflake.account_usage.warehouse_metering_history
+where start_time >= date_trunc (month, current_date)
+group  by 1, 2
+order by 2, 1;
 
 
 
@@ -84,69 +163,12 @@ show tables;
 
 
 
-// Page 63 - Example 1 of how to create a new schema by setting context
-USE ROLE SYSADMIN; USE DATABASE DEMO_DB_PERMANENT;
-CREATE OR REPLACE SCHEMA BANKING;
 
-// Page 64 - Example 2 of how to create a new schema using fully qualifed name
-USE ROLE SYSADMIN;
-CREATE OR REPLACE SCHEMA DEMO_DB_PERMANENT.BANKING;
 
-// Page 65 - Using the SHOW SCHEMAS command to see the details of schemas
-SHOW SCHEMAS;
 
-// Page 66 - Change the retention time for a schema
-USE ROLE SYSADMIN;
-ALTER SCHEMA DEMO_DB_PERMANENT.BANKING
-SET DATA_RETENTION_TIME_IN_DAYS=1;
 
-// Page 67 - Moving a table to a different (newly created) schema
-USE ROLE SYSADMIN;
-CREATE OR REPLACE SCHEMA DEMO_DB_TRANSIENT.BANKING;
-ALTER TABLE DEMO_DB_TRANSIENT.PUBLIC.SUMMARY
-RENAME TO DEMO_DB_TRANSIENT.BANKING.SUMMARY;
 
-// Page 64 - Create a schema with managed access
-USE ROLE SYSADMIN; USE DATABASE DEMO_DB_PERMANENT;
-CREATE OR REPLACE SCHEMA MSCHEMA WITH MANAGED ACCESS;
 
-// Page 65 - Using the SHOW SCHEMAS command to see details of schemas
-SHOW SCHEMAS;
-
-// Page 67 - Information Schema for a database (Example #1)
-SELECT * FROM SNOWFLAKE_SAMPLE_DATA.INFORMATION_SCHEMA.DATABASES;
-
-// Page 67 - Information Schema for a database (Example #2)
-SELECT * FROM DEMO_DB_PERMANENT.INFORMATION_SCHEMA.DATABASES;
-
-// Page 67 - Information schema for applicable roles (Example #1)
-SELECT * FROM SNOWFLAKE_SAMPLE_DATA.INFORMATION_SCHEMA.APPLICABLE_ROLES;
-
-// Page 67 - Information schema for applicable roles (Example #2)
-SELECT * FROM DEMO_DB_PERMANENT.INFORMATION_SCHEMA.APPLICABLE_ROLES;
-
-// Page 69 - Information about schemas in the Snowflake sample database (Example #1)
-SELECT * FROM SNOWFLAKE_SAMPLE_DATA.INFORMATION_SCHEMA.SCHEMATA;
-
-// Page 69 - Information about schemas in the Snowflake sample database (Example #2)
-SHOW SCHEMAS IN DATABASE SNOWFLAKE_SAMPLE_DATA;
-
-// Page 69 - Information schema for table privileges (Example #1)
-SELECT * FROM DEMO_DB_PERMANENT.INFORMATION_SCHEMA.TABLE_PRIVILEGES;
-
-// Page 69 - Information schema for table privileges (Example #2)
-SELECT * FROM DEMO_DB_TRANSIENT.INFORMATION_SCHEMA.TABLE_PRIVILEGES;
-
-// Page 70 - Show credits used over time by each virtual warehouse
-// Make sure your role is set to ACCOUNTADMIN
-USE ROLE ACCOUNTADMIN;USE DATABASE SNOWFLAKE;USE SCHEMA ACCOUNT_USAGE;
-USE WAREHOUSE COMPUTE_WH;
-SELECT start_time::date AS USAGE_DATE, WAREHOUSE_NAME,
- SUM(credits_used) AS TOTAL_CREDITS_CONSUMED
-FROM warehouse_metering_history
-WHERE start_time >= date_trunc(Month, current_date)
-GROUP BY 1,2
-ORDER BY 2,1;
 
 // Page 74 - Create some tables
 // Make sure you are using the SYSADMIN role
