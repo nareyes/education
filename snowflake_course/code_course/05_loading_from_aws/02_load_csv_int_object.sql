@@ -1,5 +1,5 @@
 use role sysadmin;
-use warehouse compute_wh;
+use warehouse compute_wh; 
 
 
 -- create table
@@ -20,7 +20,7 @@ create or replace table demo_db.public.movie_titles (
 
 
 -- create file format object
-create or replace file format manage_db.public.csv_format
+create or replace file format manage_db.file_formats.csv_format
     type = csv
     field_delimiter = ','
     skip_header = 1
@@ -28,21 +28,21 @@ create or replace file format manage_db.public.csv_format
     empty_field_as_null = true
     field_optionally_enclosed_by = '"';
 
-desc file format manage_db.public.csv_format;
+desc file format manage_db.file_formats.csv_format;
 
 
 -- create stage
-create or replace stage manage_db.public.netflix_stage
+create or replace stage manage_db.external_stage.netflix_stage
     url = 's3://s3snowflakestorage/csv/'
     storage_integration = s3_int
-    file_format = manage_db.public.csv_format;
+    file_format = manage_db.file_formats.csv_format;
 
-list @manage_db.public.netflix_stage;
+list @manage_db.external_stage.netflix_stage;
 
 
 -- load data
 copy into demo_db.public.movie_titles
-    from @manage_db.public.netflix_stage
+    from @manage_db.external_stage.netflix_stage
     files = ('netflix_titles.csv');
 
 

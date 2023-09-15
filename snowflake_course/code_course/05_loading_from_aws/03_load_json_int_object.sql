@@ -3,23 +3,23 @@ use warehouse compute_wh;
 
 
 -- create file format object
-create or replace file format manage_db.public.json_format
+create or replace file format manage_db.file_formats.json_format
     type = json;
 
-desc file format manage_db.public.json_format;
+desc file format manage_db.file_formats.json_format;
 
 
 -- create stage
-create or replace stage manage_db.public.instrument_stage
+create or replace stage manage_db.external_stage.instrument_stage
     url = 's3://s3snowflakestorage/json/'
     storage_integration = s3_int
-    file_format = manage_db.public.json_format;
+    file_format = manage_db.file_formats.json_format;
 
-list @manage_db.public.instrument_stage;
+list @manage_db.external_stage.instrument_stage;
 
 
 -- query stage to determine json format
-select * from @manage_db.public.instrument_stage;
+select * from @manage_db.external_stage.instrument_stage;
 
 
 -- query stage with formatted columns
@@ -29,20 +29,20 @@ select
     $1:overall as overall,
     $1:reviewtext::string as review_text,
     $1:reviewtime::string as review_time,
-    date_from_parts (
-        right ($1:reviewtime::string,4),
-        left ($1:reviewtime::string,2),
+    date_from_parts ( -- year, month, day
+        right ($1:reviewtime::string,4), -- year
+        left ($1:reviewtime::string,2), -- month
         case 
             when substring ($1:reviewtime::string,5,1) = ','
             then substring ($1:reviewtime::string,4,1)
             else substring ($1:reviewtime::string,4,2)
-        end
+        end -- day
     ) as review_time_formatted,
     $1:reviewerid::string as reviewer_id,
     $1:reviewername::string as reviewer_name,
     $1:summary::string as summary,
     date($1:unixreviewtime::int) as unix_review_time
-from @manage_db.public.instrument_stage;
+from @manage_db.external_stage.instrument_stage;
 
 
 -- create destination table
@@ -82,7 +82,7 @@ copy into demo_db.public.instrument_reviews
             $1:reviewername::string as reviewer_name,
             $1:summary::string as summary,
             date($1:unixreviewtime::int) as unix_review_time
-        from @manage_db.public.instrument_stage
+        from @manage_db.external_stage.instrument_stage
     );
 
 

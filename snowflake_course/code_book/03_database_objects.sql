@@ -1,8 +1,8 @@
-// Snowflake Definitive Guide 1st Edition by Joyce Kay Avila - August 2022
-// ISBN-10 : 1098103823
-// ISBN-13 : 978-1098103828
-// Contact the author: https://www.linkedin.com/in/joycekayavila/
-// Chapter 3: Creating and Managing Snowflake Secuirable Database Objects
+// snowflake definitive guide 1st edition by joyce kay avila - august 2022
+// isbn-10 : 1098103823
+// isbn-13 : 978-1098103828
+// contact the author: https://www.linkedin.com/in/joycekayavila/
+// chapter 3: creating and managing snowflake secuirable database objects
 
 
 -- set warehouse context
@@ -154,135 +154,206 @@ group  by 1, 2
 order by 2, 1;
 
 
+-- creating tables (fully qualified names are not required if context is set, but it is a best practice)
+use role sysadmin;
+use warehouse compute_wh;
+use database demo_db_permanent;
+
+create or replace schema demo_db_permanent.banking;
+
+create or replace table demo_db_permanent.banking.customer_acct (
+    customer_account int,
+    amount int,
+    transaction_ts timestamp
+);
+
+create or replace table demo_db_permanent.banking.cash (
+    customer_account int,
+    amount int,
+    transcation_ts timestamp 
+);
+
+create or replace table demo_db_permanent.banking.receivables (
+    customer_account int,
+    amount int,
+    transaction_ts timestamp 
+);
+
+create or replace table demo_db_permanent.banking.new_table (
+    customer_account int,
+    amount int,
+    transaction_ts timestamp
+);
+
+
+-- show table metadata
+show tables;
+
+drop table demo_db_permanent.banking.new_table;
+
+show tables;
+
+
+-- creating non-materialized view (fully qualified names are not required if context is set, but it is a best practice)
+use role sysadmin;
+use warehouse compute_wh;
+
+create or replace view demo_db_transient.public.new_view as (
+    select cc_name
+    from (
+        select * 
+        rom snowflake_sample_data.tpcds_sf100tcl.call_center
+    )
+);
+
+select * from demo_db_transient.public.new_view;
+
+
+-- creating materialized view (fully qualified names are not required if context is set, but it is a best practice)
+use role sysadmin;
+use warehouse compute_wh;
+
+create or replace materialized view demo_db_transient.public.new_view_mvw as (
+    select cc_name
+    from (
+        select * 
+        from snowflake_sample_data.tpcds_sf100tcl.call_center
+    )
+);
+
+select * from demo_db_transient.public.new_view;
+
+
+-- show view metadata
+use schema demo_db_transient.public;
+show views;
+
+
+-- create materialized and non-materialized views to show differences
+create or replace materialized view demo_db_transient.banking.summary_mvw as
+select * from (select * from demo_db_transient.banking.summary);
+
+create or replace view demo_db_transient.banking.summary_vw as
+select * from (select * from demo_db_transient.banking.summary);
+
+use schema demo_db_transient.banking;
+show views;
+
+
+-- create file format for loading json data into a stage
+use role sysadmin;
+use database demo_db_transient;
+
+create or replace file format ff_json
+    type = json;
+
+
+-- create internal stage using file format object
+use role sysadmin;
+use database demo_db_transient;
+use schema demo_db_transient.banking;
+
+create or replace temporary stage banking_stg
+    file_format = ff_json;
+
+
+-- create udf to show javascript properties avaialble for udfs and procedures
+use role sysadmin;
+use database demo_db_permanent;
+
+-- create or replace function js_properties()
+--     returns string 
+--     language javascript as 
+--         'return Object.getOwnPropertyNames(this)';
+
+-- select js_properties();
+
+
+-- create javascript udf which returns a scalar result
+use role sysadmin;
+use database demo_db_permanent;
+
+-- create or replace function factorial (n variant)
+--     returns variant 
+--     language javascript as 
+--         'var f = n;
+--         for (i = n - 1; i > 0; i--) {
+--             f = f * i
+--         }
+--         return f';
+
+-- select factorial(5);
+
+-- select factorial(35); -- numeric value out of range (javascript udf limitation)
+
+
+-- secure udf demo
+-- create demo table
+use role sysadmin;
+use warehouse compute_wh;
+
+create or replace table demo_db_permanent.public.sales as (
+    select *
+    from snowflake_sample_data.tpcds_sf100tcl.web_sales
+)
+limit 100000;
+
+select top 10 * from demo_db_permanent.public.sales;
+
+-- query products sold along with the product which has an sk of 1
+select
+    1 as input_item,
+    ws_web_site_sk as basket_item,
+    count (distinct ws_order_number) as baskets
+from demo_db_permanent.public.sales
+where ws_order_number in (
+    select ws_order_number
+    from demo_db_permanent.public.sales
+    where ws_web_site_sk = 1
+)
+group by ws_web_site_sk
+order by 3 desc, 2 asc;
+
+-- create secure sql udf function
+use role sysadmin;
+
+create or replace secure function
+    demo_db_permanent.public.get_mktbasket (input_web_site_sk number(38))
+
+    returns table (
+        input_item number (38, 0),
+        basket_item number (38, 0),
+        baskets number (38, 0)
+    ) as 
+        'select
+            input_web_site_sk,
+            ws_web_site_sk as basket_item,
+            count (distinct ws_order_number) as baskets
+        from demo_db_permanent.public.sales
+        where ws_order_number in (
+            select ws_order_number
+            from demo_db_permanent.public.sales
+            where ws_web_site_sk = input_web_site_sk
+        )
+        group by ws_web_site_sk
+        order by 3 desc, 2 asc';
+    
+select * from table(demo_db_permanent.public.get_mktbasket(1));
+
+select * from table(demo_db_permanent.public.get_mktbasket(2));
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-// Page 74 - Create some tables
-// Make sure you are using the SYSADMIN role
-USE ROLE SYSADMIN; USE DATABASE DEMO_DB_PERMANENT;
-CREATE OR REPLACE SCHEMA BANKING;
-CREATE OR REPLACE TABLE CUSTOMER_ACCT
- (Customer_Account int, Amount int, transaction_ts timestamp);
-CREATE OR REPLACE TABLE CASH
- (Customer_Account int, Amount int, transaction_ts timestamp);
-CREATE OR REPLACE TABLE RECEIVABLES
- (Customer_Account int, Amount int, transaction_ts timestamp);
  
 
-// Page 74 - Creating a table without specifying the database or schema
-USE ROLE SYSADMIN;
-CREATE OR REPLACE TABLE NEWTABLE
- (Customer_Account int,
- Amount int,
- transaction_ts timestamp); 
+
+
  
-// Page 75 - Drop the table, best practice is using fully qualified name
-// Make sure you are using the SYSADMIN role
-DROP TABLE DEMO_DB_PERMANENT.BANKING.NEWTABLE;
- 
-// Page 77 - Create a new view 
-USE ROLE SYSADMIN;
-CREATE OR REPLACE VIEW DEMO_DB_TRANSIENT.PUBLIC.NEWVIEW AS
-SELECT CC_NAME
-FROM (SELECT * FROM SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.CALL_CENTER);
 
-// Page 77 - Create a new materializesd view 
-USE ROLE SYSADMIN;
-CREATE OR REPLACE MATERIALIZED VIEW DEMO_DB_TRANSIENT.PUBLIC.NEWVIEW_MVW AS
-SELECT CC_NAME
-FROM (SELECT * FROM SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.CALL_CENTER);
 
-// Page 77 - Use the SHOW VIEWS command to see information on the views
-USE SCHEMA DEMO_DB_TRANSIENT.PUBLIC;
-SHOW VIEWS;
 
-// Page 78 - Create a materialized view 
-CREATE OR REPLACE MATERIALIZED VIEW DEMO_DB_TRANSIENT.BANKING.SUMMARY_MVW AS
-SELECT * FROM (SELECT * FROM DEMO_DB_TRANSIENT.BANKING.SUMMARY);
-
-// Page 78 - Create a nonmaterialized view 
-CREATE OR REPLACE VIEW DEMO_DB_TRANSIENT.BANKING.SUMMARY_VW AS
-SELECT * FROM (SELECT * FROM DEMO_DB_TRANSIENT.BANKING.SUMMARY);
-
-// Page 81 - Create a basic file format for loading JSON data into a stage
-USE ROLE SYSADMIN; USE DATABASE DEMO_DB_TRANSIENT;
-CREATE OR REPLACE FILE FORMAT FF_JSON TYPE = JSON;
-
-// Page 81 - Creating an internal stage using the recently created file format
-USE DATABASE DEMO_DB_TRANSIENT; USE SCHEMA BANKING;
-CREATE OR REPLACE TEMPORARY STAGE BANKING_STG FILE_FORMAT = FF_JSON;
-
-// Page 84 - Create a UDF to show the JavaScript properties available for UDFs and procedures
-USE ROLE SYSADMIN;
-CREATE OR REPLACE DATABASE DEMO3C_DB;
-CREATE OR REPLACE FUNCTION JS_PROPERTIES()
-RETURNS string LANGUAGE JAVASCRIPT AS
- $$ return Object.getOwnPropertyNames(this); $$;
- 
-// Page 84 - Display the results of the recently created UDF
-SELECT JS_PROPERTIES();
-
-// Page 84 - Creating a JavaScript UDF which returns a scalar result
-USE ROLE SYSADMIN; USE DATABASE DEMO3C_DB;
-CREATE OR REPLACE FUNCTION FACTORIAL(n variant)
-RETURNS variant LANGUAGE JAVASCRIPT AS
- 'var f=n;
- for (i=n-1; i>0; i--) {
- f=f*i}
- return f';
- 
-// Page 85 - Display the results of the recently created JavaScript UDF
-SELECT FACTORIAL(5);
- 
-// Page 87 - Create a table with 100,000 rows from the demo database  
-USE ROLE SYSADMIN;
-CREATE OR REPLACE DATABASE DEMO3D_DB;
-CREATE OR REPLACE TABLE DEMO3D_DB.PUBLIC.SALES AS
- (SELECT * FROM SNOWFLAKE_SAMPLE_DATA.TPCDS_SF100TCL.WEB_SALES)
-LIMIT 100000;
-
-// Page 87 - Find products sold along with the product which has an SK of 1
-SELECT 1 AS INPUT_ITEM, WS_WEB_SITE_SK AS BASKET_ITEM,
- COUNT (DISTINCT WS_ORDER_NUMBER) BASKETS
-FROM DEMO3D_DB.PUBLIC.SALES
-WHERE WS_ORDER_NUMBER IN
- (SELECT WS_ORDER_NUMBER
- FROM DEMO3D_DB.PUBLIC.SALES
- WHERE WS_WEB_SITE_SK = 1)
-GROUP BY WS_WEB_SITE_SK
-ORDER BY 3 DESC, 2;
-
-// Page 88 - Create a Secure SQL UDF function
-USE ROLE SYSADMIN;
-CREATE OR REPLACE SECURE FUNCTION
- DEMO3D_DB.PUBLIC.GET_MKTBASKET(INPUT_WEB_SITE_SK number(38))
-RETURNS TABLE (INPUT_ITEM NUMBER(38, 0), BASKET_ITEM NUMBER(38, 0),
- BASKETS NUMBER(38, 0)) AS
-'SELECT input_web_site_sk, WS_WEB_SITE_SK as BASKET_ITEM,
- COUNT(DISTINCT WS_ORDER_NUMBER) BASKETS
- FROM DEMO3D_DB.PUBLIC.SALES
- WHERE WS_ORDER_NUMBER IN
- (SELECT WS_ORDER_NUMBER
-FROM DEMO3D_DB.PUBLIC.SALES
-WHERE WS_WEB_SITE_SK = input_web_site_sk)
- GROUP BY ws_web_site_sk
- ORDER BY 3 DESC, 2';
-
-// Page 89 - Find products sold along with the product which has an SK of 1, without having access to underlying data
-SELECT * FROM TABLE(DEMO3D_DB.PUBLIC.GET_MKTBASKET(1));
 
 // Page 89 - Create a stored procedure
 USE ROLE SYSADMIN;
@@ -718,6 +789,6 @@ SELECT * FROM DEMO3F_DB.TASKSDEMO.SALES_TRANSACT;
 ALTER TASK DEMO3F_DB.TASKSDEMO.SALES_TASK SUSPEND;
 
 // Page 108 - Code Cleanup
-DROP DATABASE DEMO3C_DB; DROP DATABASE DEMO3D_DB;
+DROP DATABASE demo_db_permanent; DROP DATABASE DEMO3D_DB;
 DROP DATABASE DEMO3E_DB; DROP DATABASE DEMO3F_DB;
 
