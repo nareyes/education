@@ -1,8 +1,11 @@
 use role sysadmin;
 -- dedicated virtual warehouse for different user groups and/or work loads
+-- create dedicated virtual warehouses for every class of workload desired
+-- choose appropriate warehouse size and type for the workload
+-- implement auto-suspend and auto-resume to save costs
+-- set appropriate time-outs for auto-suspend and auto-resume
 
 
--- craete dedicated virtual warehouses for every class of workload desired
 -- data scientist group 
 create warehouse ds_wh
 with 

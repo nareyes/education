@@ -1,8 +1,10 @@
 use role sysadmin;
 use warehouse compute_wh;
 
+-- choose appropriate table types and data types
+-- transient tables for staging/development, temp tables for intermediate results, permanent tables for final results
 -- introduce cluster keys for large tables
--- cluster keys create subset of data in micro-partitions
+-- cluster keys create subsets of data in micro-partitions
 -- improves scan efficiency for large tables
 -- typically automated by snowflake (but can be manually set)
 -- snowflake automaticlaly maintains cluster keys
