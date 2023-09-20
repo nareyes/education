@@ -1,4 +1,4 @@
-use role sysadmin;
+use role accountadmin;
 use warehouse compute_wh; 
 
 -- preview parsed parquet data from prior worksheet

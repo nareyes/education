@@ -1,5 +1,5 @@
 -- set role context
-use role sysadmin;
+use role accountadmin;
 
 -- create virtual warehouse
 create or replace warehouse compute_wh_sql

@@ -1,4 +1,4 @@
-use role sysadmin;
+use role accountadmin;
 
 
 -- scale up for known patterns of high work load (changing size)

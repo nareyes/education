@@ -1,4 +1,4 @@
-use role sysadmin;
+use role sysaaccountadmindmin;
 use warehouse compute_wh;
 
 

@@ -1,4 +1,4 @@
-use role sysadmin;
+use role accountadmin;
 -- dedicated virtual warehouse for different user groups and/or work loads
 -- create dedicated virtual warehouses for every class of workload desired
 -- choose appropriate warehouse size and type for the workload

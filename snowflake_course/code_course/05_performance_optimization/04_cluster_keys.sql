@@ -1,4 +1,4 @@
-use role sysadmin;
+use role accountadmin;
 use warehouse compute_wh;
 
 -- choose appropriate table types and data types

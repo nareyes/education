@@ -1,7 +1,7 @@
 -- create demo database
 -- or replace syntax is not useful for production env
 -- better to use if not exists syntax
-use role sysadmin;
+use role accountadmin;
 create or replace database demo_db;
 
 
