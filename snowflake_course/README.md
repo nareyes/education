@@ -1,24 +1,5 @@
-# Snowflake Masterclass
+# Links
 
-[Udemy](https://www.udemy.com/course/snowflake-masterclass/)
-
-
-## Contents
-- Exercises
-- Loading Structured Data
-- Loading Copy Options
-- Loading Unstructured Data
-- Performance Optimization
-- Loading From AWS
-- Loading From Azure
-- Showpipe
-- Time Travel
-- Table Types
-- Zero Copy Cloning
-- Data Sharing
-- Data Sampling
-- Scheduling Tasks
-- Streams
-- Materialized Views
-- Dynamic Data masking
-- Access Management
+- Book: [Snowflake: The Definitive Guide](https://www.amazon.com/Snowflake-Definitive-Architecting-Designing-Deploying/dp/1098103823)
+- Course: [Snowflake Masterclass](https://www.udemy.com/course/snowflake-masterclass/)
+- Certification Prep: [SnowPro Core Certification Course & Exam](https://www.udemy.com/course/ultimate-snowpro-core-certification-course-exam/)
