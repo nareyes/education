@@ -1,5 +1,4 @@
 /*
-access control
 - role-based access control (rbac)
 - discretionary access control (dac)
 - roles & privileges
