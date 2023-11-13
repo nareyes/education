@@ -20,7 +20,7 @@
 // Page 58 - Create a Transient Database via the Worksheet
 // Navigate back to the worksheet
 // Confirm your role is set to SYSADMIN
-USE ROLE SYSADMIN;
+USE ROLE SYSADMIN; 
 USE WAREHOUSE COMPUTE_WH;
 CREATE OR REPLACE TRANSIENT DATABASE DEMO3B_DB
 Comment = 'Transient Database for Chapter 3 Exercises';

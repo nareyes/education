@@ -1,794 +1,649 @@
-// snowflake definitive guide 1st edition by joyce kay avila - august 2022
-// isbn-10 : 1098103823
-// isbn-13 : 978-1098103828
-// contact the author: https://www.linkedin.com/in/joycekayavila/
-// chapter 3: creating and managing snowflake secuirable database objects
+---------------------------------------------------------------------------
+-- Chapter 3: Creating and Managing Snowflake Securable Database Objects --
+---------------------------------------------------------------------------
 
+-------------------------------------------
+-- databases, schemas, tables, and views --
+-------------------------------------------
 
 -- set warehouse context
 use warehouse compute_wh;
 
 
--- create permanent database (using sysadmin role)
+-- create permanent database
+-- context is set when created
 use role sysadmin;
+create or replace database demo3a_db;
 
-create or replace database demo_db_permanent;
 
-
--- create transient database (using sysadmin role)
+-- create transient database
 use role sysadmin;
+create or replace transient database demo3b_db;
 
-create or replace transient database demo_db_transient;
 
-
--- see databases accessible to various roles
--- notice retention period for each database
-use role sysadmin;
-show databases;
-
+-- show database metadata
+-- accountadmin inherits permissions to databases created by sysadmin
+-- retention time (time travel) defaults to 1 day
 use role accountadmin;
 show databases;
 
 
--- update data retention policy for a permanent database
--- maximum retention period is 90 days
+-- update retention time
+-- permanent databases can be set to a max of 90 (enterprise edition or higher)
+-- transient databases can be set to a max of 1
 use role sysadmin;
-alter database demo_db_permanent
-    set data_retention_time_in_days = 10;
+alter database demo3a_db set data_retention_time_in_days = 10;
+alter database demo3b_db set data_retention_time_in_days = 10; -- will fail due to being a transient db
+
+show databases;
 
 
--- update data retention policy for a transient database
--- maximum retention period is 1 day (below statement will fail)
+-- create tables
+-- default table type is permanent for permanent db
+-- default table type is transient for transient db
+-- cannot create a permanent table in a transient db
 use role sysadmin;
-alter database demo_db_transient
-    set data_retention_time_in_days = 10;
 
+create or replace table demo3a_db.public.summary (
+    cash_amt         number
+    ,receivables_amt number
+    ,customer_amt    number
+); -- permanent table in permanent db
 
--- create a table in a permanent database
-use role sysadmin;
-use database demo_db_permanent;
+create or replace transient table demo3a_db.public.summary_transient (
+    cash_amt         number
+    ,receivables_amt number
+    ,customer_amt    number
+); -- transient table in permanent db
 
-create or replace table demo_db_permanent.public.summary (
-    cash_amt number,
-    receivables_amt number,
-    customer_amt number
-);
+create or replace table demo3b_db.public.summary (
+    cash_amt         number
+    ,receivables_amt number
+    ,customer_amt    number
+); -- transient table in transient db
 
+use database demo3a_db;
+show tables;
 
--- show permanent db table metadata
+use database demo3b_db;
 show tables;
 
 
--- create a table in a transient database
+-- create schema using context
 use role sysadmin;
-use database demo_db_transient;
-create or replace table demo_db_transient.public.summary (
-    cash_amt number,
-    receivables_amt number,
-    customer_amt number
-);
-
-
--- show transient db table metadata
-show tables;
-
-
--- create schema by setting context
-use role sysadmin;
-use database demo_db_permanent;
+use database demo3a_db;
 create or replace schema banking;
 
 
 -- create schema using fully qualified name
 use role sysadmin;
-create or replace schema demo_db_permanent.banking;
+create or replace schema demo3a_db.banking;
 
-
--- view schema metadata
 show schemas;
 
-
--- changing schema retention time (defaults to database retention time)
-use role sysadmin;
-alter schema demo_db_permanent.banking
+-- change schema retention time
+-- schema inherits database configuration, but can be manually set
+use role accountadmin;
+alter schema demo3a_db.banking
     set data_retention_time_in_days = 1;
 
+show schemas;
 
--- moving table to a different schema
+
+-- move existing table to a different schema
 use role sysadmin;
-
-create or replace schema demo_db_transient.banking;
-
-alter table demo_db_transient.public.summary
-    rename to demo_db_transient.banking.summary;
+create or replace schema demo3b_db.banking;
+alter table demo3b_db.public.summary
+    rename to demo3b_db.banking.summary;
 
 
--- create schema with managed access
+-- create managed access schema
 use role sysadmin;
-create or replace schema demo_db_permanent.mschema
-    with managed access;
-
+create or replace schema demo3a_db.mschema with managed access;
 
 show schemas;
 
 
--- information_schema account views (database context is irrelevant)
-select * from information_schema.applicable_roles;
-select * from information_schema.databases;
-select * from information_schema.enabled_roles;
-select * from information_schema.load_history;
-select * from information_schema.replication_databases;
+-- information schema account views
+select * from snowflake_sample_data.information_schema.applicable_roles;
+select * from snowflake_sample_data.information_schema.enabled_roles;
+select * from snowflake_sample_data.information_schema.databases;
+select * from snowflake_sample_data.information_schema.replication_databases;
+select * from snowflake_sample_data.information_schema.information_schema_catalog_name;
+select * from snowflake_sample_data.information_schema.load_history;
 
 
--- information_schema database views (database context is relevant)
-select * from demo_db_permanent.information_schema.columns;
-select * from demo_db_permanent.information_schema.external_tables;
-select * from demo_db_permanent.information_schema.file_formats;
-select * from demo_db_permanent.information_schema.functions;
-select * from demo_db_permanent.information_schema.object_privileges;
-select * from demo_db_permanent.information_schema.pipes;
-select * from demo_db_permanent.information_schema.procedures;
-select * from demo_db_permanent.information_schema.referential_constraints;
-select * from demo_db_permanent.information_schema.schemata;
-select * from demo_db_permanent.information_schema.sequences;
-select * from demo_db_permanent.information_schema.stages;
-select * from demo_db_permanent.information_schema.table_constraints;
-select * from demo_db_permanent.information_schema.table_privileges;
-select * from demo_db_permanent.information_schema.table_storage_metrics;
-select * from demo_db_permanent.information_schema.tables;
-select * from demo_db_permanent.information_schema.usage_privileges;
-select * from demo_db_permanent.information_schema.views;
+-- information schema database views
+select * from snowflake_sample_data.information_schema.referential_constraints;
+select * from snowflake_sample_data.information_schema.schemata;
+select * from snowflake_sample_data.information_schema.stages;
+select * from snowflake_sample_data.information_schema.tables;
+select * from snowflake_sample_data.information_schema.table_storage_metrics;
+select * from snowflake_sample_data.information_schema.views;
+select * from snowflake_sample_data.information_schema.columns;
+select * from snowflake_sample_data.information_schema.functions;
+select * from snowflake_sample_data.information_schema.procedures;
+select * from snowflake_sample_data.information_schema.sequences;
+select * from snowflake_sample_data.information_schema.file_formats;
+select * from snowflake_sample_data.information_schema.object_privileges;
+select * from snowflake_sample_data.information_schema.usage_privileges;
 
 
--- query account_usage schema in showflake database for credits used over time
+-- account_usage warehouse metering history (track credits used over time)
 use role accountadmin;
-use warehouse compute_wh;
 
 select
-    start_time::date as usage_date,
-    warehouse_name,
-    sum (credits_used) as total_credits_consumed
+    start_time::date as usage_date
+    ,warehouse_name
+    ,sum (credits_used) as total_credits_consumed
 from snowflake.account_usage.warehouse_metering_history
-where start_time >= date_trunc (month, current_date)
-group  by 1, 2
-order by 2, 1;
+where start_time >= date_trunc(month, current_date)
+group by usage_date, warehouse_name
+order by warehouse_name, usage_date;
 
 
--- creating tables (fully qualified names are not required if context is set, but it is a best practice)
+-- create tables
 use role sysadmin;
-use warehouse compute_wh;
-use database demo_db_permanent;
 
-create or replace schema demo_db_permanent.banking;
+create or replace schema banking;
 
-create or replace table demo_db_permanent.banking.customer_acct (
-    customer_account int,
-    amount int,
-    transaction_ts timestamp
+create or replace table demo3a_db.banking.customer_acct (
+    customer_account    int
+    ,amount             int 
+    ,transaction_ts     timestamp
 );
 
-create or replace table demo_db_permanent.banking.cash (
-    customer_account int,
-    amount int,
-    transcation_ts timestamp 
+create or replace table demo3a_db.banking.cash (
+    customer_account    int
+    ,amount             int 
+    ,transaction_ts     timestamp
 );
 
-create or replace table demo_db_permanent.banking.receivables (
-    customer_account int,
-    amount int,
-    transaction_ts timestamp 
+create or replace table demo3a_db.banking.receivables (
+    customer_account    int
+    ,amount             int 
+    ,transaction_ts     timestamp
 );
-
-create or replace table demo_db_permanent.banking.new_table (
-    customer_account int,
-    amount int,
-    transaction_ts timestamp
-);
-
-
--- show table metadata
-show tables;
-
-drop table demo_db_permanent.banking.new_table;
 
 show tables;
 
 
--- creating non-materialized view (fully qualified names are not required if context is set, but it is a best practice)
+-- create non-materialized and materialized views
 use role sysadmin;
-use warehouse compute_wh;
 
-create or replace view demo_db_transient.public.new_view as (
-    select cc_name
-    from (
-        select * 
-        rom snowflake_sample_data.tpcds_sf100tcl.call_center
-    )
-);
+create or replace view demo3b_db.banking.summary_vw as
+    select * from demo3b_db.banking.summary;
 
-select * from demo_db_transient.public.new_view;
+create or replace materialized view demo3b_db.banking.summary_mvw as
+    select * from demo3b_db.banking.summary;
 
-
--- creating materialized view (fully qualified names are not required if context is set, but it is a best practice)
-use role sysadmin;
-use warehouse compute_wh;
-
-create or replace materialized view demo_db_transient.public.new_view_mvw as (
-    select cc_name
-    from (
-        select * 
-        from snowflake_sample_data.tpcds_sf100tcl.call_center
-    )
-);
-
-select * from demo_db_transient.public.new_view;
-
-
--- show view metadata
-use schema demo_db_transient.public;
+use database demo3b_db;
+use schema banking;
 show views;
 
-
--- create materialized and non-materialized views to show differences
-create or replace materialized view demo_db_transient.banking.summary_mvw as
-select * from (select * from demo_db_transient.banking.summary);
-
-create or replace view demo_db_transient.banking.summary_vw as
-select * from (select * from demo_db_transient.banking.summary);
-
-use schema demo_db_transient.banking;
-show views;
+describe view demo3b_db.banking.summary_vw;
+describe view demo3b_db.banking.summary_mvw;
 
 
--- create file format for loading json data into a stage
+-----------------------------------
+-- stage and file format objects --
+-----------------------------------
+
+-- create basic file format object
 use role sysadmin;
-use database demo_db_transient;
+use database demo3b_db;
 
 create or replace file format ff_json
     type = json;
 
+show file formats;
 
--- create internal stage using file format object
+
+-- create basic internal named stage
 use role sysadmin;
-use database demo_db_transient;
-use schema demo_db_transient.banking;
+use database demo3b_db;
 
 create or replace temporary stage banking_stg
     file_format = ff_json;
 
-
--- create udf to show javascript properties avaialble for udfs and procedures
-use role sysadmin;
-use database demo_db_permanent;
-
--- create or replace function js_properties()
---     returns string 
---     language javascript as 
---         'return Object.getOwnPropertyNames(this)';
-
--- select js_properties();
+show stages;
 
 
--- create javascript udf which returns a scalar result
-use role sysadmin;
-use database demo_db_permanent;
+-------------------
+-- udfs and udtf --
+-------------------
 
--- create or replace function factorial (n variant)
---     returns variant 
---     language javascript as 
---         'var f = n;
---         for (i = n - 1; i > 0; i--) {
---             f = f * i
---         }
---         return f';
-
--- select factorial(5);
-
--- select factorial(35); -- numeric value out of range (javascript udf limitation)
-
-
--- secure udf demo
--- create demo table
-use role sysadmin;
-use warehouse compute_wh;
-
-create or replace table demo_db_permanent.public.sales as (
-    select *
-    from snowflake_sample_data.tpcds_sf100tcl.web_sales
-)
-limit 100000;
-
-select top 10 * from demo_db_permanent.public.sales;
-
--- query products sold along with the product which has an sk of 1
-select
-    1 as input_item,
-    ws_web_site_sk as basket_item,
-    count (distinct ws_order_number) as baskets
-from demo_db_permanent.public.sales
-where ws_order_number in (
-    select ws_order_number
-    from demo_db_permanent.public.sales
-    where ws_web_site_sk = 1
-)
-group by ws_web_site_sk
-order by 3 desc, 2 asc;
-
--- create secure sql udf function
+-- create function to return properties available for javascript udf's and procedures
 use role sysadmin;
 
-create or replace secure function
-    demo_db_permanent.public.get_mktbasket (input_web_site_sk number(38))
+create or replace database demo3c_db;
+create or replace function js_properties()
+    returns string
+    language javascript
+    as $$ return Object.getOwnPropertyNames(this); $$;
 
-    returns table (
-        input_item number (38, 0),
-        basket_item number (38, 0),
-        baskets number (38, 0)
+select js_properties();
+
+
+-- create simple udf
+use role sysadmin;
+use database demo3c_db;
+
+create or replace function factorial(n variant)
+    returns variant
+    language javascript
+    as
+        'var f=n;
+        for (i=n-1; i>0; i--) {
+            f=f*i
+        }
+        return f';
+
+select factorial(5);
+select factorial(34); -- fails due to udf size/depth limitations
+
+
+-- create sample data for udtf example
+use role sysadmin;
+create or replace database demo3d_db;
+create or replace table demo3d_db.public.sales as (
+    select * from snowflake_sample_data.tpcds_sf100tcl.web_sales
+    limit 100000
+);
+
+
+-- create udtf
+use role sysadmin;
+create or replace secure function demo3d_db.public.get_mktbasket(input_web_site_sk number(38)) 
+returns table (
+    input_item number(38, 0)
+    ,basket_item number(38, 0)
+    ,baskets number(38, 0)
     ) as 
         'select
-            input_web_site_sk,
-            ws_web_site_sk as basket_item,
-            count (distinct ws_order_number) as baskets
-        from demo_db_permanent.public.sales
+            input_web_site_sk
+            ,ws_web_site_sk as basket_item
+            ,count (distinct ws_order_number) as baskets
+        from demo3d_db.public.sales
         where ws_order_number in (
             select ws_order_number
-            from demo_db_permanent.public.sales
+            from demo3d_db.public.sales
             where ws_web_site_sk = input_web_site_sk
         )
         group by ws_web_site_sk
-        order by 3 desc, 2 asc';
+        order by baskets desc, basket_item asc';
+
+select * from table(demo3d_db.public.get_mktbasket(1));
+select * from table(demo3d_db.public.get_mktbasket(2));
+
+
+-----------------------
+-- stored procedures --
+-----------------------
+
+-- create simple procedure
+use role sysadmin;
+create or replace database demo3e_db;
+create or replace procedure storedproc1(argument1 varchar) 
+    returns string not null 
+    language javascript as
+        $$
+        var input_argument1 = argument1;
+        var result = `${input_argument1}` 
+        return result;
+        $$;
+
+select * from demo3e_db.information_schema.procedures;
+
+
+-- create complex procedures for accounting example
+-- documentation:
+    /* the deposit procedure processes deposits, taking a float account number and amount, 
+    then inserts these into cash and customer_acct tables, enhancing respective balances with a current timestamp.
     
-select * from table(demo_db_permanent.public.get_mktbasket(1));
-
-select * from table(demo_db_permanent.public.get_mktbasket(2));
-
-
-
-
-
- 
-
-
-
- 
-
-
-
-
-// Page 89 - Create a stored procedure
-USE ROLE SYSADMIN;
-CREATE OR REPLACE DATABASE DEMO3E_DB;
-CREATE OR REPLACE PROCEDURE STOREDPROC1(ARGUMENT1 VARCHAR)
-RETURNS string not null
-language javascript AS
-$$
-var INPUT_ARGUMENT1 = ARGUMENT1;
-var result = `${INPUT_ARGUMENT1}`
-return result;
-$$;
-
-// Page 89 - Call the stored procedure
-CALL STOREDPROC1('I really love Snowflake ❄');
-
-// Page 90 - Look at information for Snowflake stored procedures
-SELECT * FROM DEMO3E_DB.INFORMATION_SCHEMA.PROCEDURES;
-
-// Page 90 - Create a stored procedure for deposits
-USE ROLE SYSADMIN; USE DATABASE DEMO_DB_PERMANENT; USE SCHEMA BANKING;
-CREATE OR REPLACE PROCEDURE deposit(PARAM_ACCT FLOAT, PARAM_AMT FLOAT)
-returns STRING LANGUAGE javascript AS
- $$
- var ret_val = ""; var cmd_debit = ""; var cmd_credit = "";
- // INSERT data into tables
- cmd_debit = "INSERT INTO DEMO_DB_PERMANENT.BANKING.CASH VALUES ("
- + PARAM_ACCT + "," + PARAM_AMT + ",current_timestamp());";
- cmd_credit = "INSERT INTO DEMO_DB_PERMANENT.BANKING.CUSTOMER_ACCT VALUES ("
- + PARAM_ACCT + "," + PARAM_AMT + ",current_timestamp());";
- // BEGIN transaction
- snowflake.execute ({sqlText: cmd_debit});
- snowflake.execute ({sqlText: cmd_credit});
- ret_val = "Deposit Transaction Succeeded";
- return ret_val;
- $$;
-
-// Page 91 - Create a stored procedure for withdrawal
-USE ROLE SYSADMIN;USE DATABASE DEMO_DB_PERMANENT; USE SCHEMA BANKING;
-CREATE OR REPLACE PROCEDURE withdrawal(PARAM_ACCT FLOAT, PARAM_AMT FLOAT)
-returns STRING LANGUAGE javascript AS
- $$
- var ret_val = ""; var cmd_debit = ""; var cmd_credit = "";
- // INSERT data into tables
- cmd_debit = "INSERT INTO DEMO_DB_PERMANENT.BANKING.CUSTOMER_ACCT VALUES ("
- + PARAM_ACCT + "," + (-PARAM_AMT) + ",current_timestamp());";
- cmd_credit = "INSERT INTO DEMO_DB_PERMANENT.BANKING.CASH VALUES ("
- + PARAM_ACCT + "," + (-PARAM_AMT) + ",current_timestamp());";
- // BEGIN transaction
- snowflake.execute ({sqlText: cmd_debit});
- snowflake.execute ({sqlText: cmd_credit});
- ret_val = "Withdrawal Transaction Succeeded";
- return ret_val;
- $$;
-
-// Page 91 - Create a stored procedure for loan_payment
-USE ROLE SYSADMIN;USE DATABASE DEMO_DB_PERMANENT; USE SCHEMA BANKING;
-CREATE OR REPLACE PROCEDURE loan_payment(PARAM_ACCT FLOAT, PARAM_AMT FLOAT)
-returns STRING LANGUAGE javascript AS
- $$
- var ret_val = ""; var cmd_debit = ""; var cmd_credit = "";
- // INSERT data into the tables
- cmd_debit = "INSERT INTO DEMO_DB_PERMANENT.BANKING.CASH VALUES ("
- + PARAM_ACCT + "," + PARAM_AMT + ",current_timestamp());";
- cmd_credit = "INSERT INTO DEMO_DB_PERMANENT.BANKING.RECEIVABLES VALUES ("
- + PARAM_ACCT + "," +(-PARAM_AMT) + ",current_timestamp());";
- //BEGIN transaction
- snowflake.execute ({sqlText: cmd_debit});
- snowflake.execute ({sqlText: cmd_credit});
- ret_val = "Loan Payment Transaction Succeeded";
- return ret_val;
- $$;
-
-// Page 91 - Run call statements for each of the stored procedures to test them
-CALL withdrawal(21, 100);
-CALL loan_payment(21, 100);
-CALL deposit(21, 100);
-
-// Page 91 - See what happened when we called the procedures
-SELECT CUSTOMER_ACCOUNT, AMOUNT FROM DEMO_DB_PERMANENT.BANKING.CASH;
-
-// Page 92 - Truncate the tables
-USE ROLE SYSADMIN; USE DATABASE DEMO_DB_PERMANENT; USE SCHEMA BANKING;
-TRUNCATE TABLE DEMO_DB_PERMANENT.BANKING.CUSTOMER_ACCT;
-TRUNCATE TABLE DEMO_DB_PERMANENT.BANKING.CASH;
-TRUNCATE TABLE DEMO_DB_PERMANENT.BANKING.RECEIVABLES;
-
-// Page 92 - Confirm no data is in the tables, after being truncated
-SELECT CUSTOMER_ACCOUNT, AMOUNT FROM DEMO_DB_PERMANENT.BANKING.CASH;
-
-// Page 92 - Call the stored procedures 
-USE ROLE SYSADMIN;
-CALL deposit(21, 10000);
-CALL deposit(21, 400);
-CALL loan_payment(14, 1000);
-CALL withdrawal(21, 500);
-CALL deposit(72, 4000);
-CALL withdrawal(21, 250);
-
-// Page 92 - Create a stored procedure for Transactions Summary
-USE ROLE SYSADMIN; USE DATABASE DEMO_DB_TRANSIENT; USE SCHEMA BANKING;
-CREATE OR REPLACE PROCEDURE Transactions_Summary()
-returns STRING LANGUAGE javascript AS
- $$
- var cmd_truncate = `TRUNCATE TABLE IF EXISTS DEMO_DB_TRANSIENT.BANKING.SUMMARY;`
- var sql = snowflake.createStatement({sqlText: cmd_truncate});
- //Summarize Cash Amount
- var cmd_cash = `Insert into DEMO_DB_TRANSIENT.BANKING.SUMMARY (CASH_AMT)
- select sum(AMOUNT) from DEMO_DB_PERMANENT.BANKING.CASH;`
- var sql = snowflake.createStatement({sqlText: cmd_cash});
- //Summarize Receivables Amount
- var cmd_receivables = `Insert into DEMO_DB_TRANSIENT.BANKING.SUMMARY
- (RECEIVABLES_AMT) select sum(AMOUNT) from DEMO_DB_PERMANENT.BANKING.RECEIVABLES;`
- var sql = snowflake.createStatement({sqlText: cmd_receivables});
- //Summarize Customer Account Amount
- var cmd_customer = `Insert into DEMO_DB_TRANSIENT.BANKING.SUMMARY (CUSTOMER_AMT)
- select sum(AMOUNT) from DEMO_DB_PERMANENT.BANKING.CUSTOMER_ACCT;`
- var sql = snowflake.createStatement({sqlText: cmd_customer});
- //BEGIN transaction
- snowflake.execute ({sqlText: cmd_truncate});
- snowflake.execute ({sqlText: cmd_cash});
- snowflake.execute ({sqlText: cmd_receivables});
- snowflake.execute ({sqlText: cmd_customer});
- ret_val = "Transactions Successfully Summarized";
- return ret_val;
- $$;
-
-// Page 93 - Call the Transactions Summary stored procedure 
-CALL Transactions_Summary();
-
-// Page 93 - Take a look at the contents of the table
-SELECT * FROM DEMO_DB_TRANSIENT.BANKING.SUMMARY;
-
-// Page 93 - Take a look at the contents of the materialized view
-USE ROLE SYSADMIN; USE DATABASE DEMO_DB_TRANSIENT;USE SCHEMA BANKING;
-SELECT * FROM DEMO_DB_TRANSIENT.BANKING.SUMMARY_MVW;
-
-// Page 93 - Take a look at the contents of the nonmaterialized view
-USE ROLE SYSADMIN; USE DATABASE DEMO_DB_TRANSIENT;USE SCHEMA BANKING;
-SELECT * FROM DEMO_DB_TRANSIENT.BANKING.SUMMARY_VW;
-
-// Page 93 - Create a stored procedure to drop a database
-USE ROLE SYSADMIN; USE DATABASE DEMO3E_DB;
-CREATE OR REPLACE PROCEDURE drop_db()
-RETURNS STRING NOT NULL LANGUAGE javascript AS
- $$
- var cmd = `DROP DATABASE DEMO_DB_PERMANENT;`
- var sql = snowflake.createStatement({sqlText: cmd});
- var result = sql.execute();
- return 'Database has been successfully dropped';
- $$;
-
-// Page 94 - Call the procedure
-CALL drop_db();
-
-// Page 94 - Replace the procedure to drop a different database
-USE ROLE SYSADMIN;
-CREATE OR REPLACE PROCEDURE drop_db() RETURNS STRING NOT NULL
- LANGUAGE javascript AS
- $$
- var cmd = `DROP DATABASE "DEMO_DB_TRANSIENT";`
- var sql = snowflake.createStatement({sqlText: cmd});
- var result = sql.execute();
- return 'Database has been successfully dropped';
- $$;
- 
-// Page 94 - Create a task which will delay the stored procedure by 15 minutes 
-USE ROLE SYSADMIN; USE DATABASE DEMO3E_DB;
-CREATE OR REPLACE TASK tsk_wait_15
-WAREHOUSE = COMPUTE_WH SCHEDULE = '15 MINUTE'
-AS CALL drop_db();
-
-// Page 94 - ACCOUNTADMIN role is needed to grant the "Execute Task" ability to the SYSADMIN role
-USE ROLE ACCOUNTADMIN;
-GRANT EXECUTE TASK ON ACCOUNT TO ROLE SYSADMIN;
-
-// Page 94 - Resume the task because all taks are created in a suspended state
-USE ROLE SYSADMIN;
-ALTER TASK IF EXISTS tsk_wait_15 RESUME;
-
-// Page 94 - Check to see of the task is in a scheduled state
-SELECT * FROM table(information_schema.task_history
- (task_name => 'tsk_wait_15',
- scheduled_time_range_start =>
- dateadd('hour', -1, current_timestamp())));
-
-// Need to wait for 15 minutes to pass
-
-// Page 95 - Suspend the task 
- USE ROLE SYSADMIN;
-ALTER TASK IF EXISTS tsk_15 SUSPEND;
-
-// Page 95 - Create a sequence
-USE ROLE SYSADMIN; USE DATABASE DEMO3E_DB;
-CREATE OR REPLACE SEQUENCE SEQ_01 START = 1 INCREMENT = 1;
-CREATE OR REPLACE TABLE SEQUENCE_TEST(i integer);
-
-// Page 95 - Execute the sequence three or four times; run each statement separately and view the results
-SELECT SEQ_01.NEXTVAL;
-
-SELECT SEQ_01.NEXTVAL;
-
-SELECT SEQ_01.NEXTVAL;
-
-SELECT SEQ_01.NEXTVAL;
-
-// Page 95 - Create a sequence
-USE ROLE SYSADMIN;USE DATABASE DEMO3E_DB;
-CREATE OR REPLACE SEQUENCE SEQ_02 START = 1 INCREMENT = 2;
-CREATE OR REPLACE TABLE SEQUENCE_TEST(i integer);
-
-// Page 95 - See the results of how the sequence is incremented
-SELECT SEQ_02.NEXTVAL a, SEQ_02.NEXTVAL b,SEQ_02.NEXTVAL c,SEQ_02.NEXTVAL d;
-
-// Page 97 - Statements to set things up for the stream example
-USE ROLE SYSADMIN;
-CREATE OR REPLACE DATABASE DEMO3F_DB;
-CREATE OR REPLACE SCHEMA BANKING;
-CREATE OR REPLACE TABLE BRANCH (ID varchar, City varchar, Amount number (20,2));
-INSERT INTO BRANCH (ID, City, Amount)
-values
- (12001, 'Abilene', 5387.97),
- (12002, 'Barstow', 34478.10),
- (12003, 'Cadbury', 8994.63);
-
-// Page 97 - View the records in the table
-SELECT * FROM BRANCH;
-
-// Page 97 - Create two streams and use SHOW STREAMS to see details
-CREATE OR REPLACE STREAM STREAM_A ON TABLE BRANCH;
-CREATE OR REPLACE STREAM STREAM_B ON TABLE BRANCH;
-SHOW STREAMS;
-
-// Page 97 - Streams are empty; Result of statements will be "Query produced no results"
-SELECT * FROM STREAM_A;
-
-SELECT * FROM STREAM_B;
-
-// Page 97 - Insert some records into the table
-INSERT INTO BRANCH (ID, City, Amount)
-values
- (12004, 'Denton', 41242.93),
- (12005, 'Everett', 6175.22),
- (12006, 'Fargo', 443689.75);
- 
-// Page 97 - See what is now in the table and each of the streams; run the statements one at a time
-SELECT * FROM BRANCH;
-
-SELECT * FROM STREAM_A;
-
-SELECT * FROM STREAM_B;
-
-// Page 97 - Create another stream
-CREATE OR REPLACE STREAM STREAM_C ON TABLE BRANCH;
-
-// Page 98 - Add more records to the table
-INSERT INTO BRANCH (ID, City, Amount)
-values
- (12007, 'Galveston', 351247.79),
- (12008, 'Houston', 917011.27);
- 
-// Page 98 - Recreate Stream B 
-CREATE OR REPLACE STREAM STREAM_B ON TABLE BRANCH; 
-
-// Page 98 Delete the first record from each of the previous inserts
-DELETE FROM BRANCH WHERE ID = 12001;
-DELETE FROM BRANCH WHERE ID = 12004;
-DELETE FROM BRANCH WHERE ID = 12007;
-
-// Page 98 View the contents of the table and each stream; run one at a time
- SELECT * FROM BRANCH;
- 
- SELECT * FROM STREAM_A;
- 
- SELECT * FROM STREAM_B;
- 
- SELECT * FROM STREAM_C;
- 
-// Page 99 Update a record in the Branch table 
-UPDATE BRANCH
-SET City = 'Fayetteville' WHERE ID = 12006;
-SELECT * FROM BRANCH; 
-
-// Page 99 View the contents of the table and each stream; run one at a time
-SELECT * FROM BRANCH;
- 
-SELECT * FROM STREAM_A;
- 
-SELECT * FROM STREAM_B;
-
-SELECT * FROM STREAM_C;
-
-// Page 105 - Create a task admin role and grant necessary privileges
-USE ROLE SECURITYADMIN;
-CREATE ROLE TASKADMIN;
-
-USE ROLE ACCOUNTADMIN;
-GRANT EXECUTE TASK, EXECUTE MANAGED TASK ON ACCOUNT TO ROLE TASKADMIN;
-
-
-// Page 105 - Assign the role to a specific user role and back to the SYSADMIN
-USE ROLE SECURITYADMIN;
-// Replace <USER_ROLE> with an actual role
-// GRANT ROLE TASKADMIN TO ROLE <USER_ROLE>;
-GRANT ROLE TASKADMIN TO ROLE SYSADMIN;
-
-// Page 105 - Create a new database and schema for use with demonstrating tasks
-USE ROLE ACCOUNTADMIN;
-USE WAREHOUSE COMPUTE_WH;
-USE DATABASE DEMO3F_DB;
-CREATE OR REPLACE SCHEMA TASKSDEMO;
-
-// Page 105 - Create a new table for use in demonstrating tasks
-CREATE OR REPLACE TABLE DEMO3F_DB.TASKSDEMO.PRODUCT
- (Prod_ID int,
- Prod_Desc varchar(),
- Category varchar(30),
- Segment varchar(20),
- Mfg_ID int,
- Mfg_Name varchar(50));
- 
- // Page 105 - Insert some values in the table
- INSERT INTO DEMO3F_DB.TASKSDEMO.PRODUCT values
-(1201, 'Product 1201', 'Category 1201', 'Segment 1201', '1201', 'Mfg 1201');
-INSERT INTO DEMO3F_DB.TASKSDEMO.PRODUCT values
-(1202, 'Product 1202', 'Category 1202', 'Segment 1202', '1202', 'Mfg 1202');
-INSERT INTO DEMO3F_DB.TASKSDEMO.PRODUCT values
-(1203, 'Product 1203', 'Category 1203', 'Segment 1203', '1203', 'Mfg 1203');
-INSERT INTO DEMO3F_DB.TASKSDEMO.PRODUCT values
-(1204, 'Product 1204', 'Category 1204', 'Segment 1204', '1204', 'Mfg 1204');
-INSERT INTO DEMO3F_DB.TASKSDEMO.PRODUCT values
-(1205, 'Product 1205', 'Category 1205', 'Segment 1205', '1205', 'Mfg 1205');
-INSERT INTO DEMO3F_DB.TASKSDEMO.PRODUCT values
-(1206, 'Product 1206', 'Category 1206', 'Segment 1206', '1206', 'Mfg 1206');
-
-// Page 105 - Create a new Sales table
-CREATE OR REPLACE TABLE DEMO3F_DB.TASKSDEMO.SALES
- (Prod_ID int,
- Customer varchar(),
- Zip varchar(),
- Qty int,
- Revenue decimal(10,2));
- 
-// Page 106 - Create a new stream 
-CREATE OR REPLACE STREAM DEMO3F_DB.TASKSDEMO.SALES_STREAM
-ON TABLE DEMO3F_DB.TASKSDEMO.SALES
-APPEND_ONLY = TRUE;
-
-// Page 106 - Insert values into the table to test that the stream works as expected
-INSERT INTO DEMO3F_DB.TASKSDEMO.SALES VALUES
-(1201, 'Amy Johnson', 45466, 45, 2345.67);
-INSERT INTO DEMO3F_DB.TASKSDEMO.SALES VALUES
-(1201, 'Harold Robinson', 89701, 45, 2345.67);
-INSERT INTO DEMO3F_DB.TASKSDEMO.SALES VALUES
-(1203, 'Chad Norton', 33236, 45, 2345.67);
-INSERT INTO DEMO3F_DB.TASKSDEMO.SALES VALUES
-(1206, 'Horatio Simon', 75148, 45, 2345.67);
-INSERT INTO DEMO3F_DB.TASKSDEMO.SALES VALUES
-(1205, 'Misty Crawford', 10001, 45, 2345.67);
-
-
-// Page 106 - Confirm that the values are included in the stream
-SELECT * FROM DEMO3F_DB.TASKSDEMO.SALES_STREAM;
-
-// Page 106 - Create a sales transaction table
-CREATE OR REPLACE TABLE DEMO3F_DB.TASKSDEMO.SALES_TRANSACT
- (Prod_ID int,
- Prod_Desc varchar(),
- Category varchar(30),
- Segment varchar(20),
- Mfg_ID int,
- Mfg_Name varchar(50),
- Customer varchar(),
- Zip varchar(),
- Qty int,
- Revenue decimal (10, 2),
- TS timestamp);
-
-// Page 106 - Manually enter some data
-INSERT INTO
- DEMO3F_DB.TASKSDEMO.SALES_TRANSACT
- (Prod_ID,Prod_Desc,Category,Segment,Mfg_Id,
- Mfg_Name,Customer,Zip,Qty,Revenue,TS)
-SELECT
- s.Prod_ID,p.Prod_Desc,p.Category,p.Segment,p.Mfg_ID,
- p.Mfg_Name,s.Customer,s.Zip,s.Qty,s.Revenue,current_timestamp
-FROM
- DEMO3F_DB.TASKSDEMO.SALES_STREAM s
- JOIN DEMO3F_DB.TASKSDEMO.PRODUCT p ON s.Prod_ID = p.Prod_ID;
- 
- // Page 107 - Confirm that the records were inserted into the table
- SELECT * FROM DEMO3F_DB.TASKSDEMO.SALES_TRANSACT;
-
-// Page 107 - Automate the task
-CREATE OR REPLACE TASK DEMO3F_DB.TASKSDEMO.SALES_TASK
-WAREHOUSE = compute_wh
-SCHEDULE = '1 minute'
-WHEN system$stream_has_data('DEMO3F_DB.TASKSDEMO.SALES_STREAM')
-AS
-INSERT INTO
- DEMO3F_DB.TASKSDEMO.SALES_TRANSACT
- (Prod_ID,Prod_Desc,Category,Segment,Mfg_Id,
- Mfg_Name,Customer,Zip,Qty,Revenue,TS)
-SELECT
- s.Prod_ID,p.Prod_Desc,p.Category,p.Segment,p.Mfg_ID,
- p.Mfg_Name,s.Customer,s.Zip,s.Qty,s.Revenue,current_timestamp
-FROM
- DEMO3F_DB.TASKSDEMO.SALES_STREAM s
- JOIN DEMO3F_DB.TASKSDEMO.PRODUCT p ON s.Prod_ID = p.Prod_ID;
-ALTER TASK DEMO3F_DB.TASKSDEMO.SALES_TASK RESUME;
-
-// Page 107 - Insert values into the sales table
-INSERT INTO DEMO3F_DB.TASKSDEMO.SALES VALUES
-(1201, 'Edward Jameson', 45466, 45, 2345.67);
-INSERT INTO DEMO3F_DB.TASKSDEMO.SALES VALUES
-(1201, 'Margaret Volt', 89701, 45, 2345.67);
-INSERT INTO DEMO3F_DB.TASKSDEMO.SALES VALUES
-(1203, 'Antoine Lancaster', 33236, 45, 2345.67);
-INSERT INTO DEMO3F_DB.TASKSDEMO.SALES VALUES
-(1204, 'Esther Baker', 75148, 45, 2345.67);
-INSERT INTO DEMO3F_DB.TASKSDEMO.SALES VALUES
-(1206, 'Quintin Anderson', 10001, 45, 2345.67);
-
-// Page 108 - Confirm that the values were capted by the Sales stream
-SELECT * FROM DEMO3F_DB.TASKSDEMO.SALES_STREAM;
-
-// Wait for a minute
-
-// Page 108 - Confirm that the task worked
-SELECT * FROM DEMO3F_DB.TASKSDEMO.SALES_TRANSACT;
-
-// Page 108 - Suspend the task
-ALTER TASK DEMO3F_DB.TASKSDEMO.SALES_TASK SUSPEND;
-
-// Page 108 - Code Cleanup
-DROP DATABASE demo_db_permanent; DROP DATABASE DEMO3D_DB;
-DROP DATABASE DEMO3E_DB; DROP DATABASE DEMO3F_DB;
-
+    the withdrawal procedure processes account withdrawals by accepting float account number and amount, 
+    debiting the customer's account, and crediting the cash account, with both actions timestamped.
+    
+    the loan_payment procedure processes loan payments using float account number and amount, 
+    depositing into cash and reducing receivables with a corresponding negative entry, timestamp included.
+    
+    the transactions_summary procedure summarizes transactions by first clearing the summary table, 
+    then inserting calculated sums of cash, receivables, and customer_acct into it, reflecting total balances. */
+
+-- deposit transaction sproc
+use role sysadmin; 
+use database demo3a_db; 
+use schema banking;
+create or replace procedure deposit(param_acct float, param_amt float)
+    returns string 
+    language javascript as 
+        $$
+        var ret_val = ""; var cmd_debit = ""; var cmd_credit = "";
+        // INSERT data into tables
+        cmd_debit = "INSERT INTO DEMO3A_DB.BANKING.CASH VALUES (" 
+            + PARAM_ACCT + "," + PARAM_AMT + ",current_timestamp());";
+        cmd_credit = "INSERT INTO DEMO3A_DB.BANKING.CUSTOMER_ACCT VALUES ("
+            + PARAM_ACCT + "," + PARAM_AMT + ",current_timestamp());";
+        // BEGIN transaction 
+        snowflake.execute ({sqlText: cmd_debit});
+        snowflake.execute ({sqlText: cmd_credit});
+            ret_val = "Deposit Transaction Succeeded";  
+        return ret_val;
+        $$;
+
+-- withdrawal transaction sproc
+use role sysadmin;
+use database demo3a_db; 
+use schema banking;
+create or replace procedure withdrawal(param_acct float, param_amt float)
+    returns string 
+    language javascript as 
+        $$
+        var ret_val = "";  var cmd_debit = "";  var cmd_credit = "";
+        // INSERT data into tables
+        cmd_debit = "INSERT INTO DEMO3A_DB.BANKING.CUSTOMER_ACCT VALUES (" 
+    	    + PARAM_ACCT + "," + (-PARAM_AMT) + ",current_timestamp());";
+        cmd_credit = "INSERT INTO DEMO3A_DB.BANKING.CASH VALUES (" 
+    	    + PARAM_ACCT + "," + (-PARAM_AMT) + ",current_timestamp());";
+        // BEGIN transaction 
+        snowflake.execute ({sqlText: cmd_debit});
+        snowflake.execute ({sqlText: cmd_credit});
+            ret_val = "Withdrawal Transaction Succeeded";
+        return ret_val;
+        $$;
+
+-- loan payment transaction sproc
+use role sysadmin;
+use database demo3a_db; 
+use schema banking;
+create or replace procedure loan_payment(param_acct float, param_amt float)
+    returns string 
+    language javascript as 
+        $$
+        var ret_val = "";  var cmd_debit = "";  var cmd_credit = "";
+        // INSERT data into the tables
+        cmd_debit = "INSERT INTO DEMO3A_DB.BANKING.CASH VALUES (" 
+    	    + PARAM_ACCT + "," + PARAM_AMT + ",current_timestamp());";
+        cmd_credit = "INSERT INTO DEMO3A_DB.BANKING.RECEIVABLES VALUES (" 
+    	    + PARAM_ACCT + "," +(-PARAM_AMT) + ",current_timestamp());";     
+        //BEGIN transaction 
+        snowflake.execute ({sqlText: cmd_debit});                 
+        snowflake.execute ({sqlText: cmd_credit});
+    	    ret_val = "Loan Payment Transaction Succeeded";  
+        return ret_val;
+        $$;
+
+-- transaction summary sproc
+use role sysadmin; 
+use database demo3b_db; 
+use schema banking;
+create or replace procedure transactions_summary()
+    returns string 
+    language javascript as
+        $$
+        var cmd_truncate = `TRUNCATE TABLE IF EXISTS DEMO3B_DB.BANKING.SUMMARY;`
+        var sql = snowflake.createStatement({sqlText: cmd_truncate});
+        //Summarize Cash Amount  
+        var cmd_cash = `Insert into DEMO3B_DB.BANKING.SUMMARY (CASH_AMT)
+        select sum(AMOUNT) from DEMO3A_DB.BANKING.CASH;`
+        var sql = snowflake.createStatement({sqlText: cmd_cash});
+        //Summarize Receivables Amount
+        var cmd_receivables = `Insert into DEMO3B_DB.BANKING.SUMMARY
+        (RECEIVABLES_AMT) select sum(AMOUNT) from DEMO3A_DB.BANKING.RECEIVABLES;`
+        var sql = snowflake.createStatement({sqlText: cmd_receivables});
+        //Summarize Customer Account Amount
+        var cmd_customer = `Insert into DEMO3B_DB.BANKING.SUMMARY (CUSTOMER_AMT)
+        select sum(AMOUNT) from DEMO3A_DB.BANKING.CUSTOMER_ACCT;`
+        var sql = snowflake.createStatement({sqlText: cmd_customer});
+        //BEGIN transaction 
+        snowflake.execute ({sqlText: cmd_truncate});                 
+        snowflake.execute ({sqlText: cmd_cash});
+        snowflake.execute ({sqlText: cmd_receivables});
+        snowflake.execute ({sqlText: cmd_customer});
+        ret_val = "Transactions Successfully Summarized";  
+        return ret_val;
+        $$;
+
+
+-- run test transactions
+call withdrawal(21, 100);
+call loan_payment(21, 100);
+call deposit(21, 100);
+
+select customer_account, amount from demo3a_db.banking.cash;
+
+-- truncate base tables
+use role sysadmin; 
+use database demo3a_db; 
+use schema banking;
+truncate table demo3a_db.banking.customer_acct;
+truncate table demo3a_db.banking.cash;
+truncate table demo3a_db.banking.receivables;
+
+-- use procedure to input transactions
+use role sysadmin;
+call deposit(21, 10000);
+call deposit(21, 400);
+call loan_payment(14, 1000);
+call withdrawal(21, 500);
+call deposit(72, 4000);
+call withdrawal(21, 250);
+
+-- generate summary
+call transactions_summary();
+
+-- view results
+use role sysadmin; 
+use database demo3b_db;
+use schema banking;
+select * from demo3b_db.banking.summary;
+-- both mvw and standard view remain in sync with base table
+select * from demo3b_db.banking.summary_mvw;
+select * from demo3b_db.banking.summary_vw;
+
+
+-----------------------------------
+-- sequences, pipes, and streams --
+-----------------------------------
+
+-- create sequence
+use role sysadmin;
+use database demo3e_db;
+
+create or replace sequence seq_01
+    start = 1
+    increment = 1;
+
+select seq_01.nextval; -- 1
+select seq_01.nextval; -- 2
+select seq_01.nextval; -- 3
+select seq_01.nextval; -- 4
+select seq_01.nextval; -- 5
+
+create or replace sequence seq_02
+    start = 2
+    increment = 2;
+    
+select seq_02.nextval; -- 2
+select seq_02.nextval; -- 4
+select seq_02.nextval; -- 6
+select seq_02.nextval; -- 8
+select seq_02.nextval; -- 10
+
+
+-- create stream
+use role sysadmin;
+create or replace database demo3f_db;
+create or replace schema banking;
+
+create or replace table demo3f_db.banking.branch (
+    id      varchar
+    ,city   varchar
+    ,amount number (20,2)
+);
+
+insert into demo3f_db.banking.branch (id, city, amount)
+    values
+    (12001, 'Abilene', 5387.97),
+    (12002, 'Barstow', 34478.10),
+    (12003, 'Cadbury', 8994.63);
+
+select * from branch;
+/*ID	CITY	AMOUNT
+12001	Abilene	5,387.97
+12002	Barstow	34,478.1
+12003	Cadbury	8,994.63 */
+
+create or replace stream stream_a on table branch;
+
+show streams;
+
+insert into demo3f_db.banking.branch (id, city, amount)
+    values
+    (12004, 'Denton', 41242.93),
+    (12005, 'Everett', 6175.22),
+    (12006, 'Fargo', 443689.75);
+
+select * from branch;
+select * from stream_a;
+/* ID	CITY	AMOUNT	    METADATA$ACTION	METADATA$ISUPDATE	METADATA$ROW_ID
+12004	Denton	41,242.93	INSERT	        FALSE	            204bea9462d1662f53415b8c7eea0b5e58fcba12
+12005	Everett	6,175.22	INSERT	        FALSE	            2a63e637f63d4428efbd17ccdc6ea8915f99dcba
+12006	Fargo	443,689.75	INSERT	        FALSE	            88f2a54c430bc34b12bfd3ecc40b4e6bdb57b9da */
+
+delete from branch where id = 12001;
+
+select * from branch;
+select * from stream_a;
+
+
+-- create tasks
+use role accountadmin;
+use warehouse compute_wh;
+use database demo3f_db;
+create or replace schema tasksdemo;
+
+create or replace table demo3f_db.tasksdemo.product (
+    prod_id   int,
+    prod_desc varchar(),
+    category  varchar(30),
+    segment   varchar(20),
+    mfg_id    int,
+    mfg_name  varchar(50)
+);
+
+insert into demo3f_db.tasksdemo.product
+    values
+    (1201, 'Product 1201', 'Category 1201', 'Segment 1201', '1201', 'Mfg 1201'),
+    (1202, 'Product 1202', 'Category 1202', 'Segment 1202', '1202', 'Mfg 1202'),
+    (1203, 'Product 1203', 'Category 1203', 'Segment 1203', '1203', 'Mfg 1203'),
+    (1204, 'Product 1204', 'Category 1204', 'Segment 1204', '1204', 'Mfg 1204'),
+    (1205, 'Product 1205', 'Category 1205', 'Segment 1205', '1205', 'Mfg 1205'),
+    (1206, 'Product 1206', 'Category 1206', 'Segment 1206', '1206', 'Mfg 1206');
+
+select * from demo3f_db.tasksdemo.product;
+
+create or replace table demo3f_db.tasksdemo.sales (
+  prod_id  int,
+  customer varchar(),
+  zip      varchar(),
+  qty      int,
+  revenue  decimal(10,2)
+);
+
+create or replace stream demo3f_db.tasksdemo.sales_stream
+    on table demo3f_db.tasksdemo.sales
+    append_only = true;
+
+insert into demo3f_db.tasksdemo.sales
+    values
+    (1201, 'Amy Johnson', 45466, 45, 2345.67),
+    (1201, 'Harold Robinson', 89701, 45, 2345.67),
+    (1203, 'Chad Norton', 33236, 45, 2345.67),
+    (1206, 'Horatio Simon', 75148, 45, 2345.67),
+    (1205, 'Misty Crawford', 10001, 45, 2345.67);
+
+select * from demo3f_db.tasksdemo.sales;
+select * from demo3f_db.tasksdemo.sales_stream;
+
+create or replace table demo3f_db.tasksdemo.sales_transact (
+    prod_id    int,
+    prod_desc  varchar(),
+    category   varchar(30),
+    segment    varchar(20),
+    mfg_id     int,
+    mfg_name   varchar(50),
+    customer   varchar(),
+    zip        varchar(),
+    qty        int,
+    revenue    decimal (10, 2),
+    ts         timestamp
+);
+
+insert into demo3f_db.tasksdemo.sales_transact
+    select
+        s.prod_id
+        ,p.prod_desc
+        ,p.category
+        ,p.segment
+        ,p.mfg_id,
+        p.mfg_name
+        ,s.customer
+        ,s.zip
+        ,s.qty
+        ,s.revenue
+        ,current_timestamp
+    from demo3f_db.tasksdemo.sales_stream as s
+        inner join demo3f_db.tasksdemo.product as p 
+            on s.prod_id = p.prod_id;
+
+select * from demo3f_db.tasksdemo.sales_transact;
+
+create or replace task demo3f_db.tasksdemo.sales_task
+    warehouse = compute_wh 
+    schedule  = '1 minute'
+    when system$stream_has_data('demo3f_db.tasksdemo.sales_stream')
+    as
+        insert into demo3f_db.tasksdemo.sales_transact
+            select
+                s.prod_id
+                ,p.prod_desc
+                ,p.category
+                ,p.segment
+                ,p.mfg_id,
+                p.mfg_name
+                ,s.customer
+                ,s.zip
+                ,s.qty
+                ,s.revenue
+                ,current_timestamp
+            from demo3f_db.tasksdemo.sales_stream as s
+                inner join demo3f_db.tasksdemo.product as p 
+                    on s.prod_id = p.prod_id;
+    
+alter task demo3f_db.tasksdemo.sales_task resume;
+
+insert into demo3f_db.tasksdemo.sales 
+    values
+    (1201, 'Edward Jameson', 45466, 45, 2345.67),
+    (1201, 'Margaret Volt', 89701, 45, 2345.67),
+    (1203, 'Antoine Lancaster', 33236, 45, 2345.67),
+    (1204, 'Esther Baker', 75148, 45, 2345.67),
+    (1206, 'Quintin Anderson', 10001, 45, 2345.67);
+
+select * from demo3f_db.tasksdemo.sales_stream;
+select * from demo3f_db.tasksdemo.sales_transact;
+
+alter task demo3f_db.tasksdemo.sales_task suspend;
+
+
+--------------
+-- clean up --
+--------------
+
+drop database demo3a_db; 
+drop database demo3b_db;
+drop database demo3c_db; 
+drop database demo3d_db;
+drop database demo3e_db; 
+drop database demo3f_db;

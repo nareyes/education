@@ -1,9 +1,6 @@
-// snowflake definitive guide 1st edition by joyce kay avila - august 2022
-// isbn-10 : 1098103823
-// isbn-13 : 978-1098103828
-// contact the author: https://www.linkedin.com/in/joycekayavila/
-// chapter 2: creating and managing the snowflake architecture
-
+-----------------------------------------------------------------
+-- Chapter 2: Creating and Managing the Snowflake Architecture --
+-----------------------------------------------------------------
 
 /* create warehouse syntax
 create [ or replace ] warehouse [ if not exists ] <name>
@@ -27,82 +24,46 @@ objectproperties ::=
   enable_query_acceleration = { true | false }
   query_acceleration_max_scale_factor = <num>
  */
-
+ 
 
 -- set role context
-use role sysadmin;
+use role sysadmin; -- recommended for object creation
 
 
 -- create medium warehouse
-create or replace warehouse compute_wh_ch2
-with
+-- context is set when created
+create or replace warehouse ch2_wh
+    with
     warehouse_size = 'medium'
     auto_suspend = 300
     auto_resume = true
     initially_suspended = true; -- best practice
 
 
--- scaling up a virtual warehouse
-alter warehouse compute_wh_ch2
+-- alter warehouse
+alter warehouse ch2_wh
     set warehouse_size = large;
 
 
--- scaling out a virtual warehouse
-alter warehouse compute_wh_ch2
-    set 
-        min_cluster_count = 1,
-        max_cluster_count = 3;
-
-
--- set warehouse context
-use warehouse compute_wh_ch2;
-
-
--- create new warehouse for accounting domain
-create or replace warehouse compute_wh_ch2_acct
-with
-    warehouse_size = 'medium'
-    min_cluster_count = 1
-    max_cluster_count = 6
-    scaling_policy = 'standard'
+-- create multi-cluster warehouse
+-- context is set when created
+create or replace warehouse ch2_mc_wh
+    with
+    warehouse_size = medium
     auto_suspend = 300
     auto_resume = true
-    initially_suspended = true;
-
-
- -- create multi-cluster warehouse
-create or replace warehouse compute_wh_ch2
-with 
-    warehouse_size = 'xsmall'
+    initially_suspended = true
     min_cluster_count = 1
-    max_cluster_count = 3
-    auto_suspend = 600
-    auto_resume = true
-    initially_suspended = true;
+    max_cluster_count = 6
+    scaling_policy = 'standard';
 
 
- -- create maximized multi-cluster warehouse
-create or replace warehouse compute_wh_ch2
-with 
-    warehouse_size = 'xsmall'
-    min_cluster_count = 3
-    max_cluster_count = 3
-    auto_suspend = 600
-    auto_resume = true
-    initially_suspended = true;
-
-
--- disaple result cache
--- necessary for a/b testing
--- important to re-enable after testing
-alter session
-    set use_cached_result = false;
+-- alter results cache setting
+-- this can be useful for testing
+alter session set use_cached_result = false;
+alter session set use_cached_result = true;
 
 
 -- clean up
-alter session
-    set use_cached_result = true;
-
-drop warehouse compute_wh_ch2;
-
-drop warehouse compute_wh_ch2_acct;
+drop warehouse ch2_wh;
+drop warehouse ch2_mc_wh;
