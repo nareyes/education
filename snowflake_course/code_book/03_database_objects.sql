@@ -32,7 +32,7 @@ show databases;
 -- permanent databases can be set to a max of 90 (enterprise edition or higher)
 -- transient databases can be set to a max of 1
 use role sysadmin;
-alter database demo3a_db set data_retention_time_in_days = 10;
+alter database demo3a_db set data_retention_time_in_days = 1;
 alter database demo3b_db set data_retention_time_in_days = 10; -- will fail due to being a transient db
 
 show databases;

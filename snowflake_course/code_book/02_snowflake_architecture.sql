@@ -64,6 +64,9 @@ alter session set use_cached_result = false;
 alter session set use_cached_result = true;
 
 
--- clean up
+--------------
+-- clean up --
+--------------
+
 drop warehouse ch2_wh;
 drop warehouse ch2_mc_wh;
