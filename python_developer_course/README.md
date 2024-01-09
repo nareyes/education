@@ -1,4 +1,4 @@
-Comprehensive Python Cheatsheet
+Python Cheatsheet
 ===============================
 
 Contents
