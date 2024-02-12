@@ -11,6 +11,7 @@ todo_app = module.TodoList()
 # - If the action is 'exit', the loop breaks, terminating the program.
 # - If the user inputs an invalid action, it prints "Invalid Entry".
 # - After the loop terminates, it prints "Program Terminated".
+
 while True:
     user_action = input(todo_app.user_input_action).strip().lower()
 
