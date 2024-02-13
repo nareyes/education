@@ -17,8 +17,10 @@ while True:
 
     if user_action == "add":
         todo_app.add_todos()
+
     elif user_action == "show":
         todo_app.show_todos()
+
     elif user_action == "edit":
         try:
             todo_app.show_todos()
@@ -26,6 +28,7 @@ while True:
         except IndexError:
             print("Invalid Entry\n")
             continue
+
     elif user_action == "complete":
         try:
             todo_app.show_todos()
@@ -33,10 +36,13 @@ while True:
         except IndexError:
             print("Invalid Entry\n")
             continue
+
     elif user_action == "clear":
         todo_app.clear_todos()
+
     elif user_action == "exit":
         break
+    
     else:
         print("Invalid Entry\n")
 

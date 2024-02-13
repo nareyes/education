@@ -24,6 +24,14 @@ class TodoList:
             todos_local = file_local.readlines()
         return todos_local
 
+    def write_todos(self, todos):
+        """
+        Reads the todo items from the "todos.txt" file.
+        Writes the updated list back to the "todos.txt" file.
+        """
+        with open(self.filepath, "w") as file:
+            file.writelines(todos)
+
     def add_todos(self):
         """
         Adds a new todo item to the list.
