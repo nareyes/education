@@ -8,9 +8,9 @@ create or replace schema l0_src comment = 'SCHEMA FOR LANDING AREA OBJECTS';
 create or replace schema l1_rdv comment = 'SCHEMA FOR RAW VAULT OBJECTS';
 
 
---------------------------------------------------------------------
--- set up the landing area
---------------------------------------------------------------------
+-----------------------------
+-- set up the landing area -- 
+-----------------------------
 -- This exercise will pull from a single source system called 'sys 1'
 
 use schema l0_src;
@@ -100,14 +100,14 @@ create or replace table src_orders (
     constraint pk_src_orders primary key ( o_orderkey )
 ) comment = 'CUSTOMER ORDER HEADERS';
 
---------------------------------------------------------------------
--- simulate data loads from source system
---------------------------------------------------------------------
+
+--------------------------------------------
+-- simulate data loads from source system -- 
+--------------------------------------------
 
 -- create streams for outbound loads to the raw vault
 create or replace stream src_customer_strm on table src_customer;
 create or replace stream src_orders_strm on table src_orders;
-
 
 
 -- task to  simulate a subset of daily records
@@ -166,10 +166,12 @@ alter task load_src_customer resume;
 alter task load_src_orders resume;
 execute task load_daily_init;
 
+
 -- save a trip to the task history page
 select *
 from table(information_schema.task_history())
 order by scheduled_time desc;
+
 
 -- verify records loaded from "source" system
 select  'order' as tbl , count(distinct load_dts) as loads,  count(*) cnt from src_orders group by 1 
@@ -177,9 +179,9 @@ union all
 select  'customer' as tbl , count(distinct load_dts) as loads,  count(*) cnt from src_customer group by 1;
 
 
---------------------------------------------------------------------
--- create views for loading the raw vault
---------------------------------------------------------------------
+--------------------------------------------
+-- create views for loading the raw vault --
+--------------------------------------------
 
 create or replace view src_customer_strm_outbound as 
     select 
@@ -214,9 +216,9 @@ create or replace view src_order_strm_outbound as
     from src_orders_strm;
 
 
---------------------------------------------------------------------
--- set up raw vault
---------------------------------------------------------------------
+----------------------
+-- set up raw vault --
+----------------------
 
 use schema l1_rdv;
 
@@ -229,6 +231,7 @@ create or replace table hub_customer (
 
     constraint pk_hub_customer primary key ( hub_customer_hk )
 );                                    
+
 
 create or replace table hub_order (
     hub_order_hk  binary            not null,
@@ -315,11 +318,10 @@ create or replace table lnk_customer_order (
     constraint fk2_lnk_customer_order foreign key ( hub_order_hk )    references hub_order ( hub_order_hk )
 );
 
-  
- 
---------------------------------------------------------------------
--- load the Raw Vault using multi-table insert
--------------------------------------------------------------------- 
+
+-------------------------------------------------
+-- load the Raw Vault using multi-table insert --
+-------------------------------------------------
  
 create or replace task customer_strm_tsk
     warehouse = data_engineer_wh
@@ -398,88 +400,85 @@ create or replace task order_strm_tsk
     insert all
     -- make sure record does not already exist in the hub
     when (select count(1) from hub_order tgt where tgt.hub_order_hk = src_hub_order_hk) = 0
-    then into hub_order  
-    ( hub_order_hk
-    , o_orderkey
-    , load_dts
-    , rec_src
-    )  
-    values 
-    ( src_hub_order_hk
-    , src_o_orderkey
-    , src_load_dts
-    , src_rec_src
-    )  
+        then into hub_order  
+        ( hub_order_hk
+        , o_orderkey
+        , load_dts
+        , rec_src
+        )  
+        values 
+        ( src_hub_order_hk
+        , src_o_orderkey
+        , src_load_dts
+        , src_rec_src
+        )  
     -- make sure record does not already exist in the sat
     when (select count(1) from sat_sys1_order tgt where tgt.hub_order_hk = src_hub_order_hk 
     -- only insert if changes based on hash diff are detected
     and tgt.hash_diff = src_order_hash_diff) = 0
-    then into sat_sys1_order  
-    (
-    hub_order_hk  
-    , load_dts              
-    , o_orderstatus  
-    , o_totalprice   
-    , o_orderdate    
-    , o_orderpriority
-    , o_clerk        
-    , o_shippriority 
-    , o_comment              
-    , hash_diff         
-    , rec_src              
-    )  
-    values 
-    (
-    src_hub_order_hk  
-    , src_load_dts              
-    , src_o_orderstatus  
-    , src_o_totalprice   
-    , src_o_orderdate    
-    , src_o_orderpriority
-    , src_o_clerk        
-    , src_o_shippriority 
-    , src_o_comment      
-    , src_order_hash_diff         
-    , src_rec_src              
-    )
+        then into sat_sys1_order  
+        (
+        hub_order_hk  
+        , load_dts              
+        , o_orderstatus  
+        , o_totalprice   
+        , o_orderdate    
+        , o_orderpriority
+        , o_clerk        
+        , o_shippriority 
+        , o_comment              
+        , hash_diff         
+        , rec_src              
+        )  
+        values 
+        (
+        src_hub_order_hk  
+        , src_load_dts              
+        , src_o_orderstatus  
+        , src_o_totalprice   
+        , src_o_orderdate    
+        , src_o_orderpriority
+        , src_o_clerk        
+        , src_o_shippriority 
+        , src_o_comment      
+        , src_order_hash_diff         
+        , src_rec_src              
+        )
     -- make sure record does not already exist in the link
     when (select count(1) from lnk_customer_order tgt where tgt.lnk_customer_order_hk = src_lnk_customer_order_hk) = 0
-    then into lnk_customer_order  
-    (
-    lnk_customer_order_hk  
-    , hub_customer_hk              
-    , hub_order_hk  
-    , load_dts
-    , rec_src              
-    )  
-    values 
-    (
-    src_lnk_customer_order_hk
-    , src_hub_customer_hk
-    , src_hub_order_hk  
-    , src_load_dts              
-    , src_rec_src              
-    )
-    select hub_order_hk           src_hub_order_hk
-        , lnk_customer_order_hk  src_lnk_customer_order_hk
-        , hub_customer_hk        src_hub_customer_hk
-        , o_orderkey              src_o_orderkey
-        , o_orderstatus           src_o_orderstatus  
-        , o_totalprice            src_o_totalprice   
-        , o_orderdate             src_o_orderdate    
-        , o_orderpriority         src_o_orderpriority
-        , o_clerk                 src_o_clerk        
-        , o_shippriority          src_o_shippriority 
-        , o_comment               src_o_comment      
-        , order_hash_diff         src_order_hash_diff
-        , load_dts                    src_load_dts
-        , rec_src                    src_rec_src
-    from l0_src.src_order_strm_outbound src;    
+        then into lnk_customer_order  
+        (
+        lnk_customer_order_hk  
+        , hub_customer_hk              
+        , hub_order_hk  
+        , load_dts
+        , rec_src              
+        )  
+        values 
+        (
+        src_lnk_customer_order_hk
+        , src_hub_customer_hk
+        , src_hub_order_hk  
+        , src_load_dts              
+        , src_rec_src              
+        )
+        select hub_order_hk           src_hub_order_hk
+            , lnk_customer_order_hk  src_lnk_customer_order_hk
+            , hub_customer_hk        src_hub_customer_hk
+            , o_orderkey              src_o_orderkey
+            , o_orderstatus           src_o_orderstatus  
+            , o_totalprice            src_o_totalprice   
+            , o_orderdate             src_o_orderdate    
+            , o_orderpriority         src_o_orderpriority
+            , o_clerk                 src_o_clerk        
+            , o_shippriority          src_o_shippriority 
+            , o_comment               src_o_comment      
+            , order_hash_diff         src_order_hash_diff
+            , load_dts                    src_load_dts
+            , rec_src                    src_rec_src
+        from l0_src.src_order_strm_outbound src;    
 
-
-
- 
-  
+    
 -- audit the record counts before and after calling the RV load tasks
 select 'hub_customer' src, count(1) cnt from hub_customer
 union all
@@ -501,6 +500,7 @@ select 'l0_src.src_order_strm_outbound', count(1) from l0_src.src_order_strm_out
 execute task  customer_strm_tsk;
 execute task  order_strm_tsk ;
 
+
 -- load more source records and repeat the previous tasks to load them into the DV
 execute  task  l0_src.load_daily_init;  
 
@@ -509,3 +509,9 @@ execute  task  l0_src.load_daily_init;
 select *
 from table(information_schema.task_history())
 order by scheduled_time desc;
+
+
+---------------------------
+-- clean up environments --
+---------------------------
+drop database data_vault;

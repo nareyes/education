@@ -2,4 +2,5 @@ Make Bed
 Make Coffee
 Go To Work
 Take A Nap
-Go To DinnerGo To Sleep
+Go To Dinner
+Go To Sleep
