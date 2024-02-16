@@ -4,13 +4,15 @@
 import module
 todo_app = module.TodoList()
 
-# APPLICATION LOGIC
-# - The program runs in a continuous loop, prompting the user for an action (add, show, edit, complete, clear, or exit).
-# - Depending on the action, it calls the corresponding method of the TodoList class.
-# - If the action is 'edit' or 'complete', it handles IndexError exceptions if the user provides an invalid todo number.
-# - If the action is 'exit', the loop breaks, terminating the program.
-# - If the user inputs an invalid action, it prints "Invalid Entry".
-# - After the loop terminates, it prints "Program Terminated".
+"""
+APPLICATION LOGIC
+- The program runs in a continuous loop, prompting the user for an action (add, show, edit, complete, clear, or exit).
+- Depending on the action, it calls the corresponding method of the TodoList class.
+- If the action is 'edit' or 'complete', it handles IndexError exceptions if the user provides an invalid todo number.
+- If the action is 'exit', the loop breaks, terminating the program.
+- If the user inputs an invalid action, it prints "Invalid Entry".
+- After the loop terminates, it prints "Program Terminated".
+"""
 
 while True:
     user_action = input(todo_app.user_input_action).strip().lower()
