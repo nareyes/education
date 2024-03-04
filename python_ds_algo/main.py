@@ -1,19 +1,19 @@
 filenames = [
-    'chapter_01.ipynb', 
-    'chapter_02.ipynb',
-    'chapter_03.ipynb',
-    'chapter_04.ipynb',
-    'chapter_05.ipynb',
-    'chapter_06.ipynb',
-    'chapter_07.ipynb',
-    'chapter_08.ipynb',
-    'chapter_09.ipynb',
-    'chapter_10.ipynb',
-    'chapter_11.ipynb',
-    'chapter_12.ipynb',
-    'chapter_13.ipynb',
-    'chapter_14.ipynb',
-    'chapter_15.ipynb'
+    'ch_01.ipynb', 
+    'ch_02.ipynb',
+    'ch_03.ipynb',
+    'ch_04.ipynb',
+    'ch_05.ipynb',
+    'ch_06.ipynb',
+    'ch_07.ipynb',
+    'ch_08.ipynb',
+    'ch_09.ipynb',
+    'ch_10.ipynb',
+    'ch_11.ipynb',
+    'ch_12.ipynb',
+    'ch_13.ipynb',
+    'ch_14.ipynb',
+    'ch_15.ipynb'
 ]
 
 for file in filenames:
