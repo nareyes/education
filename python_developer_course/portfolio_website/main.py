@@ -1,11 +1,16 @@
+# activate conda env with command: conda activate py_sandbox
+# run Streamlit app with command: streamlit run main.py
+
+import pandas as pd
 import streamlit as st
+
 
 st.set_page_config(layout = 'wide')
 
 col1, col2 = st.columns(2)
 
 with col1:
-    st.image('images/profile.png', width = 600)
+    st.image('images/profile.png', width = 300)
 
 with col2:
     name = 'Nick Reyes'
@@ -20,3 +25,21 @@ with col2:
 
 title = 'Python Portfolio'
 st.title(title)
+
+col3, empty_col, col4 = st.columns([1.5, 0.5, 1.5])
+df = pd.read_csv('data.csv', sep = ';')
+df = df.sort_values(by = ['app'])
+
+with col3:
+    for index, row in df[:10].iterrows():
+        st.header(row['app'])
+        st.text(row['description'])
+        st.image('images/' + row['image'], width = 300)
+        st.write(f'[Source Code]({row["url"]})')
+
+with col4:
+    for index, row in df[10:].iterrows():
+        st.header(row['app'])
+        st.text(row['description'])
+        st.image('images/' + row['image'], width = 300)
+        st.write(f'[Source Code]({row["url"]})')
