@@ -1,7 +1,7 @@
 app;description;url;image
 Todo App;A distraction-free web app to help you focus on creating and completing tasks.;https://pythonhow.com;1.png
 Portfolio Website;A website built entirely in Python to showcase coding projects and apps.;https://pythonhow.com;2.png
-PDF Templates;A script that generates PDF templates of multiple pages given some predefined guidelines.;https://pythonhow.com;3.png
+PDF Generator;A script that generates PDF templates of multiple pages given some predefined guidelines.;https://pythonhow.com;3.png
 PDF Invoices;A script that reads invoice records from Excel files and automatically generates PDF invoices.;https://pythonhow.com;4.png
 Positive News Site;A website that gets data from a news API and uses sentiment analysis to publish only positive news.;https://pythonhow.com;5.png
 Weather API;A REST API built with Python and Flask to serve historical weather data for various cities.;https://pythonhow.com;6.png
