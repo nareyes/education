@@ -1,5 +1,5 @@
 # activate conda env with command: conda activate py_sandbox
-# run Streamlit app with command: streamlit run main.py
+# run Streamlit app with command: streamlit run Home.py
 
 import pandas as pd
 import streamlit as st
@@ -10,7 +10,7 @@ st.set_page_config(layout = 'wide')
 col1, col2 = st.columns(2)
 
 with col1:
-    st.image('images/profile.png', width = 300)
+    st.image('images/profile.png', width = 600)
 
 with col2:
     name = 'Nick Reyes'
@@ -22,9 +22,6 @@ with col2:
     '''
     st.title(name)
     st.info(biography)
-
-title = 'Python Portfolio'
-st.title(title)
 
 col3, empty_col, col4 = st.columns([1.5, 0.5, 1.5])
 df = pd.read_csv('data.csv', sep = ';')
