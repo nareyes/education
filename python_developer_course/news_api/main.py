@@ -26,32 +26,35 @@ Note:
 import requests as req
 from send_email import send_email
 
+topic = 'techcrunch'
 api_key = '35c80c376c864f5db83ef5935f99551f'
-url = 'https://newsapi.org/v2/top-headlines?sources=techcrunch&apiKey=35c80c376c864f5db83ef5935f99551f'
+url = 'https://newsapi.org/v2/top-headlines?' \
+        f'sources={topic}&' \
+        'apiKey=35c80c376c864f5db83ef5935f99551f&' \
+        'language=en'
 
 
 # make request and store content
-request = req.get(url)
-content = request.json()
-
-
-# extract article titles and descriptions
-# for article in content['articles']:
-#     print(article['title'])
-#     print(article['description'])
+response = req.get(url)
+content = response.json()
 
 
 # extract article titles and descriptions and store in body variable
 body = ""
-for article in content["articles"]:
+
+for article in content["articles"][:10]:
     if article["title"] is not None:
-        body = body + str(article["title"]) + "\n" + str(article["description"]) + 2*"\n"
+        body = \
+            'Subject: Today\'s News' + '/n' + body \
+            + str(article["title"]) + "\n" \
+            + str(article["description"]) + '\n' \
+            + article['url'] + 2*"\n"
 
 
 # view output
-# print(body)
+print(body)
 
 
 # send email
-body = body.encode("utf-8")
-send_email(message=body)
+# body = body.encode("utf-8")
+# send_email(message=body)
