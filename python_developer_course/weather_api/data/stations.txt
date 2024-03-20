@@ -42,3 +42,21 @@ STAID,STANAME                                 ,CN,      LAT,       LON,HGHT
    28,HELSINKI KAISANIEMI                     ,FI,+60:10:30,+024:56:52,    4
    29,JYVASKYLA LENTOASEMA                    ,FI,+62:24:07,+025:40:42,  139
    30,SODANKYLA. LAPIN ILMATIET. TUTK.KESKUS  ,FI,+67:21:57,+026:37:59,  179
+   31,MARSEILLE OBS. PALAIS-LONCHAMP          ,FR,+43:18:18,+005:23:48,   75
+   32,BOURGES                                 ,FR,+47:03:33,+002:21:34,  161
+   33,TOULOUSE-BLAGNAC                        ,FR,+43:37:15,+001:22:44,  151
+   34,BORDEAUX-MERIGNAC                       ,FR,+44:49:50,-000:41:29,   47
+   36,PERPIGNAN                               ,FR,+42:44:13,+002:52:22,   42
+   37,LYON - ST EXUPERY                       ,FR,+45:43:35,+005:04:40,  235
+   39,MARIGNANE                               ,FR,+43:26:16,+005:12:57,    9
+   40,BAMBERG                                 ,DE,+49:52:31,+010:55:18,  240
+   41,BERLIN-DAHLEM                           ,DE,+52:27:50,+013:18:06,   51
+   42,BREMEN                                  ,DE,+53:02:47,+008:47:57,    4
+   43,DRESDEN WAHNSDORF                       ,DE,+51:07:00,+013:40:59,  246
+   44,FRANKFURT                               ,DE,+50:02:47,+008:35:54,  112
+   45,HALLE                                   ,DE,+51:30:52,+011:57:02,   93
+   46,HAMBURG BERGEDORF                       ,DE,+53:28:50,+010:14:34,   35
+   47,HAMBURG FUHLSBUETTEL                    ,DE,+53:38:06,+009:59:24,   11
+   48,HOHENPEISSENBERG                        ,DE,+47:48:06,+011:00:42,  977
+   49,JENA STERNWARTE                         ,DE,+50:55:36,+011:35:03,  155
+   50,KAISERSLAUTERN                          ,DE,+49:25:31,+007:44:12,  285
