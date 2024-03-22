@@ -209,7 +209,7 @@ create or replace table loyalty_customer (
     comment       varchar                  comment 'CUSTOMER LOYALTY STATUS CALCULATED FROM SALES ORDER VOLUME',
 
     constraint pk_loyalty_customer primary key ( customer_id ) rely,
-    constraint "1" foreign key ( customer_id ) references customer ( customer_id ) rely
+    constraint fk_loyalty_customer foreign key ( customer_id ) references customer ( customer_id ) rely
 ) comment = 'CLIENT LOYALTY PROGRAM WITH GOLD, SILVER, BRONZE STATUS'
 AS 
 
