@@ -7,35 +7,78 @@ df_cards = pd.read_csv('cards.csv', dtype=str).to_dict(orient='records')
 df_cards_sec = pd.read_csv('cards_security.csv', dtype=str)
 
 
-# create classes
 class Hotel:
+    """
+    Represents a hotel with its attributes and methods.
+
+    Attributes:
+        hotel_id (str): The ID of the hotel.
+        hotel_city (str): The city where the hotel is located.
+        hotel_name (str): The name of the hotel.
+    """
 
     def __init__(self, hotel_id):
+        """
+        Initializes a Hotel object with the given hotel ID.
+
+        Args:
+            hotel_id (str): The ID of the hotel.
+        """
+
         self.hotel_id = hotel_id
         self.hotel_city = df_hotels.loc[df_hotels['id'] == self.hotel_id, 'city'].squeeze()
         self.hotel_name = df_hotels.loc[df_hotels['id'] == self.hotel_id, 'name'].squeeze()
 
-
     def book(self):
+        """
+        Marks the hotel as unavailable for booking.
+        """
+
         df_hotels.loc[df_hotels['id'] == self.hotel_id, 'available'] = 'no'
         df_hotels.to_csv('hotels.csv', index=False)
 
     def available(self):
+        """
+        Checks the availability of the hotel for booking.
+
+        Returns:
+            bool: True if the hotel is available, False otherwise.
+        """
+
         availability = df_hotels.loc[df_hotels['id'] == self.hotel_id, 'available'].squeeze()
 
-        if availability == 'yes':
-            return True 
-        else:
-            return False
+        return availability == 'yes'
 
 
 class Reservation:
-    
+    """
+    Represents a reservation for a hotel.
+
+    Attributes:
+        name (str): The name of the visitor making the reservation.
+        hotel (Hotel): The hotel object for which the reservation is made.
+    """
+
     def __init__(self, name, hotel):
+        """
+        Initializes a Reservation object.
+
+        Args:
+            name (str): The name of the visitor making the reservation.
+            hotel (Hotel): The hotel object for which the reservation is made.
+        """
+
         self.name = name
         self.hotel = hotel
 
     def generate(self):
+        """
+        Generates a reservation ticket.
+
+        Returns:
+            str: The reservation ticket containing visitor's name, hotel city, hotel name, and confirmation message.
+        """
+
         ticket = f'''
         Name: {self.name}
         City: {self.hotel.hotel_city}
@@ -47,11 +90,36 @@ class Reservation:
 
 
 class CreditCard:
-    
+    """
+    Represents a credit card.
+
+    Attributes:
+        number (str): The credit card number.
+    """
+
     def __init__(self, number):
+        """
+        Initializes a CreditCard object.
+
+        Args:
+            number (str): The credit card number.
+        """
+
         self.number = number
 
     def validate(self, expiration, cvc, holder):
+        """
+        Validates the credit card details.
+
+        Args:
+            expiration (str): The expiration date of the credit card.
+            cvc (str): The CVC code of the credit card.
+            holder (str): The name of the credit card holder.
+
+        Returns:
+            bool: True if the credit card details are valid, False otherwise.
+        """
+
         card_data = {
             'number': self.number,
             'expiration': expiration,
@@ -59,20 +127,33 @@ class CreditCard:
             'holder': holder
         }
 
-        if card_data in df_cards:
-            return True
-        else:
-            return False
+        return card_data in df_cards
 
 
 class AuthenticateCreditCard(CreditCard):
-    def authenticate(self, password_input):
-        password = df_cards_sec.loc[df_cards_sec['number'] == self.number, 'password'].squeeze()
+    """
+    Represents an authenticated credit card.
 
-        if password == password_input:
-            return True
-        else:
-            return False
+    Inherits from CreditCard class.
+
+    Attributes:
+        number (str): The credit card number.
+    """
+
+    def authenticate(self, password_input):
+        """
+        Authenticates the credit card using a password.
+
+        Args:
+            password_input (str): The password for authentication.
+
+        Returns:
+            bool: True if the authentication is successful, False otherwise.
+        """
+
+        password = df_cards_sec.loc[df_cards_sec['number'] == self.number, 'password'].squeeze()
+        
+        return password == password_input
 
 
 # print hotel availability
