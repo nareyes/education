@@ -7,7 +7,7 @@
 -------------------------------------------
 
 -- set warehouse context
-use warehouse compute_wh;
+use warehouse data_engineer_wh;
 
 
 -- create permanent database
@@ -32,9 +32,10 @@ show databases;
 -- permanent databases can be set to a max of 90 (enterprise edition or higher)
 -- transient databases can be set to a max of 1
 use role sysadmin;
-alter database demo3a_db set data_retention_time_in_days = 1;
-alter database demo3b_db set data_retention_time_in_days = 10; -- will fail due to being a transient db
+alter database demo3a_db set data_retention_time_in_days = 10;
+-- alter database demo3b_db set data_retention_time_in_days = 10; -- will fail due to being a transient db
 
+use role accountadmin;
 show databases;
 
 
@@ -48,19 +49,19 @@ create or replace table demo3a_db.public.summary (
     cash_amt         number
     ,receivables_amt number
     ,customer_amt    number
-); -- permanent table in permanent db
+); -- permanent table in permanent db, inherets retention time from db
 
 create or replace transient table demo3a_db.public.summary_transient (
     cash_amt         number
     ,receivables_amt number
     ,customer_amt    number
-); -- transient table in permanent db
+); -- transient table in permanent db, retention time set to max of 1 day for transient tables
 
 create or replace table demo3b_db.public.summary (
     cash_amt         number
     ,receivables_amt number
     ,customer_amt    number
-); -- transient table in transient db
+); -- transient table in transient db, transient by default (does not need to be specified)
 
 use database demo3a_db;
 show tables;
@@ -75,7 +76,7 @@ use database demo3a_db;
 create or replace schema banking;
 
 
--- create schema using fully qualified name
+-- create schema using fully qualified name (preferred)
 use role sysadmin;
 create or replace schema demo3a_db.banking;
 
@@ -105,28 +106,43 @@ show schemas;
 
 
 -- information schema account views
+-- returns account level metadata even though context is set to a specified db
+use role accountadmin;
 select * from snowflake_sample_data.information_schema.applicable_roles;
-select * from snowflake_sample_data.information_schema.enabled_roles;
 select * from snowflake_sample_data.information_schema.databases;
-select * from snowflake_sample_data.information_schema.replication_databases;
+select * from snowflake_sample_data.information_schema.enabled_roles;
 select * from snowflake_sample_data.information_schema.information_schema_catalog_name;
 select * from snowflake_sample_data.information_schema.load_history;
+select * from snowflake_sample_data.information_schema.replication_databases;
 
 
 -- information schema database views
+select * from snowflake_sample_data.information_schema.columns;
+select * from snowflake_sample_data.information_schema.external_tables;
+select * from snowflake_sample_data.information_schema.file_formats;
+select * from snowflake_sample_data.information_schema.functions;
+select * from snowflake_sample_data.information_schema.object_privileges;
+select * from snowflake_sample_data.information_schema.pipes;
+select * from snowflake_sample_data.information_schema.procedures;
 select * from snowflake_sample_data.information_schema.referential_constraints;
 select * from snowflake_sample_data.information_schema.schemata;
-select * from snowflake_sample_data.information_schema.stages;
-select * from snowflake_sample_data.information_schema.tables;
-select * from snowflake_sample_data.information_schema.table_storage_metrics;
-select * from snowflake_sample_data.information_schema.views;
-select * from snowflake_sample_data.information_schema.columns;
-select * from snowflake_sample_data.information_schema.functions;
-select * from snowflake_sample_data.information_schema.procedures;
 select * from snowflake_sample_data.information_schema.sequences;
-select * from snowflake_sample_data.information_schema.file_formats;
-select * from snowflake_sample_data.information_schema.object_privileges;
+select * from snowflake_sample_data.information_schema.stages;
+select * from snowflake_sample_data.information_schema.table_constraints;
+select * from snowflake_sample_data.information_schema.table_privileges;
+select * from snowflake_sample_data.information_schema.table_storage_metrics;
+select * from snowflake_sample_data.information_schema.tables;
 select * from snowflake_sample_data.information_schema.usage_privileges;
+select * from snowflake_sample_data.information_schema.views;
+
+
+    -- using information schema to return column metadata for a specified table
+    select * from snowflake_sample_data.information_schema.columns
+    where table_schema = 'TPCH_SF100' and table_name = 'LINEITEM'
+    order by ordinal_position asc;
+
+    -- alternative with less metadata
+    desc table snowflake_sample_data.tpch_sf100.lineitem;
 
 
 -- account_usage warehouse metering history (track credits used over time)
@@ -141,11 +157,20 @@ where start_time >= date_trunc(month, current_date)
 group by usage_date, warehouse_name
 order by warehouse_name, usage_date;
 
+select
+    warehouse_name
+    ,sum (credits_used) as total_credits_consumed
+    ,(total_credits_consumed / 250) * 100 as per_monthly_budget
+from snowflake.account_usage.warehouse_metering_history
+where start_time >= date_trunc(month, current_date)
+group by warehouse_name
+order by warehouse_name;
+
 
 -- create tables
 use role sysadmin;
 
-create or replace schema banking;
+create or replace schema demo3a_db.banking;
 
 create or replace table demo3a_db.banking.customer_acct (
     customer_account    int
@@ -165,6 +190,8 @@ create or replace table demo3a_db.banking.receivables (
     ,transaction_ts     timestamp
 );
 
+use database demo3a_db;
+use schema banking;
 show tables;
 
 
@@ -172,14 +199,15 @@ show tables;
 use role sysadmin;
 
 create or replace view demo3b_db.banking.summary_vw as
-    select * from demo3b_db.banking.summary;
+    select * from demo3b_db.banking.summary; -- non-materialized default
 
 create or replace materialized view demo3b_db.banking.summary_mvw as
-    select * from demo3b_db.banking.summary;
+    select * from demo3b_db.banking.summary; -- limitation: joins not supported
 
 use database demo3b_db;
 use schema banking;
 show views;
+show materialized views;
 
 describe view demo3b_db.banking.summary_vw;
 describe view demo3b_db.banking.summary_mvw;
@@ -192,6 +220,7 @@ describe view demo3b_db.banking.summary_mvw;
 -- create basic file format object
 use role sysadmin;
 use database demo3b_db;
+use schema banking;
 
 create or replace file format ff_json
     type = json;
@@ -202,6 +231,7 @@ show file formats;
 -- create basic internal named stage
 use role sysadmin;
 use database demo3b_db;
+use schema banking;
 
 create or replace temporary stage banking_stg
     file_format = ff_json;
@@ -240,7 +270,7 @@ create or replace function factorial(n variant)
         return f';
 
 select factorial(5);
-select factorial(34); -- fails due to udf size/depth limitations
+-- select factorial(34); -- fails due to udf size/depth limitations
 
 
 -- create sample data for udtf example
@@ -251,6 +281,8 @@ create or replace table demo3d_db.public.sales as (
     limit 100000
 );
 
+select * from demo3d_db.public.sales;
+
 
 -- create udtf
 use role sysadmin;
@@ -259,19 +291,19 @@ returns table (
     input_item number(38, 0)
     ,basket_item number(38, 0)
     ,baskets number(38, 0)
-    ) as 
-        'select
-            input_web_site_sk
-            ,ws_web_site_sk as basket_item
-            ,count (distinct ws_order_number) as baskets
+) as 
+    'select
+        input_web_site_sk
+        ,ws_web_site_sk as basket_item
+        ,count (distinct ws_order_number) as baskets
+    from demo3d_db.public.sales
+    where ws_order_number in (
+        select ws_order_number
         from demo3d_db.public.sales
-        where ws_order_number in (
-            select ws_order_number
-            from demo3d_db.public.sales
-            where ws_web_site_sk = input_web_site_sk
-        )
-        group by ws_web_site_sk
-        order by baskets desc, basket_item asc';
+        where ws_web_site_sk = input_web_site_sk
+    )
+    group by ws_web_site_sk
+    order by baskets desc, basket_item asc';
 
 select * from table(demo3d_db.public.get_mktbasket(1));
 select * from table(demo3d_db.public.get_mktbasket(2));
@@ -284,17 +316,19 @@ select * from table(demo3d_db.public.get_mktbasket(2));
 -- create simple procedure
 use role sysadmin;
 create or replace database demo3e_db;
-create or replace procedure storedproc1(argument1 varchar) 
+create or replace procedure storedproc_demo(user_input varchar) 
     returns string not null 
     language javascript as
         $$
-        var input_argument1 = argument1;
-        var result = `${input_argument1}` 
+        var input_argument = USER_INPUT;
+        var result = `${input_argument}` 
         return result;
         $$;
 
-select * from demo3e_db.information_schema.procedures;
+call storedproc_demo('test user input');
 
+-- return procedure info
+select * from demo3e_db.information_schema.procedures;
 
 -- create complex procedures for accounting example
 -- documentation:
@@ -319,17 +353,22 @@ create or replace procedure deposit(param_acct float, param_amt float)
     language javascript as 
         $$
         var ret_val = ""; var cmd_debit = ""; var cmd_credit = "";
-        // INSERT data into tables
-        cmd_debit = "INSERT INTO DEMO3A_DB.BANKING.CASH VALUES (" 
-            + PARAM_ACCT + "," + PARAM_AMT + ",current_timestamp());";
-        cmd_credit = "INSERT INTO DEMO3A_DB.BANKING.CUSTOMER_ACCT VALUES ("
-            + PARAM_ACCT + "," + PARAM_AMT + ",current_timestamp());";
-        // BEGIN transaction 
+        // insert data into tables
+        cmd_debit = "insert into demo3a_db.banking.cash values ("+ PARAM_ACCT + "," + PARAM_AMT + ",current_timestamp());";
+        cmd_credit = "insert into demo3a_db.banking.customer_acct values ("+ PARAM_ACCT + "," + PARAM_AMT + ",current_timestamp());";
+        // begin transaction 
         snowflake.execute ({sqlText: cmd_debit});
         snowflake.execute ({sqlText: cmd_credit});
             ret_val = "Deposit Transaction Succeeded";  
         return ret_val;
         $$;
+
+call deposit(21, 100);
+
+    -- inspect tables 
+    select * from demo3a_db.banking.cash;
+    select * from demo3a_db.banking.customer_acct;
+
 
 -- withdrawal transaction sproc
 use role sysadmin;
@@ -340,17 +379,22 @@ create or replace procedure withdrawal(param_acct float, param_amt float)
     language javascript as 
         $$
         var ret_val = "";  var cmd_debit = "";  var cmd_credit = "";
-        // INSERT data into tables
-        cmd_debit = "INSERT INTO DEMO3A_DB.BANKING.CUSTOMER_ACCT VALUES (" 
-    	    + PARAM_ACCT + "," + (-PARAM_AMT) + ",current_timestamp());";
-        cmd_credit = "INSERT INTO DEMO3A_DB.BANKING.CASH VALUES (" 
-    	    + PARAM_ACCT + "," + (-PARAM_AMT) + ",current_timestamp());";
-        // BEGIN transaction 
+        // insert data into tables
+        cmd_debit = "insert into demo3a_db.banking.customer_acct values ("+ PARAM_ACCT + "," + (-PARAM_AMT) + ",current_timestamp());";
+        cmd_credit = "insert into demo3a_db.banking.cash values ("+ PARAM_ACCT + "," + (-PARAM_AMT) + ",current_timestamp());";
+        // begin transaction 
         snowflake.execute ({sqlText: cmd_debit});
         snowflake.execute ({sqlText: cmd_credit});
             ret_val = "Withdrawal Transaction Succeeded";
         return ret_val;
         $$;
+
+call withdrawal(21, 50);
+
+    -- inspect tables
+    select * from demo3a_db.banking.cash;
+    select * from demo3a_db.banking.customer_acct;
+
 
 -- loan payment transaction sproc
 use role sysadmin;
@@ -361,17 +405,24 @@ create or replace procedure loan_payment(param_acct float, param_amt float)
     language javascript as 
         $$
         var ret_val = "";  var cmd_debit = "";  var cmd_credit = "";
-        // INSERT data into the tables
-        cmd_debit = "INSERT INTO DEMO3A_DB.BANKING.CASH VALUES (" 
-    	    + PARAM_ACCT + "," + PARAM_AMT + ",current_timestamp());";
-        cmd_credit = "INSERT INTO DEMO3A_DB.BANKING.RECEIVABLES VALUES (" 
-    	    + PARAM_ACCT + "," +(-PARAM_AMT) + ",current_timestamp());";     
-        //BEGIN transaction 
+        // insert data into the tables
+        cmd_debit = "insert into demo3a_db.banking.cash values ("+ PARAM_ACCT + "," + PARAM_AMT + ",current_timestamp());";
+        cmd_credit = "insert into demo3a_db.banking.receivables values ("+ PARAM_ACCT + "," +(-PARAM_AMT) + ",current_timestamp());";     
+        // begin transaction 
         snowflake.execute ({sqlText: cmd_debit});                 
         snowflake.execute ({sqlText: cmd_credit});
     	    ret_val = "Loan Payment Transaction Succeeded";  
         return ret_val;
         $$;
+
+call loan_payment(21, 20);
+
+    -- inspect tables
+    use role sysadmin; 
+
+    select * from demo3a_db.banking.cash;
+    select * from demo3a_db.banking.receivables;
+
 
 -- transaction summary sproc
 use role sysadmin; 
@@ -381,21 +432,21 @@ create or replace procedure transactions_summary()
     returns string 
     language javascript as
         $$
-        var cmd_truncate = `TRUNCATE TABLE IF EXISTS DEMO3B_DB.BANKING.SUMMARY;`
+        var cmd_truncate = "truncate table if exists demo3b_db.banking.summary;"
         var sql = snowflake.createStatement({sqlText: cmd_truncate});
-        //Summarize Cash Amount  
-        var cmd_cash = `Insert into DEMO3B_DB.BANKING.SUMMARY (CASH_AMT)
-        select sum(AMOUNT) from DEMO3A_DB.BANKING.CASH;`
+        // summarize cash amount  
+        var cmd_cash = "insert into demo3b_db.banking.summary (cash_amt)
+            select sum(amount) from demo3a_db.banking.cash;"
         var sql = snowflake.createStatement({sqlText: cmd_cash});
-        //Summarize Receivables Amount
-        var cmd_receivables = `Insert into DEMO3B_DB.BANKING.SUMMARY
-        (RECEIVABLES_AMT) select sum(AMOUNT) from DEMO3A_DB.BANKING.RECEIVABLES;`
+        // summarize receivables amount
+        var cmd_receivables = "insert into demo3b_db.banking.summary (receivables_amt)
+            select sum(amount) from demo3a_db.banking.receivables;"
         var sql = snowflake.createStatement({sqlText: cmd_receivables});
-        //Summarize Customer Account Amount
-        var cmd_customer = `Insert into DEMO3B_DB.BANKING.SUMMARY (CUSTOMER_AMT)
-        select sum(AMOUNT) from DEMO3A_DB.BANKING.CUSTOMER_ACCT;`
+        // summarize customer account amount
+        var cmd_customer = "insert into demo3b_db.banking.summary (customer_amt)
+            select sum(amount) from demo3a_db.banking.customer_acct;"
         var sql = snowflake.createStatement({sqlText: cmd_customer});
-        //BEGIN transaction 
+        // begin transaction 
         snowflake.execute ({sqlText: cmd_truncate});                 
         snowflake.execute ({sqlText: cmd_cash});
         snowflake.execute ({sqlText: cmd_receivables});
@@ -404,24 +455,22 @@ create or replace procedure transactions_summary()
         return ret_val;
         $$;
 
+call transactions_summary();
 
--- run test transactions
-call withdrawal(21, 100);
-call loan_payment(21, 100);
-call deposit(21, 100);
+    -- inspect table
+    select * from demo3b_db.banking.summary;
 
-select customer_account, amount from demo3a_db.banking.cash;
 
 -- truncate base tables
 use role sysadmin; 
-use database demo3a_db; 
-use schema banking;
 truncate table demo3a_db.banking.customer_acct;
 truncate table demo3a_db.banking.cash;
 truncate table demo3a_db.banking.receivables;
 
 -- use procedure to input transactions
 use role sysadmin;
+use database demo3a_db;
+use schema banking;
 call deposit(21, 10000);
 call deposit(21, 400);
 call loan_payment(14, 1000);
@@ -430,6 +479,9 @@ call deposit(72, 4000);
 call withdrawal(21, 250);
 
 -- generate summary
+use role sysadmin;
+use database demo3b_db; 
+use schema banking;
 call transactions_summary();
 
 -- view results
@@ -437,9 +489,61 @@ use role sysadmin;
 use database demo3b_db;
 use schema banking;
 select * from demo3b_db.banking.summary;
+
 -- both mvw and standard view remain in sync with base table
 select * from demo3b_db.banking.summary_mvw;
 select * from demo3b_db.banking.summary_vw;
+
+
+-- create procedure to drop database 
+use role sysadmin;
+use database demo3e_db;
+create or replace procedure drop_db(db_name varchar)
+    returns string 
+    language javascript as 
+    $$
+    var cmd = "drop database " + DB_NAME + ";"
+    var sql = snowflake.createStatement({sqlText: cmd});
+    var result = sql.execute();
+
+    return DB_NAME + " Database Successfully Dropped";
+    $$;
+
+call drop_db('demo3a_db');
+
+
+-- create task to use drop_db procedure at later time
+use role sysadmin;
+use database demo3e_db;
+create or replace task demo_tsk
+    warehouse = data_engineer_wh
+    schedule = '2 minute'
+    as
+        call drop_db('demo3b_db');
+
+
+    -- grant permission to execute task 
+    use role accountadmin;
+    grant execute task on account to role sysadmin;
+
+    -- resume task
+    use role sysadmin;
+    alter task if exists demo_tsk resume;
+
+    -- query information schema to see task is scheduled
+    use role sysadmin;
+    select * from table(
+        information_schema.task_history(
+            task_name => 'demo_tsk',
+            scheduled_time_range_start =>
+            dateadd('hour', -1, current_timestamp())
+        )
+    );
+
+    -- suspend task
+    use role sysadmin;
+    alter task if exists demo_tsk suspend;
+
 
 
 -----------------------------------
@@ -494,27 +598,116 @@ select * from branch;
 12002	Barstow	34,478.1
 12003	Cadbury	8,994.63 */
 
-create or replace stream stream_a on table branch;
-
+create or replace stream stream_a on table demo3f_db.banking.branch;
 show streams;
 
+
+-- query streams (empty until inserts)
+select * from demo3f_db.banking.stream_a;
+
+
+-- insert new records
 insert into demo3f_db.banking.branch (id, city, amount)
     values
     (12004, 'Denton', 41242.93),
     (12005, 'Everett', 6175.22),
     (12006, 'Fargo', 443689.75);
 
-select * from branch;
-select * from stream_a;
-/* ID	CITY	AMOUNT	    METADATA$ACTION	METADATA$ISUPDATE	METADATA$ROW_ID
-12004	Denton	41,242.93	INSERT	        FALSE	            204bea9462d1662f53415b8c7eea0b5e58fcba12
-12005	Everett	6,175.22	INSERT	        FALSE	            2a63e637f63d4428efbd17ccdc6ea8915f99dcba
-12006	Fargo	443,689.75	INSERT	        FALSE	            88f2a54c430bc34b12bfd3ecc40b4e6bdb57b9da */
 
-delete from branch where id = 12001;
+    -- query table and stream
+    select * from  demo3f_db.banking.branch;
+    /* ID	CITY	AMOUNT
+    12001	Abilene	5387.97
+    12002	Barstow	34478.1
+    12003	Cadbury	8994.63
+    12004	Denton	41242.93
+    12005	Everett	6175.22
+    12006	Fargo	443689.75 */
 
-select * from branch;
-select * from stream_a;
+    select * from  demo3f_db.banking.stream_a; 
+    /* ID	CITY	AMOUNT	    METADATA$ACTION	METADATA$ISUPDATE	METADATA$ROW_ID
+    12004	Denton	41,242.93	INSERT	        FALSE	            204bea9462d1662f53415b8c7eea0b5e58fcba12
+    12005	Everett	6,175.22	INSERT	        FALSE	            2a63e637f63d4428efbd17ccdc6ea8915f99dcba
+    12006	Fargo	443,689.75	INSERT	        FALSE	            88f2a54c430bc34b12bfd3ecc40b4e6bdb57b9da */
+
+
+-- insert new records again
+insert into demo3f_db.banking.branch (id, city, amount)
+    values
+    (12007, 'Galveston', 351247.79),
+    (12008, 'Houston', 817011.27);
+
+
+    -- query table and stream
+    select * from  demo3f_db.banking.branch;
+    /* ID	CITY	  AMOUNT
+    12001	Abilene	  5387.97
+    12002	Barstow	  34478.1
+    12003	Cadbury	  8994.63
+    12004	Denton	  41242.93
+    12005	Everett	  6175.22
+    12006	Fargo	  443689.75
+    12007	Galveston 351247.79
+    12008	Houston	  817011.27 */
+
+    select * from  demo3f_db.banking.stream_a; 
+    /* ID	CITY	  AMOUNT	METADATA$ACTION	METADATA$ISUPDATE	METADATA$ROW_ID
+    12004	Denton	  41242.93	INSERT	        FALSE	            afb2f66ad97ad71a99ffb5af03bbd6f2cbc588dc
+    12005	Everett	  6175.22	INSERT	        FALSE	            4389ab45dc01dc691a2e42a15cc0d42ccb2deb3c
+    12006	Fargo	  443689.75	INSERT	        FALSE	            c5dcb465da1ce62978e451a5a5ac47fa4012b65e
+    12007	Galveston 351247.79	INSERT	        FALSE	            ebc40c57c2d4b9f5d9add8fa3665c39f0547304c
+    12008	Houston	  817011.27	INSERT	        FALSE	            c73f3e3505da25f94b82fbc62705d23ebdf28c62 */
+
+
+-- delete records
+delete from demo3f_db.banking.branch where id = 12001; -- inserted before stream created
+delete from demo3f_db.banking.branch where id = 12004; -- inserted after stream created
+delete from demo3f_db.banking.branch where id = 12007; -- inserted after stream created
+
+
+    -- query table and stream
+    select * from demo3f_db.banking.branch;
+    /* ID	CITY	AMOUNT
+    12002	Barstow	34478.1
+    12003	Cadbury	8994.63
+    12005	Everett	6175.22
+    12006	Fargo	443689.75
+    12008	Houston	817011.27 */
+
+    select * from demo3f_db.banking.stream_a;
+        /* ID	CITY	  AMOUNT	METADATA$ACTION	METADATA$ISUPDATE	METADATA$ROW_ID
+        12005	Everett	  6175.22	INSERT	        FALSE	            4389ab45dc01dc691a2e42a15cc0d42ccb2deb3c
+        12006	Fargo	  443689.75	INSERT	        FALSE	            c5dcb465da1ce62978e451a5a5ac47fa4012b65e
+        12008	Houston	  817011.27	INSERT	        FALSE	            c73f3e3505da25f94b82fbc62705d23ebdf28c62 
+        12001	Abilene	  5387.97	DELETE	        FALSE	            4eb47a2fdb36b4c760369331fb571bcda5112309 */
+
+
+-- update record
+update demo3f_db.banking.branch
+    set city = 'Fayetteville'
+    where id = 12002;
+
+
+    -- query table and stream
+    select * from demo3f_db.banking.branch;
+    /* ID	CITY	     AMOUNT
+    12002	Fayetteville 34478.1
+    12003	Cadbury	     8994.63
+    12005	Everett	     6175.22
+    12006	Fargo        443689.75
+    12008	Houston	     817011.27 */
+
+    select * from demo3f_db.banking.stream_a;
+    /* ID	CITY	        AMOUNT	  METADATA$ACTION	METADATA$ISUPDATE	METADATA$ROW_ID
+    12002	Fayetteville	34478.1	  INSERT	        TRUE	            4f89e873b2b60f25225282b6203682367fca4160
+    12005	Everett	        6175.22	  INSERT	        FALSE	            3073ef3123ed35fe445eac7affc6c5b340b490f0
+    12006	Fargo	        443689.75 INSERT	        FALSE	            b62956f5bef94d31668da391eb1ad3b8c4d0533a
+    12008	Houston	        817011.27 INSERT	        FALSE	            4d2b6565edcc8b282cf1f2de3222527b64dabd61
+    12002	Barstow	        34478.1	  DELETE	        TRUE	            4f89e873b2b60f25225282b6203682367fca4160
+    12001	Abilene 	    5387.97	  DELETE	        FALSE	            4cc06a70168e62950ba875736bd8bbf9e2f3aa37 */
+
+
+
 
 
 -- create tasks
@@ -641,6 +834,7 @@ alter task demo3f_db.tasksdemo.sales_task suspend;
 -- clean up --
 --------------
 
+use role sysadmin;
 drop database demo3a_db; 
 drop database demo3b_db;
 drop database demo3c_db; 
