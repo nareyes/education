@@ -546,9 +546,9 @@ create or replace task demo_tsk
 
 
 
------------------------------------
--- sequences, pipes, and streams --
------------------------------------
+---------------------------
+-- sequences and streams --
+---------------------------
 
 -- create sequence
 use role sysadmin;
@@ -707,12 +707,13 @@ update demo3f_db.banking.branch
     12001	Abilene 	    5387.97	  DELETE	        FALSE	            4cc06a70168e62950ba875736bd8bbf9e2f3aa37 */
 
 
+-----------
+-- tasks --
+-----------
 
-
-
--- create tasks
-use role accountadmin;
-use warehouse compute_wh;
+-- create demo table and stream, insert records
+use role accountadmin; -- preferable to create a taskadmin role
+use warehouse data_engineer_wh;
 use database demo3f_db;
 create or replace schema tasksdemo;
 
@@ -792,6 +793,8 @@ insert into demo3f_db.tasksdemo.sales_transact
 
 select * from demo3f_db.tasksdemo.sales_transact;
 
+
+-- create task
 create or replace task demo3f_db.tasksdemo.sales_task
     warehouse = compute_wh 
     schedule  = '1 minute'
@@ -835,8 +838,8 @@ alter task demo3f_db.tasksdemo.sales_task suspend;
 --------------
 
 use role sysadmin;
-drop database demo3a_db; 
-drop database demo3b_db;
+-- drop database demo3a_db; 
+-- drop database demo3b_db;
 drop database demo3c_db; 
 drop database demo3d_db;
 drop database demo3e_db; 
