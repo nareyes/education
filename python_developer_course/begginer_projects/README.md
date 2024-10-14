@@ -8,3 +8,4 @@
   - Prime Numbers
   - Tic Tac Toe
   - War Card Game
+  - Rock Paper Scissors
