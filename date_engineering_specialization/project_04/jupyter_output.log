@@ -1,0 +1,52 @@
+nohup: ignoring input
+[I 2024-11-06 20:30:16.058 ServerApp] jupyter_lsp | extension was successfully linked.
+[I 2024-11-06 20:30:16.073 ServerApp] jupyter_server_terminals | extension was successfully linked.
+[I 2024-11-06 20:30:16.086 ServerApp] jupyterlab | extension was successfully linked.
+[I 2024-11-06 20:30:16.089 ServerApp] Writing Jupyter server cookie secret to /home/ec2-user/.local/share/jupyter/runtime/jupyter_cookie_secret
+[I 2024-11-06 20:30:16.808 ServerApp] notebook_shim | extension was successfully linked.
+[I 2024-11-06 20:30:16.892 ServerApp] notebook_shim | extension was successfully loaded.
+[I 2024-11-06 20:30:16.900 ServerApp] jupyter_lsp | extension was successfully loaded.
+[I 2024-11-06 20:30:16.902 ServerApp] jupyter_server_terminals | extension was successfully loaded.
+[I 2024-11-06 20:30:16.906 LabApp] JupyterLab extension loaded from /home/ec2-user/environment/jupyterlab-venv/lib64/python3.9/site-packages/jupyterlab
+[I 2024-11-06 20:30:16.906 LabApp] JupyterLab application directory is /home/ec2-user/environment/jupyterlab-venv/share/jupyter/lab
+[I 2024-11-06 20:30:16.907 LabApp] Extension Manager is 'pypi'.
+[I 2024-11-06 20:30:16.917 ServerApp] jupyterlab | extension was successfully loaded.
+[I 2024-11-06 20:30:16.918 ServerApp] Serving notebooks from local directory: /home/ec2-user/environment
+[I 2024-11-06 20:30:16.918 ServerApp] Jupyter Server 2.14.2 is running at:
+[I 2024-11-06 20:30:16.919 ServerApp] http://ip-10-0-1-82.ec2.internal:8888/lab?token=68fd52310380d43f37b6786a48c93c35ef6ff03cd79469d0
+[I 2024-11-06 20:30:16.919 ServerApp]     http://127.0.0.1:8888/lab?token=68fd52310380d43f37b6786a48c93c35ef6ff03cd79469d0
+[I 2024-11-06 20:30:16.919 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[W 2024-11-06 20:30:16.928 ServerApp] No web browser found: Error('could not locate runnable browser').
+[C 2024-11-06 20:30:16.928 ServerApp] 
+    
+    To access the server, open this file in a browser:
+        file:///home/ec2-user/.local/share/jupyter/runtime/jpserver-2635-open.html
+    Or copy and paste one of these URLs:
+        http://ip-10-0-1-82.ec2.internal:8888/lab?token=68fd52310380d43f37b6786a48c93c35ef6ff03cd79469d0
+        http://127.0.0.1:8888/lab?token=68fd52310380d43f37b6786a48c93c35ef6ff03cd79469d0
+[I 2024-11-06 20:30:17.638 ServerApp] Skipped non-installed server(s): bash-language-server, dockerfile-language-server-nodejs, javascript-typescript-langserver, jedi-language-server, julia-language-server, pyright, python-language-server, python-lsp-server, r-languageserver, sql-language-server, texlab, typescript-language-server, unified-language-server, vscode-css-languageserver-bin, vscode-html-languageserver-bin, vscode-json-languageserver-bin, yaml-language-server
+[I 2024-11-06 20:33:03.893 LabApp] Build is up to date
+[I 2024-11-06 20:33:08.874 ServerApp] Writing notebook-signing key to /home/ec2-user/.local/share/jupyter/notebook_secret
+[W 2024-11-06 20:33:08.876 ServerApp] Notebook C2_W1_Lab_3_S3_Solution.ipynb is not trusted
+[I 2024-11-06 20:33:09.606 ServerApp] Kernel started: 41bb4b86-5a4c-4365-a7d0-3c0908435548
+[I 2024-11-06 20:33:10.609 ServerApp] Connecting to kernel 41bb4b86-5a4c-4365-a7d0-3c0908435548.
+[I 2024-11-06 20:33:10.717 ServerApp] Connecting to kernel 41bb4b86-5a4c-4365-a7d0-3c0908435548.
+[I 2024-11-06 20:33:11.028 ServerApp] Connecting to kernel 41bb4b86-5a4c-4365-a7d0-3c0908435548.
+[I 2024-11-06 20:33:15.017 ServerApp] Saving file at /C2_W1_Lab_3_S3_Solution.ipynb
+[I 2024-11-06 20:33:15.095 ServerApp] Starting buffering for 41bb4b86-5a4c-4365-a7d0-3c0908435548:069e7fb8-597e-49ea-9a0a-82845da95886
+[W 2024-11-06 20:33:16.700 ServerApp] Notebook C2_W1_Lab_3_S3.ipynb is not trusted
+[I 2024-11-06 20:33:17.111 ServerApp] Kernel started: 686ca171-a267-440f-acd1-9b8d1a50d851
+[I 2024-11-06 20:33:17.894 ServerApp] Connecting to kernel 686ca171-a267-440f-acd1-9b8d1a50d851.
+[I 2024-11-06 20:35:16.897 ServerApp] Saving file at /C2_W1_Lab_3_S3.ipynb
+[I 2024-11-06 20:37:17.043 ServerApp] Saving file at /C2_W1_Lab_3_S3.ipynb
+[I 2024-11-06 20:39:17.200 ServerApp] Saving file at /C2_W1_Lab_3_S3.ipynb
+[I 2024-11-06 20:41:17.356 ServerApp] Saving file at /C2_W1_Lab_3_S3.ipynb
+[I 2024-11-06 20:43:17.520 ServerApp] Saving file at /C2_W1_Lab_3_S3.ipynb
+[I 2024-11-06 20:45:17.644 ServerApp] Saving file at /C2_W1_Lab_3_S3.ipynb
+[I 2024-11-06 20:46:28.562 ServerApp] Saving file at /C2_W1_Lab_3_S3.ipynb
+[I 2024-11-06 20:46:28.657 ServerApp] Starting buffering for 686ca171-a267-440f-acd1-9b8d1a50d851:dcdea4e8-549a-4113-9922-9a7ad31be405
+[I 2024-11-06 20:47:00.293 ServerApp] Connecting to kernel 41bb4b86-5a4c-4365-a7d0-3c0908435548.
+[I 2024-11-06 20:47:00.403 ServerApp] Connecting to kernel 686ca171-a267-440f-acd1-9b8d1a50d851.
+[I 2024-11-06 20:47:00.493 ServerApp] Starting buffering for 41bb4b86-5a4c-4365-a7d0-3c0908435548:cec33190-c51d-4b7b-a939-8c19f3f7f5d0
+[I 2024-11-06 20:47:00.537 ServerApp] Starting buffering for 686ca171-a267-440f-acd1-9b8d1a50d851:0836310e-e451-4cb1-a141-57cd730c792e
+[I 2024-11-06 20:47:00.985 LabApp] Build is up to date

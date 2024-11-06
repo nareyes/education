@@ -1,0 +1,54 @@
+nohup: ignoring input
+[I 2024-11-06 19:41:49.752 ServerApp] jupyter_lsp | extension was successfully linked.
+[I 2024-11-06 19:41:49.767 ServerApp] jupyter_server_terminals | extension was successfully linked.
+[I 2024-11-06 19:41:49.783 ServerApp] jupyterlab | extension was successfully linked.
+[I 2024-11-06 19:41:49.787 ServerApp] Writing Jupyter server cookie secret to /home/ec2-user/.local/share/jupyter/runtime/jupyter_cookie_secret
+[I 2024-11-06 19:41:50.851 ServerApp] notebook_shim | extension was successfully linked.
+[I 2024-11-06 19:41:50.904 ServerApp] notebook_shim | extension was successfully loaded.
+[I 2024-11-06 19:41:50.917 ServerApp] jupyter_lsp | extension was successfully loaded.
+[I 2024-11-06 19:41:50.928 ServerApp] jupyter_server_terminals | extension was successfully loaded.
+[I 2024-11-06 19:41:50.937 LabApp] JupyterLab extension loaded from /home/ec2-user/environment/jupyterlab-venv/lib64/python3.9/site-packages/jupyterlab
+[I 2024-11-06 19:41:50.937 LabApp] JupyterLab application directory is /home/ec2-user/environment/jupyterlab-venv/share/jupyter/lab
+[I 2024-11-06 19:41:50.938 LabApp] Extension Manager is 'pypi'.
+[I 2024-11-06 19:41:50.948 ServerApp] jupyterlab | extension was successfully loaded.
+[I 2024-11-06 19:41:50.950 ServerApp] Serving notebooks from local directory: /home/ec2-user/environment
+[I 2024-11-06 19:41:50.950 ServerApp] Jupyter Server 2.14.2 is running at:
+[I 2024-11-06 19:41:50.950 ServerApp] http://ip-10-0-1-205.ec2.internal:8888/lab?token=f2378a9594e4b1ff07423b470ac45e20c4c6bfff268fd838
+[I 2024-11-06 19:41:50.950 ServerApp]     http://127.0.0.1:8888/lab?token=f2378a9594e4b1ff07423b470ac45e20c4c6bfff268fd838
+[I 2024-11-06 19:41:50.950 ServerApp] Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[W 2024-11-06 19:41:50.963 ServerApp] No web browser found: Error('could not locate runnable browser').
+[C 2024-11-06 19:41:50.964 ServerApp] 
+    
+    To access the server, open this file in a browser:
+        file:///home/ec2-user/.local/share/jupyter/runtime/jpserver-2627-open.html
+    Or copy and paste one of these URLs:
+        http://ip-10-0-1-205.ec2.internal:8888/lab?token=f2378a9594e4b1ff07423b470ac45e20c4c6bfff268fd838
+        http://127.0.0.1:8888/lab?token=f2378a9594e4b1ff07423b470ac45e20c4c6bfff268fd838
+[I 2024-11-06 19:41:51.855 ServerApp] Skipped non-installed server(s): bash-language-server, dockerfile-language-server-nodejs, javascript-typescript-langserver, jedi-language-server, julia-language-server, pyright, python-language-server, python-lsp-server, r-languageserver, sql-language-server, texlab, typescript-language-server, unified-language-server, vscode-css-languageserver-bin, vscode-html-languageserver-bin, vscode-json-languageserver-bin, yaml-language-server
+[I 2024-11-06 19:42:24.486 LabApp] Build is up to date
+[I 2024-11-06 19:42:30.720 ServerApp] Writing notebook-signing key to /home/ec2-user/.local/share/jupyter/notebook_secret
+[W 2024-11-06 19:42:30.724 ServerApp] Notebook C2_W1_Lab_2_DynamoDB.ipynb is not trusted
+[I 2024-11-06 19:42:31.406 ServerApp] Kernel started: 794266fc-fa93-4a58-affd-49bed2cedc8e
+[I 2024-11-06 19:42:32.428 ServerApp] Connecting to kernel 794266fc-fa93-4a58-affd-49bed2cedc8e.
+[I 2024-11-06 19:42:32.554 ServerApp] Starting buffering for 794266fc-fa93-4a58-affd-49bed2cedc8e:a2e74fea-86ee-4d9d-ae1f-afe4f289e70e
+[I 2024-11-06 19:42:32.653 ServerApp] Connecting to kernel 794266fc-fa93-4a58-affd-49bed2cedc8e.
+[I 2024-11-06 19:42:32.774 ServerApp] Connecting to kernel 794266fc-fa93-4a58-affd-49bed2cedc8e.
+[I 2024-11-06 19:43:07.002 ServerApp] Connecting to kernel 794266fc-fa93-4a58-affd-49bed2cedc8e.
+[W 2024-11-06 19:43:07.354 ServerApp] Notebook C2_W1_Lab_2_DynamoDB.ipynb is not trusted
+[I 2024-11-06 19:43:08.396 LabApp] Build is up to date
+[I 2024-11-06 19:43:10.594 ServerApp] Connecting to kernel 794266fc-fa93-4a58-affd-49bed2cedc8e.
+[I 2024-11-06 19:44:31.064 ServerApp] Saving file at /C2_W1_Lab_2_DynamoDB.ipynb
+[I 2024-11-06 19:48:31.240 ServerApp] Saving file at /C2_W1_Lab_2_DynamoDB.ipynb
+[I 2024-11-06 19:50:31.469 ServerApp] Saving file at /C2_W1_Lab_2_DynamoDB.ipynb
+[I 2024-11-06 19:52:31.701 ServerApp] Saving file at /C2_W1_Lab_2_DynamoDB.ipynb
+[I 2024-11-06 19:54:31.862 ServerApp] Saving file at /C2_W1_Lab_2_DynamoDB.ipynb
+[I 2024-11-06 19:56:32.007 ServerApp] Saving file at /C2_W1_Lab_2_DynamoDB.ipynb
+[I 2024-11-06 19:58:32.237 ServerApp] Saving file at /C2_W1_Lab_2_DynamoDB.ipynb
+[I 2024-11-06 20:00:32.453 ServerApp] Saving file at /C2_W1_Lab_2_DynamoDB.ipynb
+[I 2024-11-06 20:02:32.638 ServerApp] Saving file at /C2_W1_Lab_2_DynamoDB.ipynb
+[I 2024-11-06 20:04:32.841 ServerApp] Saving file at /C2_W1_Lab_2_DynamoDB.ipynb
+[I 2024-11-06 20:06:33.032 ServerApp] Saving file at /C2_W1_Lab_2_DynamoDB.ipynb
+[I 2024-11-06 20:08:33.278 ServerApp] Saving file at /C2_W1_Lab_2_DynamoDB.ipynb
+[I 2024-11-06 20:10:33.433 ServerApp] Saving file at /C2_W1_Lab_2_DynamoDB.ipynb
+[I 2024-11-06 20:12:33.735 ServerApp] Saving file at /C2_W1_Lab_2_DynamoDB.ipynb
+[I 2024-11-06 20:14:09.086 ServerApp] Saving file at /C2_W1_Lab_2_DynamoDB.ipynb
