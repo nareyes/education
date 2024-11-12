@@ -1,5 +1,4 @@
 filenames = [
-    'ch_01.ipynb', 
     'ch_02.ipynb',
     'ch_03.ipynb',
     'ch_04.ipynb',

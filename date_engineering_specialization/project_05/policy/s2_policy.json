@@ -1,0 +1,16 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::de-c2w1a1-471112775447-us-east-1-data-test/csv/*",
+            "Condition": {
+                "IpAddress": {
+                    "aws:SourceIp": "18.206.119.64"
+                }
+            }
+        }
+    ]
+}
