@@ -1,0 +1,27 @@
+{
+    "job_id": 971411792214430,
+    "creator_user_name": "labuser9084188_1738337208@vocareum.com",
+    "run_as_user_name": "labuser9084188_1738337208@vocareum.com",
+    "run_as_owner": true,
+    "settings": {
+      "name": "labuser9084188_1738337208_Lesson_5_Job_2",
+      "email_notifications": {},
+      "webhook_notifications": {},
+      "timeout_seconds": 0,
+      "max_concurrent_runs": 1,
+      "tasks": [
+        {
+          "task_key": "Ingest_Source_2",
+          "run_if": "ALL_SUCCESS",
+          "notebook_task": {
+            "notebook_path": "/Workspace/Users/labuser9084188_1738337208@vocareum.com/deploy-workloads-with-databricks-workflows-2.0.1/Deploy Workloads with Databricks Workflows/Task Notebooks/Lesson 5 Notebooks/Ingest Source 2",
+            "source": "WORKSPACE"
+          },
+          "timeout_seconds": 0,
+          "email_notifications": {}
+        }
+      ],
+      "format": "MULTI_TASK"
+    },
+    "created_time": 1738351809664
+  }

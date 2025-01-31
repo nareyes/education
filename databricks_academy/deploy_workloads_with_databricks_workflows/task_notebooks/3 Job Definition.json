@@ -1,0 +1,46 @@
+{
+    "job_id": 675586138890978,
+    "creator_user_name": "labuser9084188_1738337208@vocareum.com",
+    "run_as_user_name": "labuser9084188_1738337208@vocareum.com",
+    "run_as_owner": true,
+    "settings": {
+      "name": "labuser9084188_1738337208_Lesson_03",
+      "email_notifications": {
+        "no_alert_for_skipped_runs": false
+      },
+      "webhook_notifications": {},
+      "timeout_seconds": 0,
+      "trigger": {
+        "pause_status": "UNPAUSED",
+        "file_arrival": {
+          "url": "/Volumes/dbacademy/labuser9084188_1738337208/trigger_storage_location/"
+        }
+      },
+      "max_concurrent_runs": 1,
+      "tasks": [
+        {
+          "task_key": "View_New_CSV_Data",
+          "run_if": "ALL_SUCCESS",
+          "notebook_task": {
+            "notebook_path": "/Workspace/Users/labuser9084188_1738337208@vocareum.com/deploy-workloads-with-databricks-workflows-2.0.1/Deploy Workloads with Databricks Workflows/Task Notebooks/Lesson 3 Notebooks/View Baby Names",
+            "source": "WORKSPACE"
+          },
+          "timeout_seconds": 0,
+          "email_notifications": {},
+          "webhook_notifications": {}
+        }
+      ],
+      "format": "MULTI_TASK",
+      "parameters": [
+        {
+          "name": "catalog",
+          "default": "dbacademy"
+        },
+        {
+          "name": "schema",
+          "default": "labuser9084188_1738337208"
+        }
+      ]
+    },
+    "created_time": 1738339213654
+  }

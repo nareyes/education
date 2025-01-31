@@ -1,0 +1,64 @@
+{
+    "job_id": 525474721887583,
+    "creator_user_name": "labuser9084188_1738337208@vocareum.com",
+    "run_as_user_name": "labuser9084188_1738337208@vocareum.com",
+    "run_as_owner": true,
+    "settings": {
+      "name": "labuser9084188_1738337208_Lesson_02",
+      "email_notifications": {
+        "no_alert_for_skipped_runs": false
+      },
+      "webhook_notifications": {},
+      "timeout_seconds": 0,
+      "max_concurrent_runs": 1,
+      "tasks": [
+        {
+          "task_key": "Ingest_CSV",
+          "run_if": "ALL_SUCCESS",
+          "notebook_task": {
+            "notebook_path": "/Workspace/Users/labuser9084188_1738337208@vocareum.com/deploy-workloads-with-databricks-workflows-2.0.1/Deploy Workloads with Databricks Workflows/Task Notebooks/Lesson 2 Notebooks/2.01 - Ingest CSV",
+            "source": "WORKSPACE"
+          },
+          "timeout_seconds": 0,
+          "email_notifications": {},
+          "webhook_notifications": {}
+        },
+        {
+          "task_key": "Create_Invalid_Region_Table",
+          "depends_on": [
+            {
+              "task_key": "Ingest_CSV"
+            }
+          ],
+          "run_if": "ALL_SUCCESS",
+          "notebook_task": {
+            "notebook_path": "/Workspace/Users/labuser9084188_1738337208@vocareum.com/deploy-workloads-with-databricks-workflows-2.0.1/Deploy Workloads with Databricks Workflows/Task Notebooks/Lesson 2 Notebooks/2.02 - Create Invalid Region Table",
+            "source": "WORKSPACE"
+          },
+          "timeout_seconds": 0,
+          "email_notifications": {},
+          "webhook_notifications": {}
+        },
+        {
+          "task_key": "Create_Valid_Region_Table",
+          "depends_on": [
+            {
+              "task_key": "Ingest_CSV"
+            }
+          ],
+          "run_if": "ALL_SUCCESS",
+          "notebook_task": {
+            "notebook_path": "/Workspace/Users/labuser9084188_1738337208@vocareum.com/deploy-workloads-with-databricks-workflows-2.0.1/Deploy Workloads with Databricks Workflows/Task Notebooks/Lesson 2 Notebooks/2.02 - Create Valid Region Table",
+            "source": "WORKSPACE"
+          },
+          "timeout_seconds": 0,
+          "email_notifications": {}
+        }
+      ],
+      "format": "MULTI_TASK",
+      "queue": {
+        "enabled": true
+      }
+    },
+    "created_time": 1738340978254
+  }
