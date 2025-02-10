@@ -1,0 +1,33 @@
+{
+    "id": "8ffbb74a-d6c8-488d-bd5f-98cad47898e2",
+    "pipeline_type": "WORKSPACE",
+    "development": true,
+    "continuous": false,
+    "channel": "CURRENT",
+    "photon": true,
+    "libraries": [
+        {
+            "notebook": {
+                "path": "/Users/labuser9104086_1738597681@vocareum.com/build-data-pipelines-with-delta-live-tables-2.0.1/Build Data Pipelines with Delta Live Tables/2B - Python Pipelines/1 - Orders Pipeline"
+            }
+        },
+        {
+            "notebook": {
+                "path": "/Users/labuser9104086_1738597681@vocareum.com/build-data-pipelines-with-delta-live-tables-2.0.1/Build Data Pipelines with Delta Live Tables/2B - Python Pipelines/2 - Customers Pipeline"
+            }
+        },
+        {
+            "notebook": {
+                "path": "/Users/labuser9104086_1738597681@vocareum.com/build-data-pipelines-with-delta-live-tables-2.0.1/Build Data Pipelines with Delta Live Tables/2B - Python Pipelines/3L - Status Pipeline Lab"
+            }
+        }
+    ],
+    "name": "labuser9104086_1738597681: Example Pipeline",
+    "serverless": true,
+    "catalog": "dbacademy",
+    "configuration": {
+        "source": "/Volumes/dbacademy/ops/labuser9104086_1738597681@vocareum_com/stream-source"
+    },
+    "schema": "labuser9104086_1738597681",
+    "data_sampling": false
+}
